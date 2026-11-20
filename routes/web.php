@@ -1,7 +1,8 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CompetitionController;
+
 
 Route::get('/', function () {
     return view('login');
@@ -27,9 +28,18 @@ Route::get('/cari-partner', function () {
     return view('cari_partner');
 });
 
-Route::get('/cari-lomba', function () {
-    return view('cari_lomba');
-});
+Route::get('/cari-lomba', [CompetitionController::class, 'index'])
+    ->name('cari_lomba');
+
+Route::get('/cari-lomba/{id}', [CompetitionController::class, 'show'])
+    ->whereNumber('id')
+    ->name('cari_lomba.show');
+Route::post('/tambah-lomba', [LombaController::class, 'store'])
+    ->middleware('auth')
+    ->name('lomba.store');
+Route::get('/posting-lomba', function () {
+    return view('posting_lomba');
+})->name('posting-lomba');
 
 Route::get('/posting-lomba', function () {
     return view('posting_lomba');
