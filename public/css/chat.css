@@ -1,0 +1,1276 @@
+:root {
+    --deep: #850000;
+    --deep2: #990000;
+    --pink: #ce5064;
+    --cream: #fff1e2;
+    --light: #fff8f1;
+    --border: #c64242;
+    --ink: #2c1b1b;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: var(--ink);
+    background: #fbf7f2;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+}
+
+/* TOPBAR */
+.topbar {
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 0 30px;
+    background: #fff4e9;
+}
+
+/* BRAND */
+.brand {
+    width: 40px;
+    height: 44px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--deep);
+}
+
+.brand-f {
+    font-weight: 900;
+    font-size: 40px;
+    line-height: 1;
+}
+
+.brand small {
+    position: absolute;
+    top: 29px;
+    left: 13px;
+    font-size: 8px;
+    font-weight: 900;
+}
+
+/* NAVIGATION */
+.topnav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.topnav a {
+    color: #111;
+    text-decoration: none;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.topnav a:hover {
+    text-decoration: underline;
+}
+
+/* HEADER ACTIONS */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--deep);
+}
+
+.chat-head-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--deep);
+    color: white;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 19px;
+}
+
+.bell {
+    font-size: 20px;
+}
+
+.header-avatar {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--deep);
+    border-radius: 50%;
+    text-decoration: none;
+}
+
+/* PAGE LAYOUT */
+.page-shell {
+    max-width: 1200px;
+    margin: 12px auto;
+    padding: 0 20px;
+}
+
+.chat-page {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff0e1;
+    padding: 24px 12px 15px;
+    min-height: 520px;
+}
+
+/* PAGE TITLE */
+.page-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 0 23px 18px 30px;
+}
+
+.page-titlebar h1 {
+    font-size: 38px;
+    line-height: 1.2;
+    color: var(--deep);
+    letter-spacing: -1.5px;
+    margin: 0 16px 0 0;
+}
+
+/* SEARCH */
+.search-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 80px;
+    height: 39px;
+    background: #fffaf6;
+    border: 1px solid #ead5c4;
+    border-radius: 7px;
+    padding: 0 20px;
+}
+
+.search-area svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: #9d0707;
+    stroke-width: 2;
+    flex-shrink: 0;
+}
+
+.search-area input {
+    width: 100%;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: #333;
+    font-size: 12px;
+}
+
+.search-button {
+    border: 0;
+    border-bottom: 1px solid var(--deep);
+    padding: 0;
+    background: none;
+    color: var(--deep);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* MESSENGER LAYOUT */
+.messenger {
+    height: 510px;
+    display: grid;
+    grid-template-columns: minmax(250px, 34%) minmax(0, 1fr);
+    gap: 10px;
+}
+
+/* CONVERSATION PANEL */
+.conversation-panel {
+    background: var(--deep);
+    border-radius: 9px;
+    padding: 15px 8px 8px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* FILTER BAR */
+.filterbar {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    padding: 0 9px;
+}
+
+.pill,
+.filterbar select {
+    background: #fffaf5;
+    border: 0;
+    border-radius: 7px;
+    font-size: 11px;
+    color: #8e8181;
+    height: 23px;
+    padding: 0 10px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.pill.active {
+    background: #f8d2cb;
+    color: #790000;
+}
+
+.filterbar select {
+    min-width: 0;
+    flex: 1;
+    padding: 0 3px;
+    outline: none;
+}
+
+/* CONVERSATION LIST */
+.list-rule {
+    height: 2px;
+    background: #fff3ee;
+    margin: 12px 22px 5px;
+}
+
+.conversation-list {
+    overflow-y: auto;
+    min-height: 0;
+    flex: 1;
+    padding: 0 3px;
+    scrollbar-width: thin;
+    scrollbar-color: #bf7b79 #850000;
+}
+
+.conversation-item {
+    width: 100%;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    text-align: left;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 9px 12px;
+    cursor: pointer;
+    color: #fff;
+    min-height: 57px;
+}
+
+.conversation-item:hover {
+    background: #a9212b;
+}
+
+.conversation-item.active {
+    background: var(--pink);
+}
+
+.avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #fff2e3;
+    color: var(--deep);
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* CONTACT INFORMATION */
+.contact-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+}
+
+.contact-name {
+    font-weight: 700;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contact-preview {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contact-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.contact-time {
+    font-size: 10px;
+    opacity: 0.85;
+}
+
+.unread-badge {
+    background: #fff3e9;
+    color: #8a0000;
+    border-radius: 20px;
+    min-width: 19px;
+    padding: 3px 5px;
+    text-align: center;
+    font-size: 10px;
+}
+
+.no-results {
+    color: white;
+    padding: 22px 12px;
+    line-height: 1.5;
+}
+
+/* CHAT ROOM */
+.chat-room {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid #ddc8b7;
+    border-radius: 8px;
+    background: #f7efe5;
+}
+
+/* ROOM HEADER */
+.room-header {
+    height: 58px;
+    flex: 0 0 58px;
+    background: #d14f65;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+}
+
+.back-button,
+.room-menu {
+    background: none;
+    color: #fff;
+    border: 0;
+    font-size: 27px;
+    cursor: pointer;
+}
+
+.back-button {
+    line-height: 1;
+}
+
+.avatar-header {
+    width: 39px;
+    height: 39px;
+    flex-basis: 39px;
+}
+
+.room-title {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.room-title strong {
+    font-size: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.room-title span {
+    font-size: 11px;
+}
+
+.room-menu {
+    font-size: 19px;
+}
+
+/* MESSAGES AREA - BACKGROUND FIGMA */
+.messages-area {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 15px 25px;
+
+    background-color: #fff8ed;
+    background-image: url("../assets/images/backgroundChat.jpeg");
+    background-repeat: repeat;
+    background-position: center top;
+    background-size: 400px auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+
+.day-separator {
+    align-self: center;
+    background: #fff1df;
+    border-radius: 8px;
+    padding: 5px 14px;
+    font-size: 11px;
+    color: #a99a8c;
+    margin: 2px 0 5px;
+}
+
+
+/* =================================
+   MESSAGE BUBBLES - FIX JAM CHAT
+================================= */
+
+.message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    align-self: flex-start;
+    width: fit-content;
+    max-width: 77%;
+    min-width: 70px;
+
+    padding: 10px 13px 7px;
+    border-radius: 15px;
+
+    background: #F8C9D1;
+    color: #650A18;
+
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+    font-size: 14px;
+}
+
+/* PESAN KITA - PINK TUA */
+.message.mine {
+    align-self: flex-end;
+    background: #D14F65;
+    color: #FFFFFF;
+    border-bottom-right-radius: 3px;
+}
+
+/* PESAN ORANG LAIN - PINK MUDA */
+.message.theirs {
+    align-self: flex-start;
+    background: #F8C9D1;
+    color: #650A18;
+    border-bottom-left-radius: 3px;
+}
+
+/* POSISI JAM PESAN */
+.message-time {
+    display: block;
+    align-self: flex-end;
+
+    margin-top: 5px;
+    margin-left: 20px;
+
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-align: right;
+}
+
+/* JAM PESAN KITA */
+.message.mine .message-time {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* JAM PESAN ORANG LAIN */
+.message.theirs .message-time {
+    color: #8F5360;
+}
+
+
+.empty-chat {
+    margin: auto;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    background: #fffaf1b8;
+    color: #8c7771;
+}
+
+
+/* ==========================
+   MESSAGE COMPOSER
+========================== */
+
+.composer {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    min-height: 66px;
+    background: #fffaf4;
+    border-top: 1px solid #e7d6c5;
+}
+
+/* Tombol lampiran */
+.attach-button {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px;
+    border: none;
+    border-radius: 12px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.attach-button:hover {
+    background: #ffead9;
+}
+
+.attach-icon {
+    width: 27px;
+    height: 27px;
+    display: block;
+    object-fit: contain;
+}
+
+/* Kolom mengetik pesan */
+.composer input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    height: 43px;
+    padding: 0 17px;
+    border: 1px solid #efd9c7;
+    border-radius: 24px;
+    outline: none;
+    background: #ffecd9;
+    color: #442525;
+    font-size: 14px;
+}
+
+.composer input:focus {
+    border-color: #ce5064;
+    box-shadow: 0 0 0 3px rgba(206,80,100,0.10);
+}
+
+/* Tombol kirim */
+.send-button {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #78001d;
+    color: #ffffff;
+    cursor: pointer;
+    transform: none;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.send-button svg {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.send-button:hover {
+    background: #a51b3d;
+    transform: translateY(-1px);
+}
+
+.send-button:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 480px) {
+    .composer {
+        gap: 7px;
+        padding: 8px;
+    }
+
+    .attach-button,
+    .send-button {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+    }
+}
+
+/* RESPONSIVE - MOBILE */
+@media (max-width: 760px) {
+    .topbar {
+        padding: 0 14px;
+        gap: 8px;
+    }
+
+    .topnav {
+        overflow-x: auto;
+        gap: 14px;
+    }
+
+    .topnav a {
+        font-size: 11px;
+    }
+
+    .header-actions {
+        display: none;
+    }
+
+    .page-shell {
+        padding: 0 8px;
+    }
+
+    .chat-page {
+        padding: 13px 8px;
+    }
+
+    .page-titlebar {
+        margin: 0 3px 15px;
+        gap: 8px;
+    }
+
+    .page-titlebar h1 {
+        font-size: 28px;
+        margin: 0 5px;
+    }
+
+    .search-area {
+        padding: 0 9px;
+    }
+
+    .search-button {
+        font-size: 14px;
+    }
+
+    .messenger {
+        height: calc(100dvh - 180px);
+        min-height: 420px;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .conversation-panel {
+        display: flex;
+    }
+
+    .chat-room {
+        display: none;
+    }
+
+    .messenger.room-open .conversation-panel {
+        display: none;
+    }
+
+    .messenger.room-open .chat-room {
+        display: flex;
+    }
+}
+
+/* RESPONSIVE - DESKTOP */
+@media (min-width: 761px) {
+    .back-button {
+        visibility: hidden;
+        width: 0;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+/* Background logo FUB */
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background-color: #FCEBD9;
+    border-radius: 10px;
+}
+
+/* Pesan dari orang lain */
+.message.incoming,
+.message.received {
+    background-color: #F8C9D1;
+    color: #650A18;
+}
+
+/* Pesan yang kita kirim */
+.message.outgoing,
+.message.sent {
+    background-color: #D54C63;
+    color: #FFFFFF;
+}
+
+/* LOGO FINS NAVBAR */
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 5px;
+    background-color: #FCEBD9;
+    border-radius: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.brand-logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* PERBESAR HALAMAN CHAT */
+.page-shell {
+    max-width: 1450px;
+    width: 96%;
+    margin: 12px auto;
+    padding: 0 12px;
+}
+
+.chat-page {
+    padding: 20px 14px 16px;
+}
+
+/* Perbesar ruang chat */
+@media (min-width: 761px) {
+    .messenger {
+        height: min(680px, calc(100vh - 245px));
+        min-height: 510px;
+        grid-template-columns: minmax(300px, 34%) minmax(0, 1fr);
+        gap: 12px;
+    }
+}
+
+/* PERBESAR KONTEN CHAT */
+.conversation-item {
+    min-height: 65px;
+    padding: 11px 14px;
+}
+
+.contact-name {
+    font-size: 14px;
+}
+
+.contact-preview {
+    font-size: 12px;
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    font-size: 13px;
+}
+
+.message {
+    font-size: 15px;
+    padding: 12px 15px 9px;
+}
+
+.room-title strong {
+    font-size: 20px;
+}
+
+.composer input {
+    font-size: 14px;
+}
+
+
+/* FILE ATTACHMENT IN CHAT */
+.message-attachment {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 320px;
+    max-width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.16);
+    color: inherit;
+    text-decoration: none;
+}
+
+.message-attachment:hover {
+    background: rgba(255, 255, 255, 0.24);
+}
+
+.attachment-file-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.attachment-file-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    flex: 1;
+    min-width: 0;
+}
+
+.attachment-file-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.attachment-file-size {
+    display: block;
+    font-size: 11px;
+    opacity: 0.85;
+    line-height: 1.2;
+}
+
+.attachment-download {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.message-attachment:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.attachment-file-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+}
+
+.attachment-file-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.attachment-file-name {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.attachment-file-size {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.attachment-download {
+    font-size: 30px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.attach-button:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+
+/* TOMBOL BUAT GRUP */
+.create-group-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    width: calc(100% - 18px);
+    min-height: 38px;
+    margin: 12px 9px 0;
+    padding: 9px 14px;
+
+    background: #CE5064;
+    border: 1px solid #E28B99;
+    border-radius: 8px;
+
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+}
+
+.create-group-btn:hover {
+    background: #E06378;
+}
+
+.create-group-btn span {
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+/* GARIS PEMISAH */
+.conversation-panel .list-rule {
+    flex-shrink: 0;
+    margin: 12px 22px 8px;
+}
+
+
+/* ===================================
+   POPUP BUAT GRUP - FINS UB
+=================================== */
+
+/* Background gelap saat popup dibuka */
+.group-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    background: rgba(35, 0, 8, 0.55);
+}
+
+/* Penting: sembunyikan popup ketika ditutup */
+.group-overlay[hidden] {
+    display: none;
+}
+
+/* Kotak popup */
+.group-modal {
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+
+    padding: 25px;
+    background: #FFF8F1;
+    border-radius: 16px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+}
+
+/* Header popup */
+.group-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.group-modal-header h2 {
+    margin: 0;
+    color: #850000;
+    font-size: 23px;
+}
+
+.group-modal-header button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    background: #F8C9D1;
+    border: none;
+    border-radius: 50%;
+
+    color: #850000;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* Form */
+#createGroupForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#createGroupForm > label {
+    color: #850000;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#createGroupForm > input {
+    width: 100%;
+    height: 43px;
+    padding: 0 13px;
+
+    border: 1px solid #EAD5C4;
+    border-radius: 9px;
+    background: #FFFFFF;
+
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+}
+
+#createGroupForm > input:focus {
+    border-color: #CE5064;
+}
+
+/* Daftar anggota */
+.group-member-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    max-height: 220px;
+    overflow-y: auto;
+
+    padding: 8px;
+    background: #FFFFFF;
+    border: 1px solid #EAD5C4;
+    border-radius: 10px;
+}
+
+.group-member-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.group-member-item:hover {
+    background: #FFF0E8;
+}
+
+.group-member-item input {
+    width: 17px;
+    height: 17px;
+    accent-color: #CE5064;
+    cursor: pointer;
+}
+
+.group-member-item span {
+    color: #4A2727;
+    font-size: 13px;
+}
+
+/* Tombol buat grup */
+.group-submit-btn {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 10px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #850000;
+    color: #FFFFFF;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.group-submit-btn:hover {
+    background: #A91A2C;
+}
+
+/* PENGUMUMAN SISTEM GRUP */
+.system-announcement {
+    align-self: center;
+    width: fit-content;
+    max-width: 85%;
+
+    padding: 6px 14px;
+    margin: 5px 0;
+
+    background: #FFF1DF;
+    color: #9B7068;
+
+    border-radius: 9px;
+
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+
+/* MENU PERCAKAPAN */
+.room-menu-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.room-dropdown[hidden] {
+    display: none;
+}
+
+.room-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 100;
+    width: 210px;
+    padding: 7px;
+
+    background: #FFF8F1;
+    border: 1px solid #EAD5C4;
+    border-radius: 10px;
+
+    box-shadow: 0 8px 24px rgba(50, 0, 0, 0.16);
+}
+
+.delete-chat-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 11px 12px;
+    border: none;
+    border-radius: 7px;
+
+    background: transparent;
+    color: #B52E42;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.delete-chat-option:hover {
+    background: #FCE4E7;
+}
+
+/* Pastikan dropdown tidak terpotong */
+.room-header {
+    position: relative;
+    z-index: 2;
+}
+
+/* ===================================
+   POPUP KONFIRMASI HAPUS CHAT
+=================================== */
+
+.delete-confirm-overlay[hidden] {
+    display: none;
+}
+
+.delete-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    background: rgba(35, 0, 8, 0.55);
+}
+
+.delete-confirm-modal {
+    width: 100%;
+    max-width: 420px;
+
+    background: #FFF8F1;
+    border-radius: 16px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+
+    padding: 24px;
+}
+
+.delete-confirm-header h2 {
+    margin: 0 0 14px;
+    color: #850000;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.delete-confirm-body p {
+    margin: 0;
+    color: #4A2727;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.delete-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.delete-cancel-btn,
+.delete-confirm-btn {
+    min-width: 96px;
+    height: 42px;
+    border: none;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.delete-cancel-btn {
+    background: #F4D7C7;
+    color: #7A3C2A;
+}
+
+.delete-cancel-btn:hover {
+    background: #efcbb6;
+}
+
+.delete-confirm-btn {
+    background: #A85A1A;
+    color: #FFFFFF;
+}
+
+.delete-confirm-btn:hover {
+    background: #8d4b14;
+}

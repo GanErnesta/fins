@@ -1,0 +1,160 @@
+/* Navbar FINS: terisolasi dari CSS halaman lainnya. */
+.fins-header,
+.fins-header * { box-sizing: border-box; }
+
+.fins-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    background: #860000;
+    box-shadow: 0 2px 12px rgba(0,0,0,.10);
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+.fins-header__inner {
+    width: 100%;
+    max-width: 1440px;
+    min-height: 72px;
+    margin: 0 auto;
+    padding: 0 46px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+}
+
+.fins-header__brand {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 2px;
+    color: #fff;
+    text-decoration: none;
+    line-height: 1;
+}
+.fins-header__brand-f { font-size: 39px; font-weight: 800; }
+.fins-header__brand-ub { font-size: 11px; font-weight: 800; margin-top: 5px; }
+
+.fins-header__nav {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+.fins-header__nav a {
+    position: relative;
+    padding: 26px 0;
+    color: rgba(255,255,255,.85);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color .2s ease;
+}
+.fins-header__nav a:hover,
+.fins-header__nav a.active { color: #fff; }
+.fins-header__nav a.active { font-weight: 700; }
+.fins-header__nav a.active::after {
+    content: '';
+    position: absolute;
+    bottom: 18px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: #fff;
+}
+
+.fins-header__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+    flex-shrink: 0;
+}
+.fins-header__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 6px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    list-style: none;
+    transition: background .2s ease;
+}
+.fins-header__icon:hover { background: rgba(255,255,255,.16); }
+.fins-header__icon svg { display: block; width: 21px; height: 21px; }
+.fins-header__notification { position: relative; }
+.fins-header__notification summary::-webkit-details-marker { display: none; }
+.fins-header__dropdown {
+    position: absolute;
+    top: 45px;
+    right: -48px;
+    width: 260px;
+    padding: 16px;
+    background: #fff;
+    color: #252525;
+    border: 1px solid #ededed;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.15);
+}
+.fins-header__dropdown strong { font-size: 14px; }
+.fins-header__dropdown p { margin: 10px 0 0; font-size: 12px; color: #666; }
+
+.fins-header__profile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 36px;
+    height: 36px;
+    margin-left: 5px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f2f2f2;
+    flex-shrink: 0;
+}
+.fins-header__profile img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media (max-width: 1050px) {
+    .fins-header__inner { padding: 0 22px; gap: 20px; }
+    .fins-header__nav { gap: 16px; }
+    .fins-header__nav a { font-size: 12px; }
+    .fins-header__actions { gap: 7px; }
+}
+@media (max-width: 760px) {
+    .fins-header__inner {
+        min-height: 62px;
+        padding: 10px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .fins-header__brand { order: 1; }
+    .fins-header__brand-f { font-size: 31px; }
+    .fins-header__actions { order: 2; margin-left: auto; }
+    .fins-header__nav {
+        order: 3;
+        flex: 0 0 100%;
+        justify-content: flex-start;
+        gap: 20px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .fins-header__nav::-webkit-scrollbar { display: none; }
+    .fins-header__nav a { padding: 10px 0; }
+    .fins-header__nav a.active::after { bottom: 2px; }
+    .fins-header__dropdown { right: -44px; max-width: 85vw; }
+}
