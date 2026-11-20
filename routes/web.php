@@ -1,7 +1,7 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LombaSayaController;
 
 Route::get('/', function () {
     return view('login');
@@ -35,9 +35,11 @@ Route::get('/posting-lomba', function () {
     return view('posting_lomba');
 });
 
-Route::get('/lomba-saya', function () {
-    return view('lomba_saya');
-});
+
+Route::get('/lomba-saya', [
+    LombaSayaController::class, 'index'
+])->name('lomba_saya');
+
 
 Route::get('/chat', function () {
     return view('chat');
