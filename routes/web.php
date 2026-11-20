@@ -1,10 +1,11 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\CompetitionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,13 +25,11 @@ Route::get('/', function () {
 
 Route::middleware('guest')->group(function () {
 
-    // Halaman Login
     Route::get('/login', [
         LoginController::class,
         'showLogin'
     ])->name('login');
 
-    // Proses Login menggunakan NIM dan Password
     Route::post('/login', [
         LoginController::class,
         'login'
@@ -46,20 +45,16 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('guest')->group(function () {
 
-    // Menampilkan Halaman Sign Up
     Route::get('/signup', [
         SignupController::class,
         'showSignup'
     ])->name('signup');
 
-    // Step 1 - Nama, NIM, Fakultas, Program Studi
     Route::post('/signup/step-1', [
         SignupController::class,
         'step1'
     ])->name('signup.step1');
 
-    // Step 2 - Email, Password, Konfirmasi Password
-    // SignupController mengirim OTP ke email asli
     Route::post('/signup/step-2', [
         SignupController::class,
         'step2'
@@ -75,27 +70,25 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('guest')->group(function () {
 
-    // Menampilkan halaman input OTP
+    // Halaman verifikasi
     Route::get('/verification', [
         VerificationController::class,
         'show'
     ])->name('verification');
 
-    // Memeriksa OTP
-    // Jika berhasil, VerificationController
-    // menyimpan akun ke database Supabase
+    // Proses verifikasi OTP
     Route::post('/verification', [
         VerificationController::class,
         'verify'
     ])->name('verification.verify');
 
-    // Mengirim ulang OTP ke email mahasiswa
+    // Kirim ulang OTP
     Route::post('/verification/resend', [
         VerificationController::class,
         'resend'
     ])->name('verification.resend');
 
-    // Halaman Verifikasi Berhasil
+    // Verifikasi berhasil
     Route::get('/verification-success', function () {
 
         if (!session('account_verified')) {
@@ -106,7 +99,7 @@ Route::middleware('guest')->group(function () {
 
     })->name('verification-success');
 
-    // Halaman Verifikasi Gagal
+    // Verifikasi gagal
     Route::get('/verification-failed', function () {
         return view('verification-failed');
     })->name('verification-failed');
@@ -144,7 +137,7 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | FITUR CARI PARTNER
+    | CARI PARTNER
     |--------------------------------------------------------------------------
     */
 
@@ -154,28 +147,52 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | FITUR PERLOMBAAN
+    | CARI LOMBA
     |--------------------------------------------------------------------------
     */
 
-    // Cari Lomba
-    Route::get('/cari-lomba', function () {
-        return view('cari_lomba');
-    })->name('cari-lomba');
+    // Daftar kompetisi
+    Route::get('/cari-lomba', [
+        CompetitionController::class,
+        'index'
+    ])->name('cari-lomba');
 
-    // Posting Lomba
+    // Detail kompetisi
+    Route::get('/cari-lomba/{id}', [
+        CompetitionController::class,
+        'show'
+    ])->whereNumber('id')->name('cari_lomba.show');
+
+    /*
+    |--------------------------------------------------------------------------
+    | POSTING LOMBA
+    |--------------------------------------------------------------------------
+    */
+
+    // Halaman posting
     Route::get('/posting-lomba', function () {
         return view('posting_lomba');
     })->name('posting-lomba');
 
-    // Lomba Saya
+    // Menyimpan posting lomba
+    Route::post('/tambah-lomba', [
+        CompetitionController::class,
+        'store'
+    ])->name('lomba.store');
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOMBA SAYA
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/lomba-saya', function () {
         return view('lomba_saya');
     })->name('lomba-saya');
 
     /*
     |--------------------------------------------------------------------------
-    | FITUR CHAT
+    | CHAT
     |--------------------------------------------------------------------------
     */
 
