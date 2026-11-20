@@ -8,28 +8,26 @@
 
     <title>Posting Lomba | FINS UB</title>
 
-    <!-- CSS terbaru -->
-    <link rel="stylesheet" href="{{ asset('css/posting_lomba.css') }}?v=5">
+    <link rel="stylesheet"
+          href="{{ asset('css/posting_lomba.css') }}?v=8">
 
-    <!-- JavaScript -->
-    <script src="{{ asset('js/posting_lomba.js') }}" defer></script>
+    <script src="{{ asset('js/posting_lomba.js') }}?v=8"
+            defer></script>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
+<!-- ================= NAVBAR ================= -->
 <header class="navbar">
 
-    <!-- Logo Kiri -->
-    <a href="{{ url('/home') }}" class="navbar-logo"
-       aria-label="FINS UB - Beranda">
+    <a href="{{ url('/home') }}"
+       class="navbar-logo"
+       aria-label="FINS UB">
         <span class="logo-f">F</span>
         <small class="logo-ub">UB</small>
     </a>
 
-    <!-- Menu Tengah -->
-    <nav class="nav-links" aria-label="Navigasi utama">
-
+    <nav class="nav-links">
         <a href="{{ url('/home') }}">Beranda</a>
 
         <a href="{{ url('/cari-lomba') }}" class="active">
@@ -43,10 +41,8 @@
         <a href="{{ url('/lomba-saya') }}">
             Lomba Saya
         </a>
-
     </nav>
 
-    <!-- Ikon Kanan -->
     <div class="nav-actions">
 
         <!-- Chat -->
@@ -62,15 +58,14 @@
                  stroke-linecap="round"
                  stroke-linejoin="round"
                  aria-hidden="true">
-
                 <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8
                          8.5 8.5 0 0 1-7.6 4.7
-                         8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7
+                         8.38 8.38 0 0 1-3.8-.9
+                         L3 21l1.9-5.7
                          a8.38 8.38 0 0 1-.9-3.8
                          8.5 8.5 0 0 1 4.7-7.6
-                         8.38 8.38 0 0 1-.9-3.8
-                         h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-
+                         8.38 8.38 0 0 1 3.8-.9h.5
+                         a8.48 8.48 0 0 1 8 8v.5z"/>
                 <path d="M8 10h8M8 14h5"/>
             </svg>
         </a>
@@ -88,11 +83,9 @@
                  stroke-linecap="round"
                  stroke-linejoin="round"
                  aria-hidden="true">
-
                 <path d="M18 8a6 6 0 0 0-12 0
                          c0 7-3 7-3 9h18
                          c0-2-3-2-3-9"/>
-
                 <path d="M10 21h4"/>
             </svg>
 
@@ -102,9 +95,7 @@
         <!-- Profil -->
         <a href="{{ url('/profile') }}"
            class="profile-logo"
-           title="Profil"
-           aria-label="Profil">
-
+           title="Profil">
             <span>F</span>
             <small>UB</small>
         </a>
@@ -112,7 +103,7 @@
     </div>
 </header>
 
-<!-- HEADER HALAMAN -->
+<!-- ================= HEADER ================= -->
 <section class="page-heading">
     <div class="container">
 
@@ -120,26 +111,25 @@
             Kolaborasi & Rekrutmen Tim
         </p>
 
-        <h1>
-            Buat Postingan Pencarian Anggota Tim
-        </h1>
+        <h1>Buat Postingan Pencarian Anggota Tim</h1>
 
         <p class="heading-description">
-            Publikasikan kebutuhan formasi tim lomba Anda agar mahasiswa
-            Universitas Brawijaya yang memiliki skill relevan dapat
-            mengajukan diri atau Anda ajak secara langsung.
+            Publikasikan kebutuhan formasi tim lomba Anda
+            agar mahasiswa Universitas Brawijaya yang
+            memiliki skill relevan dapat mengajukan diri
+            atau Anda ajak secara langsung.
         </p>
 
     </div>
 </section>
 
-<!-- KONTEN UTAMA -->
+<!-- ================= KONTEN ================= -->
 <main class="container main-layout">
 
-    <!-- FORM KIRI -->
     <form
-        action="{{ route('posting_lomba.store') }}"
+        action="{{ route('posting-lomba.store') }}"
         method="POST"
+        enctype="multipart/form-data"
         id="postingForm"
         class="form-container"
     >
@@ -153,11 +143,16 @@
 
         @if($errors->any())
             <div class="alert-error">
-                {{ $errors->first() }}
+                <strong>Periksa data berikut:</strong>
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 
-        <!-- SECTION 1 -->
+        <!-- ================= BAGIAN 1 ================= -->
         <div class="section-title">
             <span class="step-number">1</span>
             <h2>Informasi Perlombaan</h2>
@@ -165,86 +160,206 @@
 
         <div class="form-section">
 
+            <!-- JENIS POSTINGAN -->
             <div class="form-group">
-                <label for="nama_lomba">
-                    Nama Lomba / Kompetisi <span>*</span>
+                <label>
+                    Pilih Jenis Postingan <span>*</span>
                 </label>
 
-                <input
-                    type="text"
-                    id="nama_lomba"
-                    name="nama_lomba"
-                    value="{{ old('nama_lomba') }}"
-                    placeholder="Contoh : Divisi UX 2026"
-                    maxlength="150"
-                    required
-                >
-            </div>
+                <div class="mode-options">
 
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label for="kategori">
-                        Kategori Perlombaan
+                    <label class="mode-option">
+                        <input
+                            type="radio"
+                            name="mode_lomba"
+                            value="existing"
+                            @checked(old('mode_lomba', 'existing') === 'existing')
+                        >
+                        <span>Gunakan Lomba yang Sudah Ada</span>
                     </label>
 
-                    <select id="kategori" name="kategori" required>
-                        <option value="">Pilih kategori</option>
+                    <label class="mode-option">
+                        <input
+                            type="radio"
+                            name="mode_lomba"
+                            value="new"
+                            @checked(old('mode_lomba') === 'new')
+                        >
+                        <span>Buat Lomba Baru</span>
+                    </label>
 
-                        @foreach([
-                            'Teknologi & AI',
-                            'UI/UX Design',
-                            'Business Plan',
-                            'Karya Tulis Ilmiah',
-                            'Robotika',
-                            'Hackathon',
-                            'Lainnya'
-                        ] as $kategori)
+                </div>
+            </div>
 
-                            <option value="{{ $kategori }}"
-                                @selected(old('kategori') === $kategori)>
-                                {{ $kategori }}
+            <!-- LOMBA DARI SUPABASE -->
+            <div id="existingLombaFields">
+
+                <div class="form-group">
+                    <label for="cari_lomba_id">
+                        Pilih Kompetisi <span>*</span>
+                    </label>
+
+                    <select
+                        id="cari_lomba_id"
+                        name="cari_lomba_id"
+                    >
+                        <option value="">
+                            -- Pilih Lomba --
+                        </option>
+
+                        @foreach($lombas as $item)
+                            <option
+                                value="{{ $item->id }}"
+                                data-title="{{ $item->title }}"
+                                data-category="{{ $item->category }}"
+                                data-organizer="{{ $item->organizer }}"
+                                data-deadline="{{ $item->deadline }}"
+                                data-image="{{ $item->image ? (filter_var($item->image, FILTER_VALIDATE_URL) ? $item->image : asset(ltrim($item->image, '/'))) : '' }}"
+                                @selected(old('cari_lomba_id') == $item->id)
+                            >
+                                {{ $item->title }} - {{ $item->organizer }}
                             </option>
-
                         @endforeach
+
                     </select>
                 </div>
 
+                <p class="field-hint">
+                    Daftar kompetisi diambil dari database
+                    Cari Lomba di Supabase.
+                </p>
+
+                @if($lombas->isEmpty())
+                    <p class="position-error">
+                        Belum ada lomba di database.
+                        Silakan pilih Buat Lomba Baru.
+                    </p>
+                @endif
+
+            </div>
+
+            <!-- MEMBUAT LOMBA BARU -->
+            <div id="newLombaFields" hidden>
+
                 <div class="form-group">
-                    <label for="penyelenggara">
-                        Penyelenggara
+                    <label for="nama_lomba">
+                        Nama Lomba / Kompetisi <span>*</span>
                     </label>
 
                     <input
                         type="text"
-                        id="penyelenggara"
-                        name="penyelenggara"
-                        value="{{ old('penyelenggara') }}"
-                        placeholder="Contoh : Kemendikbud / Puspresnas"
+                        id="nama_lomba"
+                        name="nama_lomba"
+                        value="{{ old('nama_lomba') }}"
+                        placeholder="Contoh: National UI UX Creative Challenge 2027"
                         maxlength="150"
-                        required
+                    >
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label for="kategori">
+                            Kategori Perlombaan <span>*</span>
+                        </label>
+
+                        <select id="kategori" name="kategori">
+                            <option value="">Pilih Kategori</option>
+
+                            @foreach([
+                                'Teknologi dan AI',
+                                'PKM Kemendikbud',
+                                'Business Plan & Case',
+                                'UI/UX & Desain',
+                                'Essay',
+                                'Hackathon',
+                                'Poster'
+                            ] as $kategori)
+
+                                <option
+                                    value="{{ $kategori }}"
+                                    @selected(old('kategori') === $kategori)
+                                >
+                                    {{ $kategori }}
+                                </option>
+
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="penyelenggara">
+                            Penyelenggara <span>*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="penyelenggara"
+                            name="penyelenggara"
+                            value="{{ old('penyelenggara') }}"
+                            placeholder="Contoh: Universitas Brawijaya"
+                            maxlength="150"
+                        >
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="deadline" class="larger-label">
+                        Batas Akhir / Deadline Pendaftaran
+                    </label>
+
+                    <input
+                        type="date"
+                        id="deadline"
+                        name="deadline"
+                        value="{{ old('deadline') }}"
                     >
                 </div>
 
             </div>
 
-            <div class="form-group">
-                <label for="deadline" class="larger-label">
-                    Batas Akhir / Deadline Pendaftaran
+            <!-- ================= UPLOAD GAMBAR ================= -->
+            <div class="form-group poster-upload-group">
+
+                <label for="image">
+                    Upload Gambar / Poster Lomba
                 </label>
 
-                <input
-                    type="date"
-                    id="deadline"
-                    name="deadline"
-                    value="{{ old('deadline') }}"
-                    required
-                >
+                <div class="poster-upload-box">
+
+                    <div class="poster-upload-icon">▧</div>
+
+                    <p>Tambahkan poster untuk postingan lomba</p>
+
+                    <span>
+                        Pilih gambar dari perangkat kamu
+                    </span>
+
+                    <input
+                        type="file"
+                        id="image"
+                        name="image"
+                        accept=".jpg,.jpeg,.png,.webp"
+                    >
+
+                    <small>
+                        JPG, PNG, WEBP • Maksimal 2 MB
+                    </small>
+
+                </div>
+
+                @error('image')
+                    <p class="position-error">
+                        {{ $message }}
+                    </p>
+                @enderror
+
             </div>
 
         </div>
 
-        <!-- SECTION 2 -->
+        <!-- ================= BAGIAN 2 ================= -->
         <div class="section-title">
             <span class="step-number">2</span>
             <h2>Deskripsi Tim & Ekspektasi</h2>
@@ -262,7 +377,7 @@
                     name="deskripsi"
                     rows="4"
                     maxlength="3000"
-                    placeholder="Jelaskan gagasan atau fokus produk/karya yang akan diangkat tim anda..."
+                    placeholder="Jelaskan ide, konsep karya, atau rencana tim yang akan mengikuti kompetisi..."
                     required
                 >{{ old('deskripsi') }}</textarea>
             </div>
@@ -277,14 +392,14 @@
                     id="target"
                     name="target"
                     maxlength="300"
-                    value="{{ old('target', 'Target lolos ke babak final & meraih juara di tingkat nasional.') }}"
+                    value="{{ old('target', 'Target lolos ke babak final dan meraih juara tingkat nasional.') }}"
                     required
                 >
             </div>
 
         </div>
 
-        <!-- SECTION 3 -->
+        <!-- ================= BAGIAN 3 ================= -->
         <div class="section-title">
             <span class="step-number">3</span>
             <h2>Posisi & Keahlian yang Dicari</h2>
@@ -292,8 +407,10 @@
 
         <div class="form-section final-section">
 
-            <!-- LIST POSISI -->
-            <div id="positionsList" class="positions-list"></div>
+            <div
+                id="positionsList"
+                class="positions-list"
+            ></div>
 
             <!-- TAMBAH POSISI -->
             <div class="add-position-box">
@@ -305,7 +422,7 @@
                     <input
                         type="text"
                         id="newRole"
-                        placeholder="Nama Peran : (misal data analisis)"
+                        placeholder="Nama peran, contoh: UI/UX Designer"
                         maxlength="100"
                     >
 
@@ -315,7 +432,7 @@
                         min="1"
                         max="30"
                         value="1"
-                        aria-label="Jumlah orang"
+                        aria-label="Jumlah anggota"
                     >
 
                 </div>
@@ -323,7 +440,7 @@
                 <input
                     type="text"
                     id="newSkills"
-                    placeholder="Keahlian yang dibutuhkan"
+                    placeholder="Skill: Figma, Wireframing, Research"
                     maxlength="500"
                 >
 
@@ -335,9 +452,17 @@
                     Tambahkan Posisi Ini
                 </button>
 
-                <p id="positionError" class="position-error"></p>
+                <p
+                    id="positionError"
+                    class="position-error"
+                ></p>
 
             </div>
+
+            <p class="total-team-info">
+                Total anggota yang dicari:
+                <strong id="totalTeamText">0 orang</strong>
+            </p>
 
             <!-- KANAL DISKUSI -->
             <div class="form-group channel-group">
@@ -349,24 +474,27 @@
                     type="text"
                     id="kanal_diskusi"
                     name="kanal_diskusi"
-                    value="{{ old('kanal_diskusi', 'Chat Fins/Grup WA Tim') }}"
+                    value="{{ old('kanal_diskusi', 'Chat FINS / Grup WhatsApp Tim') }}"
                     maxlength="255"
                     required
                 >
             </div>
 
-            <!-- INPUT POSISI DATABASE -->
+            <!-- INPUT HIDDEN POSISI -->
             <div id="positionHiddenInputs"></div>
 
-            <!-- TOMBOL SIMPAN -->
-            <button type="submit" class="publish-btn">
+            <button
+                type="submit"
+                class="publish-btn"
+            >
                 ➤ &nbsp; Publikasikan Postingan
             </button>
 
         </div>
+
     </form>
 
-    <!-- LIVE PREVIEW KANAN -->
+    <!-- ================= LIVE PREVIEW ================= -->
     <aside class="preview-section">
 
         <p class="preview-label">
@@ -377,14 +505,43 @@
 
             <div class="preview-top">
 
-                <span class="category-badge" id="previewCategory">
-                    Teknologi & AI
+                <span
+                    class="category-badge"
+                    id="previewCategory"
+                >
+                    Kategori Lomba
                 </span>
 
                 <span class="deadline-text">
                     Deadline:
                     <span id="previewDeadline">—</span>
                 </span>
+
+            </div>
+
+            <!-- PREVIEW POSTER -->
+            <div class="preview-poster" id="previewPosterBox">
+
+                <img
+                    id="previewPoster"
+                    alt="Pratinjau poster lomba"
+                    hidden
+                >
+
+                <div id="previewPosterPlaceholder"
+                     class="preview-poster-placeholder">
+
+                    <span>FINS COMPETITION</span>
+
+                    <strong>
+                        Poster Perlombaan
+                    </strong>
+
+                    <small>
+                        Gambar lomba akan ditampilkan di sini
+                    </small>
+
+                </div>
 
             </div>
 
@@ -395,28 +552,34 @@
             <p class="preview-organizer">
                 Penyelenggara:
                 <span id="previewOrganizer">
-                    Puspresnas / Balai Prestasi UB
+                    Belum dipilih
                 </span>
             </p>
 
-            <div class="preview-description" id="previewDescription">
-                Eduact Competition 2026
+            <div
+                class="preview-description"
+                id="previewDescription"
+            >
+                Deskripsi perlombaan dan ide tim
+                akan muncul di sini.
             </div>
 
             <p class="preview-target">
                 <strong>Target:</strong>
                 <span id="previewTarget">
-                    Target lolos ke babak final & meraih juara
-                    di tingkat nasional.
+                    Target tim belum ditentukan.
                 </span>
             </p>
 
             <h3 class="preview-position-title">
                 Formasi yang Dicari
-                (<span id="previewCount">2</span> orang):
+                (<span id="previewCount">0</span> orang):
             </h3>
 
-            <div id="previewPositions" class="preview-positions"></div>
+            <div
+                id="previewPositions"
+                class="preview-positions"
+            ></div>
 
         </div>
 
@@ -424,7 +587,7 @@
 
 </main>
 
-<!-- FOOTER -->
+<!-- ================= FOOTER ================= -->
 <footer class="footer">
 
     <div class="container footer-grid">
@@ -436,10 +599,11 @@
             </div>
 
             <p>
-                Find Your Skills Partner - Ekosistem kolaborasi
-                mahasiswa Universitas Brawijaya untuk menemukan
-                tim lomba lintas fakultas dan berprestasi di
-                kancah nasional maupun internasional.
+                Find Your Skills Partner - Ekosistem
+                kolaborasi mahasiswa Universitas Brawijaya
+                untuk menemukan tim lomba lintas fakultas
+                dan berprestasi di kancah nasional
+                maupun internasional.
             </p>
 
             <p>
@@ -454,12 +618,12 @@
             <h3>KATEGORI KOMPETISI</h3>
 
             <p>
-                Puspresnas Gemastik & Satria Data<br>
+                Puspresnas Gemastik &amp; Satria Data<br>
                 Program Kreativitas Mahasiswa<br>
-                Business Plan & Case Competition<br>
+                Business Plan &amp; Case Competition<br>
                 Karya Tulis Ilmiah<br>
-                UI/UX Design & Software Development<br>
-                Robotic cup<br>
+                UI/UX Design &amp; Software Development<br>
+                Robotic Cup<br>
                 Hackathon Competition
             </p>
 
@@ -470,16 +634,16 @@
             <h3>RUMPUN FAKULTAS</h3>
 
             <p>
-                Menghubungkan mahasiswa FILKOM, FEB, FT, FIA,
-                FK, FTP, FISIP, FMIPA, FP, FH, dan FIB
-                dalam satu sinergi juara
+                Menghubungkan mahasiswa FILKOM, FEB, FT,
+                FIA, FK, FTP, FISIP, FMIPA, FP, FH
+                dan FIB dalam satu sinergi juara.
             </p>
 
             <p>
-                <strong class="tips">Tips Juara :</strong>
-                Tim multidisiplin (Teknologi + Bisnis + Riset)
-                memiliki tingkat lolos 2–3x lebih tinggi
-                di ajang bergengsi.
+                <strong class="tips">Tips Juara:</strong>
+                Tim multidisiplin Teknologi, Bisnis,
+                dan Riset dapat membantu memperkuat
+                kolaborasi dan inovasi.
             </p>
 
         </div>
@@ -488,7 +652,7 @@
 
 </footer>
 
-<!-- Data posisi setelah validasi gagal -->
+<!-- DATA POSISI DARI VALIDASI LARAVEL -->
 <script id="oldPositionsData" type="application/json">
     @json(old('positions'))
 </script>

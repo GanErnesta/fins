@@ -1,20 +1,30 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Cari Lomba | Find Your Skills Partner</title>
-    <link rel="stylesheet" href="{{ asset('css/cari_lomba.css') }}?v=40">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ asset('css/cari_lomba.css') }}?v=41">
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}?v=1">
+
+    <!-- JavaScript -->
     <script src="{{ asset('js/cari_lomba.js') }}?v=40" defer></script>
 </head>
+
 <body>
 
+    <!-- NAVBAR -->
     @include('components.navbar')
 
     <main class="page">
 
+        <!-- HEADER -->
         <section class="intro">
+
             <div>
                 <div class="eyebrow">
                     DIREKTORI KOMPETISI MAHASISWA
@@ -29,17 +39,33 @@
                 </p>
             </div>
 
-            <span class="result-count" id="result-count" aria-live="polite">
-                Menampilkan {{ $lomba->count() }} dari {{ $lomba->count() }} ajang lomba
+            <span
+                class="result-count"
+                id="result-count"
+                aria-live="polite"
+            >
+                Menampilkan {{ $lomba->count() }}
+                dari {{ $lomba->count() }} ajang lomba
             </span>
+
         </section>
 
+        <!-- NOTIFIKASI BERHASIL -->
+        @if(session('success'))
+            <div class="posting-success" role="alert">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <!-- FILTER LOMBA -->
         <section class="filter-panel">
 
             <div class="filters-row">
 
+                <!-- Search -->
                 <label class="search-box">
                     <span aria-hidden="true">⌕</span>
+
                     <input
                         type="search"
                         id="search"
@@ -48,15 +74,24 @@
                     >
                 </label>
 
-                <select id="deadline" aria-label="Filter deadline">
+                <!-- Filter Deadline -->
+                <select
+                    id="deadline"
+                    aria-label="Filter deadline"
+                >
                     <option value="">Semua Deadline</option>
                     <option value="open">Masih Dibuka</option>
-                     <option value="open">Segera Tutup</option>
+                    <option value="warning">Segera Tutup</option>
                     <option value="closed">Sudah Ditutup</option>
                 </select>
 
-                <select id="organizer" aria-label="Filter penyelenggara">
+                <!-- Filter Penyelenggara -->
+                <select
+                    id="organizer"
+                    aria-label="Filter penyelenggara"
+                >
                     <option value="">Semua Penyelenggara</option>
+
                     @foreach($penyelenggara as $organizer)
                         <option value="{{ $organizer }}">
                             {{ $organizer }}
@@ -64,7 +99,11 @@
                     @endforeach
                 </select>
 
-                <select id="team-size" aria-label="Filter ukuran tim">
+                <!-- Filter Ukuran Tim -->
+                <select
+                    id="team-size"
+                    aria-label="Filter ukuran tim"
+                >
                     <option value="">Semua Ukuran Tim</option>
                     <option value="1">Individu</option>
                     <option value="2">2 Orang</option>
@@ -80,6 +119,7 @@
 
             </div>
 
+            <!-- Urutan -->
             <div class="sort-row">
                 <select id="sort" aria-label="Urutkan lomba">
                     <option value="soon">Deadline Terdekat</option>
@@ -87,10 +127,13 @@
                 </select>
             </div>
 
+            <!-- Kategori -->
             <div class="categories">
+
                 <span>Kategori :</span>
 
                 <div class="category-buttons">
+
                     @foreach([
                         'Semua',
                         'Teknologi dan AI',
@@ -101,6 +144,7 @@
                         'Hackathon',
                         'Poster'
                     ] as $category)
+
                         <button
                             type="button"
                             class="category-pill {{ $category === 'Semua' ? 'selected' : '' }}"
@@ -109,21 +153,33 @@
                         >
                             {{ $category }}
                         </button>
+
                     @endforeach
+
                 </div>
+
             </div>
 
         </section>
 
-        <section class="competition-grid" id="competition-grid">
+        <!-- DAFTAR KOMPETISI -->
+        <section
+            class="competition-grid"
+            id="competition-grid"
+        >
 
             @foreach($lomba as $competition)
 
                 @php
-                    $deadlineDate = \Illuminate\Support\Carbon::parse($competition->deadline);
+
+                    // Mengambil tanggal deadline
+                    $deadlineDate = \Illuminate\Support\Carbon::parse(
+                        $competition->deadline
+                    );
 
                     $today = now()->startOfDay();
 
+                    // Menghitung sisa hari
                     $daysLeft = (int) $today->diffInDays(
                         $deadlineDate->copy()->startOfDay(),
                         false
@@ -131,40 +187,56 @@
 
                     $isOpen = $daysLeft >= 0;
 
-                    $isWarning = $daysLeft >= 0 && $daysLeft <= 3;
+                    $isWarning = $daysLeft >= 0
+                        && $daysLeft <= 3;
 
+                    // Status pendaftaran
                     if ($daysLeft < 0) {
                         $statusClass = 'closed';
                         $statusText = 'Sudah Tutup';
+
                     } elseif ($isWarning) {
                         $statusClass = 'warning';
                         $statusText = 'Segera Ditutup';
+
                     } else {
                         $statusClass = 'open';
                         $statusText = 'Pendaftaran Buka';
                     }
 
+                    // Peringatan deadline
                     $warningText = $isWarning
-                        ? ($daysLeft === 0
+                        ? (
+                            $daysLeft === 0
                             ? 'Pendaftaran ditutup hari ini!'
-                            : 'Ditutup dalam ' . $daysLeft . ' hari')
+                            : 'Ditutup dalam ' . $daysLeft . ' hari'
+                        )
                         : '';
 
+                    // Mengambil skills dari JSONB Supabase
                     $skills = $competition->skills ?? [];
 
                     if (is_string($skills)) {
-                        $skills = json_decode($skills, true) ?: [];
+                        $skills = json_decode(
+                            $skills,
+                            true
+                        ) ?: [];
                     }
 
-                    if ($skills instanceof \Illuminate\Support\Collection) {
+                    if (
+                        $skills instanceof
+                        \Illuminate\Support\Collection
+                    ) {
                         $skills = $skills->all();
                     }
 
-                    $skills = is_array($skills) ? $skills : [];
+                    $skills = is_array($skills)
+                        ? $skills
+                        : [];
+
                 @endphp
 
-
-
+                <!-- CARD LOMBA -->
                 <article
                     class="competition-card"
                     data-title="{{ strtolower($competition->title) }}"
@@ -176,75 +248,103 @@
                     data-skills="{{ strtolower(implode(' ', $skills)) }}"
                 >
 
+                    <!-- POSTER -->
                     <div class="poster-wrap">
 
                         @if($competition->image)
+
                             <img
                                 src="{{ asset(ltrim($competition->image, '/')) }}"
                                 alt="Poster {{ $competition->title }}"
                                 loading="lazy"
                             >
+
                         @else
+
                             <div class="poster-placeholder">
                                 <span>FYS COMPETITION</span>
-                                <strong>{{ $competition->title }}</strong>
-                                <small>{{ $competition->category }}</small>
+
+                                <strong>
+                                    {{ $competition->title }}
+                                </strong>
+
+                                <small>
+                                    {{ $competition->category }}
+                                </small>
                             </div>
+
                         @endif
 
+                        <!-- BADGE -->
                         <div class="poster-badges">
+
                             <span class="tag">
                                 {{ $competition->subtitle ?? $competition->category }}
                             </span>
 
-                            
-                        
                             <span class="status {{ $statusClass }}">
                                 {{ $statusText }}
                             </span>
 
-
                         </div>
 
-                       
+                        <!-- WARNING -->
                         @if($isWarning)
-                            <div class="deadline-warning" role="status">
-                                <span class="warning-icon">⚠</span>
-                                <span>{{ $warningText }}</span>
-                            </div>
-                        @endif
 
+                            <div
+                                class="deadline-warning"
+                                role="status"
+                            >
+                                <span class="warning-icon">
+                                    ⚠
+                                </span>
+
+                                <span>
+                                    {{ $warningText }}
+                                </span>
+                            </div>
+
+                        @endif
 
                     </div>
 
+                    <!-- BODY CARD -->
                     <div class="card-body">
 
                         <p class="organizer">
                             {{ $competition->organizer }}
                         </p>
 
-                        <h2>{{ $competition->title }}</h2>
+                        <h2>
+                            {{ $competition->title }}
+                        </h2>
 
                         <p class="deadline-text {{ $isWarning ? 'deadline-urgent' : '' }}">
-                            🗓 Deadline : {{ $deadlineDate->format('Y-m-d') }}
+                            🗓 Deadline :
+                            {{ $deadlineDate->format('Y-m-d') }}
                         </p>
 
                         <p class="description">
-                            {{ $competition->description ?? 'Kompetisi mahasiswa untuk mengembangkan inovasi, kreativitas, dan kolaborasi.' }}
+                            {{ $competition->description
+                                ?? 'Kompetisi mahasiswa untuk mengembangkan inovasi, kreativitas, dan kolaborasi.' }}
                         </p>
 
                         <p class="skill-label">
                             SKILL YANG RELEVAN :
                         </p>
 
+                        <!-- SKILLS -->
                         <div class="skills">
+
                             @foreach($skills as $skill)
                                 <span>{{ $skill }}</span>
                             @endforeach
+
                         </div>
 
+                        <!-- TOMBOL LIHAT DETAIL -->
                         <a
-                            href="{{ route('cari_lomba.show', ['id' => $competition->id]) }}"
+                            href="{{ route('cari_lomba.show', ['cariLomba' => $competition->id]) }}"
                             class="detail-button"
                         >
                             Lihat Detail
@@ -258,17 +358,29 @@
 
         </section>
 
-        <div id="empty-state" class="empty-state" hidden>
+        <!-- KETIKA TIDAK ADA LOMBA -->
+        <div
+            id="empty-state"
+            class="empty-state"
+            hidden
+        >
             Tidak ada perlombaan yang sesuai dengan filter.
         </div>
 
     </main>
 
+    <!-- FOOTER -->
     <footer class="fys-footer">
+
         <div class="fys-footer-content">
 
+            <!-- KIRI -->
             <div class="fys-footer-left">
-                <a href="{{ url('/home') }}" class="fys-footer-logo">
+
+                <a
+                    href="{{ url('/home') }}"
+                    class="fys-footer-logo"
+                >
                     <span>F</span>
                     <small>UB</small>
                 </a>
@@ -285,9 +397,12 @@
                     Kampus Utama Universitas Brawijaya,
                     Malang, Jawa Timur.
                 </p>
+
             </div>
 
+            <!-- TENGAH -->
             <div class="fys-footer-middle">
+
                 <h3>KATEGORI KOMPETISI</h3>
 
                 <p>
@@ -299,9 +414,12 @@
                     Robotic Cup<br>
                     Hackathon Competition
                 </p>
+
             </div>
 
+            <!-- KANAN -->
             <div class="fys-footer-right">
+
                 <h3>RUMPUN FAKULTAS</h3>
 
                 <p>
@@ -312,26 +430,34 @@
 
                 <div class="fys-footer-tip">
                     <strong>Tips Juara :</strong>
+
                     Tim multidisiplin (Teknologi + Bisnis + Riset)
                     memiliki tingkat lolos 2–3x lebih tinggi
                     di ajang bergengsi.
                 </div>
+
             </div>
 
         </div>
+
     </footer>
 
+    <!-- TOMBOL PLUS POSTING LOMBA -->
     <div class="tambah-lomba-container">
-        <span class="tambah-lomba-label">Posting Lomba</span>
+
+        <span class="tambah-lomba-label">
+            Posting Lomba
+        </span>
 
         <a
-            href="{{ route('posting-lomba') }}"
+            href="{{ route('posting-lomba.create') }}"
             class="tambah-lomba"
             title="Tambah Lomba"
             aria-label="Tambah Lomba"
         >
             +
         </a>
+
     </div>
 
 </body>

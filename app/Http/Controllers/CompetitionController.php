@@ -38,7 +38,7 @@ class CompetitionController extends Controller
         'skills.*' => 'required|string|max:100',
     ]);
 
-    $lomba = \App\Models\Lomba::findOrFail($data['lomba_id']);
+    $lomba = \App\Models\CariLomba::findOrFail($data['lomba_id']);
 
     $lomba->skills = $data['skills'];
     $lomba->save();
