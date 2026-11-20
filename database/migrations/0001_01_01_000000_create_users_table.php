@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -13,11 +14,18 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+
+            // Data mahasiswa FINS
             $table->string('name');
+            $table->string('nim', 20)->unique();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+
+            // Autentikasi
             $table->string('password');
             $table->rememberToken();
+
+            // Waktu pembuatan dan perubahan
             $table->timestamps();
         });
 
@@ -31,7 +39,7 @@ return new class extends Migration
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
+            $table->text('user_agent');
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
@@ -42,8 +50,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
     }
 };
