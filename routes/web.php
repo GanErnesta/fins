@@ -1,6 +1,7 @@
 
 <?php
 
+use App\Http\Controllers\ChatFileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -39,9 +40,22 @@ Route::get('/lomba-saya', function () {
     return view('lomba_saya');
 });
 
+
 Route::get('/chat', function () {
     return view('chat');
-});
+})->name('chat');
+
+Route::post('/chat/upload', [
+    ChatFileController::class,
+    'upload'
+])->name('chat.file.upload');
+
+Route::get('/chat/files/{filename}', [
+    ChatFileController::class,
+    'download'
+])->where('filename', '[A-Za-z0-9._-]+')
+  ->name('chat.file.download');
+
 
 Route::get('/verification', function () {
     return view('verification');
