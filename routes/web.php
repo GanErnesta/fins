@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -6,6 +7,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CompetitionController;
+use App\Http\Controllers\ChatFileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,11 +27,13 @@ Route::get('/', function () {
 
 Route::middleware('guest')->group(function () {
 
+    // Halaman login
     Route::get('/login', [
         LoginController::class,
         'showLogin'
     ])->name('login');
 
+    // Proses login
     Route::post('/login', [
         LoginController::class,
         'login'
@@ -45,16 +49,19 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('guest')->group(function () {
 
+    // Halaman signup
     Route::get('/signup', [
         SignupController::class,
         'showSignup'
     ])->name('signup');
 
+    // Signup step 1
     Route::post('/signup/step-1', [
         SignupController::class,
         'step1'
     ])->name('signup.step1');
 
+    // Signup step 2
     Route::post('/signup/step-2', [
         SignupController::class,
         'step2'
@@ -125,12 +132,22 @@ Route::post('/logout', [
 
 Route::middleware('auth')->group(function () {
 
-    // Home
+    /*
+    |--------------------------------------------------------------------------
+    | HOME
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/home', function () {
         return view('home');
     })->name('home');
 
-    // Profile
+    /*
+    |--------------------------------------------------------------------------
+    | PROFILE
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/profile', function () {
         return view('profile');
     })->name('profile');
@@ -169,7 +186,7 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    // Halaman posting
+    // Halaman posting lomba
     Route::get('/posting-lomba', function () {
         return view('posting_lomba');
     })->name('posting-lomba');
@@ -196,8 +213,29 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
+    // Halaman chat
     Route::get('/chat', function () {
         return view('chat');
     })->name('chat');
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHAT FILE - UPLOAD DAN DOWNLOAD
+    |--------------------------------------------------------------------------
+    */
+
+    // Upload file melalui chat
+    Route::post('/chat/upload', [
+        ChatFileController::class,
+        'upload'
+    ])->name('chat.file.upload');
+
+    // Download file dari chat
+    Route::get('/chat/files/{filename}', [
+        ChatFileController::class,
+        'download'
+    ])
+    ->where('filename', '[A-Za-z0-9._-]+')
+    ->name('chat.file.download');
 
 });
