@@ -8,6 +8,7 @@ use App\Http\Controllers\SignupController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\ChatFileController;
+use App\Http\Controllers\LombaSayaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -178,7 +179,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/cari-lomba/{id}', [
         CompetitionController::class,
         'show'
-    ])->whereNumber('id')->name('cari_lomba.show');
+    ])
+    ->whereNumber('id')
+    ->name('cari_lomba.show');
 
     /*
     |--------------------------------------------------------------------------
@@ -203,9 +206,11 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/lomba-saya', function () {
-        return view('lomba_saya');
-    })->name('lomba-saya');
+    // Halaman Lomba Saya menggunakan Controller
+    Route::get('/lomba-saya', [
+        LombaSayaController::class,
+        'index'
+    ])->name('lomba-saya');
 
     /*
     |--------------------------------------------------------------------------
