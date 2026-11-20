@@ -65,12 +65,32 @@ $kompetisi = [
     </a>
 
     <nav class="fins-nav-links" aria-label="Navigasi utama">
-        <a class="active" href="home.php">Beranda</a>
-        <a href="cari_lomba.php">Lomba</a>
-        <a href="cari_partner.php">Cari Partner</a>
-        <a href="lomba_saya.php">Lomba Saya</a>
-        <a href="#">Tim Saya</a>
-    </nav>
+
+    <a href="{{ route('home') }}"
+       class="{{ request()->routeIs('home') ? 'active' : '' }}">
+        Beranda
+    </a>
+
+    <a href="{{ route('cari-lomba') }}"
+       class="{{ request()->routeIs('cari-lomba', 'cari_lomba.show') ? 'active' : '' }}">
+        Lomba
+    </a>
+
+    <a href="{{ route('cari-partner') }}"
+       class="{{ request()->routeIs('cari-partner') ? 'active' : '' }}">
+        Cari Partner
+    </a>
+
+    <a href="{{ route('lomba-saya') }}"
+       class="{{ request()->routeIs('lomba-saya') ? 'active' : '' }}">
+        Lomba Saya
+    </a>
+
+    <a href="{{ route('lomba-saya') }}#tim-saya">
+        Tim Saya
+    </a>
+
+</nav>
 
     <div class="fins-nav-actions">
         <a class="fins-nav-icon" href="chat.php" aria-label="Chat">

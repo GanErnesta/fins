@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -6,33 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cari Lomba | Find Your Skills Partner</title>
     <link rel="stylesheet" href="{{ asset('css/cari_lomba.css') }}?v=40">
+    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}?v=1">
     <script src="{{ asset('js/cari_lomba.js') }}?v=40" defer></script>
 </head>
 <body>
 
-    <header class="topbar">
-        <a href="{{ url('/home') }}" class="brand">
-            <span>F</span>
-            <small>UB</small>
-        </a>
-
-        <nav class="main-nav">
-            <a href="{{ url('/home') }}">Beranda</a>
-            <a href="{{ url('/cari-lomba') }}" class="active">Lomba</a>
-            <a href="{{ url('/cari-partner') }}">Cari Partner</a>
-            <a href="{{ url('/lomba-saya') }}">Lomba Saya</a>
-            <a href="{{ url('/tim-saya') }}">Tim Saya</a>
-        </nav>
-
-        <div class="header-actions">
-            <span class="header-icon" aria-hidden="true">♧</span>
-            <span class="header-icon" aria-hidden="true">♧</span>
-
-            <a href="{{ url('/profile') }}" class="profile-icon" aria-label="Profil">
-                F
-            </a>
-        </div>
-    </header>
+    @include('components.navbar')
 
     <main class="page">
 
@@ -93,7 +71,7 @@
                     <option value="3">3 Orang</option>
                     <option value="4">4 Orang</option>
                     <option value="5">5 Orang</option>
-                    <option value="6">6 rang</option>
+                    <option value="6">6 Orang</option>
                     <option value="7">7 Orang</option>
                     <option value="8">8 Orang</option>
                     <option value="9">9 Orang</option>
@@ -266,7 +244,7 @@
                         </div>
 
                         <a
-                            href="{{ route('cari_lomba.show', $competition) }}"
+                            href="{{ route('cari_lomba.show', ['id' => $competition->id]) }}"
                             class="detail-button"
                         >
                             Lihat Detail
@@ -347,7 +325,7 @@
         <span class="tambah-lomba-label">Posting Lomba</span>
 
         <a
-            href="{{ url('/tambah-lomba') }}"
+            href="{{ route('posting-lomba') }}"
             class="tambah-lomba"
             title="Tambah Lomba"
             aria-label="Tambah Lomba"
