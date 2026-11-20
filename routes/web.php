@@ -2,6 +2,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PostingLombaController;
 
 Route::get('/', function () {
     return view('login');
@@ -31,9 +32,14 @@ Route::get('/cari-lomba', function () {
     return view('cari_lomba');
 });
 
-Route::get('/posting-lomba', function () {
-    return view('posting_lomba');
-});
+Route::get('/posting-lomba', [
+    PostingLombaController::class, 'create'
+])->name('posting_lomba.create');
+
+// Menyimpan postingan ke database
+Route::post('/posting-lomba', [
+    PostingLombaController::class, 'store'
+])->name('posting_lomba.store');
 
 Route::get('/lomba-saya', function () {
     return view('lomba_saya');
