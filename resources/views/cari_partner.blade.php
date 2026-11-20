@@ -44,42 +44,18 @@ $interestOptions = ['Hackathon', 'UI/UX Design Competition', 'Business Plan (BPC
 
     <title>Cari Partner | FINS</title>
 
-    <link rel="stylesheet" href="../css/cari_partner.css">
-    <link rel="stylesheet" href="../css/cari_partner-navbar.css">
+    <link rel="stylesheet" href="{{ asset('css/cari_partner.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 
-    <script src="../js/cari_partner.js" defer></script>
+    <script src="{{ asset('js/cari_partner.js') }}" defer></script>
 
 </head>
 
 
 
 <body>
+    @include('components.navbar')
 
-    <header class="fins-navbar">
-    <a class="fins-brand" href="home.php" aria-label="FINS Beranda">
-        <span class="fins-brand-mark">F<span>UB</span></span>
-    </a>
-
-    <nav class="fins-nav-links" aria-label="Navigasi utama">
-        <a href="home.php">Beranda</a>
-        <a href="cari_lomba.php">Lomba</a>
-        <a class="active" href="cari_partner.php">Cari Partner</a>
-        <a href="lomba_saya.php">Lomba Saya</a>
-        <a href="#">Tim Saya</a>
-    </nav>
-
-    <div class="fins-nav-actions">
-        <a class="fins-nav-icon" href="chat.php" aria-label="Chat">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/><path d="M8 10h8M8 14h5"/></svg>
-        </a>
-        <a class="fins-nav-icon notification-icon" href="#" aria-label="Notifikasi">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i></i>
-        </a>
-        <a class="fins-nav-avatar" href="profile.php" aria-label="Buka profil">
-            <img src="../assets/images/Group4.png" alt="Foto profil">
-        </a>
-    </div>
-</header>
 
     <main class="cp-main">
 
