@@ -3,8 +3,13 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\SignupController;
+use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\PostingLombaController;
+use App\Http\Controllers\LombaSayaController;
+use App\Http\Controllers\ChatFileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,125 +18,260 @@ use App\Http\Controllers\PostingLombaController;
 */
 
 Route::get('/', function () {
-    return view('login');
+    return redirect()->route('login');
 });
 
 /*
 |--------------------------------------------------------------------------
-| AUTHENTICATION
+| AUTHENTICATION - LOGIN
 |--------------------------------------------------------------------------
 */
 
-// Halaman Login
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
+Route::middleware('guest')->group(function () {
 
-// Halaman Signup
-Route::get('/signup', function () {
-    return view('signup');
-})->name('signup');
+    // Halaman Login
+    Route::get('/login', [
+        LoginController::class,
+        'showLogin'
+    ])->name('login');
+
+    // Proses Login
+    Route::post('/login', [
+        LoginController::class,
+        'login'
+    ])->name('login.submit');
+
+});
 
 /*
 |--------------------------------------------------------------------------
-| HALAMAN UTAMA SETELAH LOGIN
+| AUTHENTICATION - SIGN UP
 |--------------------------------------------------------------------------
 */
 
-// Beranda
-Route::get('/home', function () {
-    return view('home');
-})->name('home');
+Route::middleware('guest')->group(function () {
 
-// Profil
-Route::get('/profile', function () {
-    return view('profile');
-})->name('profile');
+    // Halaman Signup
+    Route::get('/signup', [
+        SignupController::class,
+        'showSignup'
+    ])->name('signup');
+
+    // Proses Signup Step 1
+    Route::post('/signup/step-1', [
+        SignupController::class,
+        'step1'
+    ])->name('signup.step1');
+
+    // Proses Signup Step 2
+    Route::post('/signup/step-2', [
+        SignupController::class,
+        'step2'
+    ])->name('signup.step2');
+
+});
 
 /*
 |--------------------------------------------------------------------------
-| CARI PARTNER
+| VERIFIKASI OTP EMAIL
 |--------------------------------------------------------------------------
 */
 
-Route::get('/cari-partner', function () {
-    return view('cari_partner');
-})->name('cari-partner');
+Route::middleware('guest')->group(function () {
+
+    // Halaman Verifikasi
+    Route::get('/verification', [
+        VerificationController::class,
+        'show'
+    ])->name('verification');
+
+    // Proses Verifikasi OTP
+    Route::post('/verification', [
+        VerificationController::class,
+        'verify'
+    ])->name('verification.verify');
+
+    // Kirim Ulang OTP
+    Route::post('/verification/resend', [
+        VerificationController::class,
+        'resend'
+    ])->name('verification.resend');
+
+    // Halaman Verifikasi Berhasil
+    Route::get('/verification-success', function () {
+
+        if (!session('account_verified')) {
+            return redirect()->route('signup');
+        }
+
+        return view('verification-success');
+
+    })->name('verification-success');
+
+    // Halaman Verifikasi Gagal
+    Route::get('/verification-failed', function () {
+        return view('verification-failed');
+    })->name('verification-failed');
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALIAS ROUTE VERIFIKASI
+    |--------------------------------------------------------------------------
+    | Mempertahankan nama route dari branch posting_lomba.
+    */
+
+    Route::get('/verification/success', function () {
+        return redirect()->route('verification-success');
+    })->name('verification.success');
+
+    Route::get('/verification/failed', function () {
+        return redirect()->route('verification-failed');
+    })->name('verification.failed');
+
+});
 
 /*
 |--------------------------------------------------------------------------
-| CARI LOMBA
+| LOGOUT
 |--------------------------------------------------------------------------
 */
 
-// Menampilkan daftar lomba dari Supabase
-Route::get('/cari-lomba', [
-    CompetitionController::class,
-    'index'
-])->name('cari-lomba');
-
-// Menampilkan halaman detail lomba
-Route::get('/cari-lomba/{cariLomba}', [
-    CompetitionController::class,
-    'show'
-])->whereNumber('cariLomba')
-  ->name('cari_lomba.show');
+Route::post('/logout', [
+    LoginController::class,
+    'logout'
+])
+->middleware('auth')
+->name('logout');
 
 /*
 |--------------------------------------------------------------------------
-| POSTING LOMBA
+| HALAMAN UTAMA FINS
 |--------------------------------------------------------------------------
 */
 
-// Menampilkan halaman Posting Lomba
-Route::get('/posting-lomba', [
-    PostingLombaController::class,
-    'create'
-])->name('posting-lomba.create');
+Route::middleware('auth')->group(function () {
 
-// Menyimpan postingan ke Supabase
-Route::post('/posting-lomba', [
-    PostingLombaController::class,
-    'store'
-])->name('posting-lomba.store');
+    /*
+    |--------------------------------------------------------------------------
+    | HOME
+    |--------------------------------------------------------------------------
+    */
 
-/*
-|--------------------------------------------------------------------------
-| LOMBA SAYA
-|--------------------------------------------------------------------------
-*/
+    Route::get('/home', function () {
+        return view('home');
+    })->name('home');
 
-Route::get('/lomba-saya', function () {
-    return view('lomba_saya');
-})->name('lomba-saya');
+    /*
+    |--------------------------------------------------------------------------
+    | PROFILE
+    |--------------------------------------------------------------------------
+    */
 
-/*
-|--------------------------------------------------------------------------
-| CHAT
-|--------------------------------------------------------------------------
-*/
+    Route::get('/profile', function () {
+        return view('profile');
+    })->name('profile');
 
-Route::get('/chat', function () {
-    return view('chat');
-})->name('chat');
+    /*
+    |--------------------------------------------------------------------------
+    | CARI PARTNER
+    |--------------------------------------------------------------------------
+    */
 
-/*
-|--------------------------------------------------------------------------
-| VERIFIKASI
-|--------------------------------------------------------------------------
-*/
+    Route::get('/cari-partner', function () {
+        return view('cari_partner');
+    })->name('cari-partner');
 
-// Halaman verifikasi
-Route::get('/verification', function () {
-    return view('verification');
-})->name('verification');
+    /*
+    |--------------------------------------------------------------------------
+    | CARI LOMBA
+    |--------------------------------------------------------------------------
+    */
 
-// Verifikasi berhasil
-Route::get('/verification-success', function () {
-    return view('verification-success');
-})->name('verification.success');
+    // Menampilkan daftar lomba
+    Route::get('/cari-lomba', [
+        CompetitionController::class,
+        'index'
+    ])->name('cari-lomba');
 
-// Verifikasi gagal
-Route::get('/verification-failed', function () {
-    return view('verification-failed');
-})->name('verification.failed');
+    // Menampilkan detail lomba
+    Route::get('/cari-lomba/{id}', [
+        CompetitionController::class,
+        'show'
+    ])
+    ->whereNumber('id')
+    ->name('cari_lomba.show');
+
+    /*
+    |--------------------------------------------------------------------------
+    | POSTING LOMBA
+    |--------------------------------------------------------------------------
+    */
+
+    // Halaman Posting Lomba
+    Route::get('/posting-lomba', [
+        PostingLombaController::class,
+        'create'
+    ])->name('posting-lomba');
+
+    // Alias route untuk branch posting_lomba
+    Route::get('/posting-lomba/create', [
+        PostingLombaController::class,
+        'create'
+    ])->name('posting-lomba.create');
+
+    // Menyimpan posting lomba melalui PostingLombaController
+    Route::post('/posting-lomba', [
+        PostingLombaController::class,
+        'store'
+    ])->name('posting-lomba.store');
+
+    // Mempertahankan route penyimpanan dari branch main
+    Route::post('/tambah-lomba', [
+        CompetitionController::class,
+        'store'
+    ])->name('lomba.store');
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOMBA SAYA
+    |--------------------------------------------------------------------------
+    */
+
+    // Halaman Lomba Saya menggunakan Controller
+    Route::get('/lomba-saya', [
+        LombaSayaController::class,
+        'index'
+    ])->name('lomba-saya');
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHAT
+    |--------------------------------------------------------------------------
+    */
+
+    // Halaman Chat
+    Route::get('/chat', function () {
+        return view('chat');
+    })->name('chat');
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHAT FILE - UPLOAD DAN DOWNLOAD
+    |--------------------------------------------------------------------------
+    */
+
+    // Upload File Chat
+    Route::post('/chat/upload', [
+        ChatFileController::class,
+        'upload'
+    ])->name('chat.file.upload');
+
+    // Download File Chat
+    Route::get('/chat/files/{filename}', [
+        ChatFileController::class,
+        'download'
+    ])
+    ->where('filename', '[A-Za-z0-9._-]+')
+    ->name('chat.file.download');
+
+});

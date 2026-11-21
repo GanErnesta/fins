@@ -1,0 +1,467 @@
+
+/* ========================================
+   FINS - DETAIL LOMBA
+   COLOR PALETTE MERAH & CREAM
+======================================== */
+
+:root {
+    --detail-primary: #900000;
+    --detail-dark: #700000;
+    --detail-cream: #fff2e6;
+    --detail-white: #fffdfb;
+    --detail-border: #e9ded5;
+    --detail-text: #161616;
+    --detail-muted: #777777;
+}
+
+.detail-overlay,
+.detail-overlay * {
+    box-sizing: border-box;
+}
+
+/* BACKGROUND */
+
+
+.detail-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(20, 10, 10, 0.55);
+
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+}
+
+.detail-modal {
+    position: relative;
+    z-index: 1;
+}
+
+
+/* ========================================
+   HEADER
+======================================== */
+
+.detail-header {
+    position: relative;
+    height: 225px;
+    min-height: 225px;
+    flex-shrink: 0;
+
+    overflow: hidden;
+
+    background: linear-gradient(
+        135deg,
+        #5c0000,
+        #900000 60%,
+        #b84738
+    );
+}
+
+.detail-header > img {
+    display: block;
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+}
+
+.header-shade {
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        to bottom,
+        rgba(35, 0, 0, 0.12),
+        rgba(48, 0, 0, 0.48) 55%,
+        rgba(45, 0, 0, 0.94)
+    );
+}
+
+.close-detail {
+    position: absolute;
+    top: 17px;
+    right: 18px;
+    z-index: 5;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+    background: rgba(15, 0, 0, 0.65);
+
+    color: #ffffff;
+    font-size: 27px;
+    line-height: 1;
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+.close-detail:hover {
+    background: #900000;
+    color: #ffffff;
+}
+
+.header-content {
+    position: absolute;
+    left: 26px;
+    right: 70px;
+    bottom: 20px;
+    z-index: 2;
+}
+
+.detail-category {
+    margin-bottom: 8px;
+
+    color: #ffe3b4;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.detail-title {
+    margin: 0;
+
+    color: #ffffff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 1.2;
+
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+/* ========================================
+   CONTENT AREA
+======================================== */
+
+.detail-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+
+    padding: 25px 26px 30px;
+
+    background: #faf8f5;
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #b5a8a0 transparent;
+}
+
+.detail-scroll::-webkit-scrollbar {
+    width: 7px;
+}
+
+.detail-scroll::-webkit-scrollbar-thumb {
+    background: #b5a8a0;
+    border-radius: 10px;
+}
+
+/* ========================================
+   INFORMASI LOMBA
+======================================== */
+
+.detail-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.info-box {
+    min-width: 0;
+    padding: 14px 12px;
+
+    background: #ffffff;
+    border: 1px solid var(--detail-border);
+    border-radius: 12px;
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-bottom: 8px;
+
+    color: #777777;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.info-icon {
+    color: #900000;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.info-value {
+    color: #222222;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+
+    overflow-wrap: anywhere;
+}
+
+.info-value.prize {
+    color: #a14314;
+}
+
+/* ========================================
+   SECTION
+======================================== */
+
+.detail-section {
+    margin-bottom: 26px;
+}
+
+.detail-section h3 {
+    margin: 0 0 12px;
+
+    color: #222222;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.detail-section p {
+    margin: 0;
+
+    color: #6b6b6b;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* ========================================
+   SKILLS
+======================================== */
+
+.detail-skills {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+.detail-skills span {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 7px 11px;
+
+    background: #f5f3f0;
+    border: 1px solid #e5dfda;
+    border-radius: 7px;
+
+    color: #555555;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+/* ========================================
+   TIMELINE
+======================================== */
+
+.timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+    padding: 11px 13px;
+
+    background: #ffffff;
+    border: 1px solid var(--detail-border);
+    border-radius: 9px;
+}
+
+.timeline-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-width: 0;
+}
+
+.timeline-icon {
+    color: #900000;
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.timeline-name {
+    color: #444444;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.timeline-date {
+    flex-shrink: 0;
+
+    color: #777777;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* ========================================
+   FOOTER POPUP
+======================================== */
+
+.detail-footer {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+    min-height: 70px;
+    padding: 14px 18px;
+
+    background: #ffffff;
+    border-top: 1px solid var(--detail-border);
+}
+
+.guide-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #666666;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.guide-link:hover {
+    color: #900000;
+}
+
+.footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    margin-left: auto;
+}
+
+.btn-partner,
+.btn-team {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 37px;
+    padding: 9px 15px;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+.btn-partner {
+    background: #f6e9eb;
+    color: #77222a;
+}
+
+.btn-partner:hover {
+    background: #efd8dc;
+    color: #77222a;
+}
+
+.btn-team {
+    background: #900000;
+    color: #ffffff;
+}
+
+.btn-team:hover {
+    background: #700000;
+    color: #ffffff;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 650px) {
+    .detail-overlay {
+        padding: 12px;
+    }
+
+    .detail-modal {
+        max-height: 94vh;
+        border-radius: 14px;
+    }
+
+    .detail-header {
+        height: 190px;
+        min-height: 190px;
+    }
+
+    .header-content {
+        left: 17px;
+        right: 55px;
+        bottom: 16px;
+    }
+
+    .detail-title {
+        font-size: 21px;
+    }
+
+    .detail-scroll {
+        padding: 18px 15px 24px;
+    }
+
+    .detail-info-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .detail-section h3 {
+        font-size: 15px;
+    }
+
+    .detail-footer {
+        flex-wrap: wrap;
+        padding: 12px;
+    }
+
+    .footer-actions {
+        width: 100%;
+    }
+
+    .btn-partner,
+    .btn-team {
+        flex: 1;
+        padding: 9px 10px;
+    }
+}

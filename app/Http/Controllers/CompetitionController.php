@@ -24,12 +24,16 @@ class CompetitionController extends Controller
         ));
     }
 
-    public function show(CariLomba $cariLomba)
-    {
-        return view('cari_lomba_detail', [
-            'lomba' => $cariLomba
-        ]);
-    }
+    
+        public function show($id)
+        {
+            $lomba = CariLomba::findOrFail($id);
+
+            return view('cari_lomba_detail', [
+                'lomba' => $lomba
+            ]);
+        }
+
     public function store(\Illuminate\Http\Request $request)
 {
     $data = $request->validate([

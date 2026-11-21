@@ -21,6 +21,12 @@ return [
 
     'connections' => [
 
+        /*
+        |--------------------------------------------------------------------------
+        | SQLite
+        |--------------------------------------------------------------------------
+        */
+
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
@@ -31,6 +37,12 @@ return [
             'journal_mode' => null,
             'synchronous' => null,
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | MySQL
+        |--------------------------------------------------------------------------
+        */
 
         'mysql' => [
             'driver' => 'mysql',
@@ -49,9 +61,18 @@ return [
             'engine' => null,
 
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                \Pdo\Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                (PHP_VERSION_ID >= 80500
+                    ? \Pdo\Mysql::ATTR_SSL_CA
+                    : \PDO::MYSQL_ATTR_SSL_CA
+                ) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | MariaDB
+        |--------------------------------------------------------------------------
+        */
 
         'mariadb' => [
             'driver' => 'mariadb',
@@ -70,9 +91,18 @@ return [
             'engine' => null,
 
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                \Pdo\Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                (PHP_VERSION_ID >= 80500
+                    ? \Pdo\Mysql::ATTR_SSL_CA
+                    : \PDO::MYSQL_ATTR_SSL_CA
+                ) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | PostgreSQL
+        |--------------------------------------------------------------------------
+        */
 
         'pgsql' => [
             'driver' => 'pgsql',
@@ -88,6 +118,12 @@ return [
             'search_path' => 'public',
             'sslmode' => 'prefer',
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | SQL Server
+        |--------------------------------------------------------------------------
+        */
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',
@@ -130,7 +166,10 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env(
+                'REDIS_PREFIX',
+                Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'
+            ),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 
