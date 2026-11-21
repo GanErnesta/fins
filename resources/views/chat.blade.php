@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Chat | FINS UB</title>
-    <link rel="stylesheet" href="{{ asset('css/chat.css') }}?v=1">
-    <script src="{{ asset('js/chat.js') }}?v=1" defer></script>
+    <link rel="stylesheet" href="{{ asset('css/chat.css') }}?v=8">
+    <script src="{{ asset('js/chat.js') }}?v=8" defer></script>
 </head>
 <body>
 <header class="topbar">
@@ -189,6 +189,294 @@
     </div>
 </div>
 
+
+<!-- =========================================
+     POPUP INFORMASI GRUP - FINS UB
+========================================= -->
+<div class="group-info-overlay" id="groupInfoOverlay" hidden>
+
+    <div class="group-info-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="groupInfoTitle">
+
+        <!-- Header -->
+        <div class="group-info-header">
+            <h2 id="groupInfoTitle">Informasi Grup</h2>
+
+            <button type="button"
+                    id="closeGroupInfoBtn"
+                    aria-label="Tutup informasi grup">
+                &times;
+            </button>
+        </div>
+
+        <!-- Identitas Grup -->
+        <div class="group-info-profile">
+
+            <div class="group-info-avatar" id="groupInfoAvatar">
+                    T
+            </div>
+
+            <div class="group-info-identity">
+                <h3 id="groupInfoName">Nama Grup</h3>
+
+                <p id="groupInfoCount">0 Anggota</p>
+            </div>
+
+        </div>
+
+        <!-- Daftar Anggota -->
+        <div class="group-info-members">
+
+    <div class="group-info-members-header">
+        <h3>Daftar Anggota</h3>
+
+        <button
+            type="button"
+            class="group-add-member-btn"
+            id="openAddGroupMemberBtn">
+            + Tambah Anggota
+        </button>
+    </div>
+
+            <div id="groupInfoMemberList"
+                 class="group-info-member-list">
+                <!-- Diisi otomatis oleh JavaScript -->
+            </div>
+
+        </div>
+
+        <!-- Tombol Tutup -->
+        
+<!-- Tombol bagian bawah popup Informasi Grup -->
+<div class="group-info-footer">
+
+    <button
+        type="button"
+        id="leaveGroupBtn"
+        class="group-leave-btn">
+        Keluar Grup
+    </button>
+
+    <button
+        type="button"
+        id="closeGroupInfoFooter"
+        class="group-info-close-btn">
+        Tutup
+    </button>
+
+</div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     POPUP TAMBAH ANGGOTA GRUP - FINS UB
+========================================= -->
+<div class="add-group-member-overlay" id="addGroupMemberOverlay" hidden>
+
+    <div class="add-group-member-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="addGroupMemberTitle">
+
+        <div class="add-group-member-header">
+            <h2 id="addGroupMemberTitle">Tambah Anggota</h2>
+
+            <button type="button"
+                    id="closeAddGroupMemberBtn"
+                    aria-label="Tutup popup">
+                &times;
+            </button>
+        </div>
+
+        <p class="add-group-member-description">
+            Pilih kontak yang ingin ditambahkan ke grup.
+        </p>
+
+        <form id="addGroupMemberForm">
+
+            <input type="search"
+                   id="addGroupMemberSearch"
+                   class="add-group-member-search"
+                   placeholder="Cari nama kontak..."
+                   autocomplete="off">
+
+            <div id="addGroupMemberList"
+                 class="add-group-member-list">
+                <!-- Diisi otomatis oleh JavaScript -->
+            </div>
+
+            <div class="add-group-member-actions">
+                <button type="button"
+                        id="cancelAddGroupMemberBtn"
+                        class="add-group-member-cancel">
+                    Batal
+                </button>
+
+                <button type="submit"
+                        class="add-group-member-submit">
+                    Tambah Anggota
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     POPUP KONFIRMASI KELUARKAN ANGGOTA
+========================================= -->
+<div class="remove-member-overlay" id="removeMemberOverlay" hidden>
+
+    <div class="remove-member-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="removeMemberTitle">
+
+        <div class="remove-member-header">
+            <h2 id="removeMemberTitle">Keluarkan Anggota</h2>
+        </div>
+
+        <p id="removeMemberText">
+            Yakin ingin mengeluarkan anggota ini dari grup?
+        </p>
+
+        <div class="remove-member-actions">
+
+            <button type="button"
+                    id="cancelRemoveMemberBtn"
+                    class="remove-member-cancel">
+                Batal
+            </button>
+
+            <button type="button"
+                    id="confirmRemoveMemberBtn"
+                    class="remove-member-confirm">
+                Keluarkan
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     POPUP KONFIRMASI KELUAR GRUP
+========================================= -->
+<div class="leave-group-overlay" id="leaveGroupOverlay" hidden>
+
+    <div class="leave-group-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="leaveGroupTitle">
+
+        <div class="leave-group-header">
+            <h2 id="leaveGroupTitle">Keluar dari Grup</h2>
+        </div>
+
+        <p id="leaveGroupText">
+            Yakin ingin keluar dari grup ini?
+        </p>
+
+        <p class="leave-group-description">
+            Grup akan dihilangkan dari daftar percakapanmu.
+        </p>
+
+        <div class="leave-group-actions">
+
+            <button type="button"
+                    id="cancelLeaveGroupBtn"
+                    class="leave-group-cancel">
+                Batal
+            </button>
+
+            <button type="button"
+                    id="confirmLeaveGroupBtn"
+                    class="leave-group-confirm">
+                Keluar Grup
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     POPUP KONFIRMASI JADIKAN ADMIN
+========================================= -->
+<div class="make-admin-overlay" id="makeAdminOverlay" hidden>
+
+    <div class="make-admin-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="makeAdminTitle">
+
+        <div class="make-admin-header">
+            <h2 id="makeAdminTitle">Jadikan Admin Grup</h2>
+        </div>
+
+        <p id="makeAdminText">
+            Yakin ingin menjadikan anggota ini sebagai Admin?
+        </p>
+
+        <div class="make-admin-actions">
+
+            <button type="button"
+                    id="cancelMakeAdminBtn"
+                    class="make-admin-cancel">
+                Batal
+            </button>
+
+            <button type="button"
+                    id="confirmMakeAdminBtn"
+                    class="make-admin-confirm">
+                Jadikan Admin
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- POPUP PERINGATAN ADMIN GRUP -->
+<div class="admin-warning-overlay" id="adminWarningOverlay" hidden>
+    <div class="admin-warning-modal"
+         role="alertdialog"
+         aria-modal="true"
+         aria-labelledby="adminWarningTitle"
+         aria-describedby="adminWarningText">
+
+        <div class="admin-warning-icon">!</div>
+
+        <h2 id="adminWarningTitle">Tidak Bisa Keluar Grup</h2>
+
+        <p id="adminWarningText">
+            Kamu adalah satu-satunya Admin grup.
+            Jadikan anggota lain sebagai Admin terlebih dahulu.
+        </p>
+
+        <button type="button"
+                id="closeAdminWarningBtn"
+                class="admin-warning-close">
+            Mengerti
+        </button>
+    </div>
+</div>
+
+
 <!-- POPUP KONFIRMASI HAPUS PERCAKAPAN -->
 <div class="delete-confirm-overlay" id="deleteConfirmOverlay" hidden>
     <div class="delete-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
@@ -213,5 +501,31 @@
     </div>
 </div>
 
+<!-- POPUP EDIT PESAN -->
+<div class="message-modal-overlay" id="editMessageOverlay" hidden>
+    <div class="message-modal" role="dialog" aria-modal="true" aria-labelledby="editMessageTitle">
+        <h2 id="editMessageTitle">Edit Pesan</h2>
+        <form id="editMessageForm">
+            <label for="editMessageInput">Isi pesan</label>
+            <textarea id="editMessageInput" maxlength="2000" rows="4" required></textarea>
+            <div class="message-modal-actions">
+                <button type="button" id="cancelEditMessage" class="message-modal-cancel">Batal</button>
+                <button type="submit" class="message-modal-primary">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- POPUP HAPUS PESAN (BERBEDA DENGAN HAPUS PERCAKAPAN) -->
+<div class="message-modal-overlay" id="deleteMessageOverlay" hidden>
+    <div class="message-modal" role="dialog" aria-modal="true" aria-labelledby="deleteMessageTitle">
+        <h2 id="deleteMessageTitle">Hapus Pesan</h2>
+        <p id="deleteMessageText"></p>
+        <div class="message-modal-actions">
+            <button type="button" id="cancelDeleteMessage" class="message-modal-cancel">Batal</button>
+            <button type="button" id="confirmDeleteMessage" class="message-modal-primary">Hapus</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

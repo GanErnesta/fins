@@ -1,4 +1,3 @@
-
 (() => {
     'use strict';
 
@@ -144,6 +143,64 @@
         chats = structuredClone(initialConversations);
     }
 
+    
+/* ==========================================
+   MIGRASI DATA GRUP LAMA - MULTI ADMIN
+========================================== */
+
+// Menyesuaikan grup lama tanpa menghapus data
+let groupDataUpdated = false;
+
+chats.forEach(chat => {
+    if (!chat.isGroup) return;
+
+    // Pastikan daftar anggota berbentuk array
+    if (!Array.isArray(chat.members)) {
+        chat.members = ['Kamu'];
+        groupDataUpdated = true;
+    }
+
+    // Grup lama belum memiliki properti admins
+    if (!Array.isArray(chat.admins)) {
+        chat.admins = chat.members.includes('Kamu')
+            ? ['Kamu']
+            : (chat.members.length ? [chat.members[0]] : []);
+
+        groupDataUpdated = true;
+    }
+
+    // Pastikan Admin benar-benar anggota grup
+    const validAdmins = [
+        ...new Set(
+            chat.admins.filter(
+                name => chat.members.includes(name)
+            )
+        )
+    ];
+
+    // Jika grup memiliki anggota, harus ada minimal satu Admin
+    if (validAdmins.length === 0 && chat.members.length > 0) {
+        validAdmins.push(chat.members[0]);
+    }
+
+    if (JSON.stringify(chat.admins) !== JSON.stringify(validAdmins)) {
+        chat.admins = validAdmins;
+        groupDataUpdated = true;
+    }
+});
+
+// Simpan hanya jika ada data grup yang diperbarui
+if (groupDataUpdated) {
+    try {
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(chats)
+        );
+    } catch (error) {
+        console.error('Gagal menyimpan migrasi Admin grup:', error);
+    }
+}
+
     // INITIAL STATE
     let selectedId = chats.some(c => c.id === 2)
         ? 2
@@ -237,20 +294,23 @@ function renderGroupMembers() {
             return;
         }
 
-        const group = {
-            id: Date.now(),
-            name: name,
-            isGroup: true,
-            members: ['Kamu', ...members],
-            unread: 0,
-            messages: [{
-    id: Date.now() + 1,
-    from: 'system',
-    type: 'system',
-    text: 'Grup ' + name + ' berhasil dibuat!',
-    at: new Date().toISOString()
-}]
-        };
+        
+const group = {
+    id: Date.now(),
+    name: name,
+    isGroup: true,
+    members: ['Kamu', ...members],
+    admins: ['Kamu'],
+    unread: 0,
+    messages: [{
+        id: Date.now() + 1,
+        from: 'system',
+        type: 'system',
+        text: 'Grup ' + name + ' berhasil dibuat!',
+        at: new Date().toISOString()
+    }]
+};
+
 
         chats.push(group);
         groupOverlay.hidden = true;
@@ -319,6 +379,15 @@ function renderGroupMembers() {
         return el;
     }
 
+    // Pesan tersembunyi hanya untuk browser ini.
+    const visibleMessages = c => c.messages.filter(m => !m.hiddenForMe);
+    const messagePreview = c => {
+        const msg = visibleMessages(c).at(-1);
+        if (!msg) return 'Mulai percakapan';
+        if (msg.deletedForAll) return 'Pesan ini telah dihapus';
+        return msg.type === 'file' ? '📎 ' + (msg.fileName || 'Lampiran') : (msg.text || 'Mulai percakapan');
+    };
+
     // RENDER CONVERSATION LIST
     function renderList() {
         const term = search.value
@@ -330,9 +399,9 @@ function renderGroupMembers() {
             (
                 !term ||
                 c.name.toLocaleLowerCase('id').includes(term) ||
-                c.messages.some(m =>
-                   (m.text || '').toLocaleLowerCase('id').includes(term) ||
-                (m.fileName || '').toLocaleLowerCase('id').includes(term)   
+                visibleMessages(c).some(m =>
+                   !m.deletedForAll && ((m.text || '').toLocaleLowerCase('id').includes(term) ||
+                   (m.fileName || '').toLocaleLowerCase('id').includes(term))
                 )
             )
         );
@@ -385,9 +454,7 @@ function renderGroupMembers() {
                 node(
                     'span',
                     'contact-preview',
-                    c.messages.at(-1)?.type === 'file'
-                    ? '📎 ' + c.messages.at(-1).fileName
-                    : (c.messages.at(-1)?.text || 'Mulai percakapan')
+                    messagePreview(c)
                 )
             );
 
@@ -485,7 +552,7 @@ function renderGroupMembers() {
         $('selectedStatus').textContent = c.isGroup ? `${c.members.length} anggota`: 'Percakapan';
 
         // EMPTY CHAT
-        if (!c.messages.length) {
+        if (!visibleMessages(c).length) {
             area.append(
                 node(
                     'p',
@@ -501,6 +568,7 @@ function renderGroupMembers() {
         let previousDay = '';
 
         for (const msg of c.messages) {
+            if (msg.hiddenForMe) continue;
             const day = formatDay(msg.at);
 
             // DAY SEPARATOR
@@ -522,7 +590,7 @@ if (
      msg.text?.endsWith(' berhasil dibuat!'))
 ) {
 
-    area.append(announcement);
+    area.append(node('div', 'system-announcement', msg.text || 'Pengumuman grup'));
     continue;
 }
 
@@ -532,7 +600,10 @@ const bubble = node(
     (msg.from === 'me' ? 'mine' : 'theirs')
 );
 
-            if (msg.type === 'file' && msg.fileUrl) {
+            if (msg.deletedForAll) {
+                bubble.classList.add('deleted-message');
+                bubble.append(node('span', 'message-text', 'Pesan ini telah dihapus'));
+            } else if (msg.type === 'file' && msg.fileUrl) {
 
                 const attachment = node(
                     'a',
@@ -585,12 +656,55 @@ const bubble = node(
                 );
             }
 
-            bubble.append(
-                node('span', 'message-time', formatTime(msg.at))
-            );
+            const time = node('span', 'message-time', formatTime(msg.at));
+            if (msg.editedAt && !msg.deletedForAll) {
+                time.prepend(node('span', 'message-edited-label', '(diedit) '));
+            }
+            bubble.append(time);
 
+            const row = node('div', 'message-row ' + (msg.from === 'me' ? 'mine' : 'theirs'));
+            row.append(bubble);
 
-            area.append(bubble);
+            // Pesan sistem dan pesan yang sudah ditarik tidak mempunyai menu.
+            if (!msg.deletedForAll) {
+                const actions = node('div', 'message-actions');
+                const toggle = node('button', 'message-actions-toggle', '⋮');
+                toggle.type = 'button';
+                toggle.setAttribute('aria-label', 'Opsi pesan');
+                toggle.setAttribute('aria-expanded', 'false');
+
+                const menu = node('div', 'message-actions-menu');
+                menu.hidden = true;
+                const option = (label, callback) => {
+                    const button = node('button', 'message-action-item', label);
+                    button.type = 'button';
+                    button.addEventListener('click', event => {
+                        event.stopPropagation();
+                        menu.hidden = true;
+                        callback(c.id, msg.id);
+                    });
+                    menu.append(button);
+                };
+
+                if (msg.from === 'me' && msg.type !== 'file') {
+                    option('✎ Edit pesan', openEditMessage);
+                }
+                option('Hapus untuk saya', (chatId, msgId) => openDeleteMessage(chatId, msgId, 'me'));
+                if (msg.from === 'me') {
+                    option('Hapus untuk semua orang', (chatId, msgId) => openDeleteMessage(chatId, msgId, 'all'));
+                }
+                toggle.addEventListener('click', event => {
+                    event.stopPropagation();
+                    document.querySelectorAll('.message-actions-menu').forEach(other => {
+                        if (other !== menu) other.hidden = true;
+                    });
+                    menu.hidden = !menu.hidden;
+                    toggle.setAttribute('aria-expanded', String(!menu.hidden));
+                });
+                actions.append(toggle, menu);
+                row.append(actions);
+            }
+            area.append(row);
         }
 
         // AUTO SCROLL TO LATEST MESSAGE
@@ -598,6 +712,98 @@ const bubble = node(
             area.scrollTop = area.scrollHeight;
         });
     }
+
+    // EDIT / HAPUS PESAN - DEMO LOCALSTORAGE
+    const editMessageOverlay = $('editMessageOverlay');
+    const editMessageInput = $('editMessageInput');
+    const editMessageForm = $('editMessageForm');
+    const deleteMessageOverlay = $('deleteMessageOverlay');
+    const deleteMessageText = $('deleteMessageText');
+    let editingMessage = null;
+    let deletingMessage = null;
+
+    function findMessage(chatId, messageId) {
+        const conversation = chats.find(c => c.id === chatId);
+        return { conversation, message: conversation?.messages.find(m => m.id === messageId) };
+    }
+
+    function openEditMessage(chatId, messageId) {
+        const { message } = findMessage(chatId, messageId);
+        if (!message || message.from !== 'me' || message.type === 'file' || message.deletedForAll) return;
+        editingMessage = { chatId, messageId };
+        editMessageInput.value = message.text || '';
+        editMessageOverlay.hidden = false;
+        editMessageInput.focus();
+    }
+
+    function openDeleteMessage(chatId, messageId, scope) {
+        const { message } = findMessage(chatId, messageId);
+        if (!message || message.from === 'system' || message.deletedForAll) return;
+        if (scope === 'all' && message.from !== 'me') return;
+        deletingMessage = { chatId, messageId, scope };
+        deleteMessageText.textContent = scope === 'all'
+            ? 'Pesan ini akan ditandai sebagai dihapus untuk semua orang pada data demo browser ini.'
+            : 'Pesan ini akan disembunyikan dari percakapanmu di browser ini.';
+        deleteMessageOverlay.hidden = false;
+    }
+
+    function closeEditMessage() {
+        editingMessage = null;
+        editMessageOverlay.hidden = true;
+    }
+    function closeDeleteMessage() {
+        deletingMessage = null;
+        deleteMessageOverlay.hidden = true;
+    }
+
+    $('cancelEditMessage').addEventListener('click', closeEditMessage);
+    editMessageOverlay.addEventListener('click', e => {
+        if (e.target === editMessageOverlay) closeEditMessage();
+    });
+    editMessageForm.addEventListener('submit', e => {
+        e.preventDefault();
+        if (!editingMessage) return;
+        const text = editMessageInput.value.trim();
+        if (!text) return;
+        const { message } = findMessage(editingMessage.chatId, editingMessage.messageId);
+        if (!message || message.from !== 'me' || message.type === 'file' || message.deletedForAll) return;
+        if (text !== message.text) {
+            message.text = text;
+            message.editedAt = new Date().toISOString();
+            save();
+        }
+        closeEditMessage();
+        renderList();
+        renderRoom();
+    });
+
+    $('cancelDeleteMessage').addEventListener('click', closeDeleteMessage);
+    deleteMessageOverlay.addEventListener('click', e => {
+        if (e.target === deleteMessageOverlay) closeDeleteMessage();
+    });
+    $('confirmDeleteMessage').addEventListener('click', () => {
+        if (!deletingMessage) return;
+        const { chatId, messageId, scope } = deletingMessage;
+        const { message } = findMessage(chatId, messageId);
+        if (!message || (scope === 'all' && message.from !== 'me')) return;
+        if (scope === 'me') {
+            message.hiddenForMe = true;
+        } else {
+            message.deletedForAll = true;
+            message.text = '';
+            // Referensi file dipertahankan di data lokal; tombol unduh tidak lagi ditampilkan.
+        }
+        closeDeleteMessage();
+        save();
+        renderList();
+        renderRoom();
+    });
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.message-actions')) {
+            document.querySelectorAll('.message-actions-menu').forEach(menu => menu.hidden = true);
+        }
+    });
 
     // SELECT CHAT
     function selectChat(id) {
@@ -653,6 +859,642 @@ const bubble = node(
     const cancelDeleteBtn = $('cancelDeleteBtn');
     const confirmDeleteBtn = $('confirmDeleteBtn');
 
+    // POPUP INFORMASI GRUP
+const groupInfoOverlay = $('groupInfoOverlay');
+const groupInfoName = $('groupInfoName');
+const groupInfoCount = $('groupInfoCount');
+const groupInfoMemberList = $('groupInfoMemberList');
+const closeGroupInfoBtn = $('closeGroupInfoBtn');
+const closeGroupInfoFooter = $('closeGroupInfoFooter');
+
+// Menampilkan informasi grup yang sedang dipilih
+function openGroupInfo() {
+    const c = selected();
+
+    if (!c || !c.isGroup) return;
+
+    groupInfoName.textContent = c.name;
+
+    // Avatar otomatis menggunakan inisial nama grup
+$('groupInfoAvatar').textContent = initials(c.name);
+
+    const members = Array.isArray(c.members) ? c.members : [];
+
+    groupInfoCount.textContent = `${members.length} Anggota`;
+
+    groupInfoMemberList.replaceChildren();
+
+    members.forEach((member, index) => {
+        const item = document.createElement('div');
+        item.className = 'group-info-member-item';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'group-info-member-avatar';
+        avatar.textContent = initials(member);
+
+        const name = document.createElement('span');
+        name.className = 'group-info-member-name';
+        name.textContent = member;
+
+        
+
+const role = document.createElement('span');
+role.className = 'group-info-member-role';
+
+// Status Admin berdasarkan data admins
+const isAdmin = (c.admins || []).includes(member);
+const currentUserIsAdmin = (c.admins || []).includes('Kamu');
+
+role.textContent = isAdmin ? 'Admin' : 'Anggota';
+
+item.append(avatar, name, role);
+
+// Tombol pengelolaan hanya muncul untuk Admin
+if (currentUserIsAdmin && member !== 'Kamu') {
+
+    // Jadikan Admin untuk anggota biasa
+    if (!isAdmin) {
+        const makeAdminBtn = document.createElement('button');
+
+        makeAdminBtn.type = 'button';
+        makeAdminBtn.className = 'group-make-admin-btn';
+        makeAdminBtn.textContent = 'Jadikan Admin';
+
+        makeAdminBtn.addEventListener('click', () => {
+            makeGroupAdmin(c.id, member);
+        });
+
+        item.append(makeAdminBtn);
+    }
+
+    // Tombol Keluarkan tetap tersedia
+    // untuk anggota biasa.
+    if (!isAdmin) {
+        const removeBtn = document.createElement('button');
+
+        removeBtn.type = 'button';
+        removeBtn.className = 'group-remove-member-btn';
+        removeBtn.textContent = 'Keluarkan';
+
+        removeBtn.addEventListener('click', () => {
+            openRemoveMember(c.id, member);
+        });
+
+        item.append(removeBtn);
+    }
+}
+
+groupInfoMemberList.append(item);
+
+    });
+
+    groupInfoOverlay.hidden = false;
+}
+
+// Menutup popup
+function closeGroupInfo() {
+    groupInfoOverlay.hidden = true;
+}
+
+
+
+/* =========================================
+   POPUP JADIKAN ADMIN - FINS UB
+========================================= */
+
+const makeAdminOverlay = $('makeAdminOverlay');
+const makeAdminText = $('makeAdminText');
+const cancelMakeAdminBtn = $('cancelMakeAdminBtn');
+const confirmMakeAdminBtn = $('confirmMakeAdminBtn');
+
+let pendingMakeAdmin = null;
+
+// Membuka popup Jadikan Admin
+function makeGroupAdmin(groupId, memberName) {
+    const group = chats.find(c => c.id === groupId);
+
+    if (!group || !group.isGroup) return;
+
+    // Hanya Admin yang boleh menunjuk Admin baru
+    if (!(group.admins || []).includes('Kamu')) return;
+
+    // Pastikan target adalah anggota, belum menjadi Admin
+    if (!(group.members || []).includes(memberName)) return;
+    if ((group.admins || []).includes(memberName)) return;
+
+    pendingMakeAdmin = { groupId, memberName };
+
+    makeAdminText.textContent =
+        `Yakin ingin menjadikan ${memberName} sebagai Admin grup ${group.name}?`;
+
+    groupInfoOverlay.hidden = true;
+    makeAdminOverlay.hidden = false;
+}
+
+// Menutup popup dan kembali ke Informasi Grup
+function closeMakeAdmin() {
+    makeAdminOverlay.hidden = true;
+    pendingMakeAdmin = null;
+
+    if (selected()?.isGroup) {
+        openGroupInfo();
+    }
+}
+
+// Tombol Batal
+cancelMakeAdminBtn.addEventListener('click', closeMakeAdmin);
+
+// Klik di luar popup
+makeAdminOverlay.addEventListener('click', event => {
+    if (event.target === makeAdminOverlay) {
+        closeMakeAdmin();
+    }
+});
+
+// Konfirmasi Jadikan Admin
+confirmMakeAdminBtn.addEventListener('click', () => {
+    if (!pendingMakeAdmin) return;
+
+    const { groupId, memberName } = pendingMakeAdmin;
+    const group = chats.find(c => c.id === groupId);
+
+    if (
+        !group ||
+        !group.isGroup ||
+        !(group.admins || []).includes('Kamu') ||
+        !(group.members || []).includes(memberName) ||
+        (group.admins || []).includes(memberName)
+    ) {
+        closeMakeAdmin();
+        return;
+    }
+
+    // Tambah Admin baru tanpa menghapus Admin sebelumnya
+    group.admins.push(memberName);
+
+    // Pengumuman sistem
+    group.messages.push({
+        id: Date.now(),
+        from: 'system',
+        type: 'system',
+        text: `${memberName} sekarang menjadi Admin grup.`,
+        at: new Date().toISOString()
+    });
+
+    save();
+    renderList();
+    renderRoom();
+    closeMakeAdmin();
+});
+
+
+// POPUP PERINGATAN ADMIN
+const adminWarningOverlay = $('adminWarningOverlay');
+const closeAdminWarningBtn = $('closeAdminWarningBtn');
+
+function showAdminWarning() {
+    adminWarningOverlay.hidden = false;
+    closeAdminWarningBtn.focus();
+}
+
+function closeAdminWarning() {
+    adminWarningOverlay.hidden = true;
+}
+
+closeAdminWarningBtn.addEventListener('click', closeAdminWarning);
+
+adminWarningOverlay.addEventListener('click', event => {
+    if (event.target === adminWarningOverlay) {
+        closeAdminWarning();
+    }
+});
+
+
+/* =========================================
+   FITUR KELUAR DARI GRUP - FINS UB
+========================================= */
+
+const leaveGroupBtn = $('leaveGroupBtn');
+const leaveGroupOverlay = $('leaveGroupOverlay');
+const leaveGroupText = $('leaveGroupText');
+const cancelLeaveGroupBtn = $('cancelLeaveGroupBtn');
+const confirmLeaveGroupBtn = $('confirmLeaveGroupBtn');
+
+let pendingLeaveGroupId = null;
+
+// Membuka popup konfirmasi Keluar Grup
+leaveGroupBtn.addEventListener('click', () => {
+    const group = selected();
+
+    if (!group || !group.isGroup) return;
+
+    const members = Array.isArray(group.members)
+        ? group.members
+        : [];
+
+    // Pada sistem demo, Kamu merupakan Admin grup
+    // dan belum tersedia pemindahan Admin.
+    // Periksa jumlah Admin yang masih aktif
+const admins = (group.admins || []).filter(
+    admin => members.includes(admin)
+);
+
+const currentUserIsAdmin = admins.includes('Kamu');
+
+// Admin terakhir tidak boleh keluar
+if (currentUserIsAdmin && admins.length <= 1) {
+    groupInfoOverlay.hidden = true;
+    showAdminWarning();
+    return;
+}
+    pendingLeaveGroupId = group.id;
+
+    leaveGroupText.textContent =
+        `Yakin ingin keluar dari grup ${group.name}?`;
+
+    groupInfoOverlay.hidden = true;
+    leaveGroupOverlay.hidden = false;
+});
+
+// Menutup popup konfirmasi
+function closeLeaveGroup() {
+    leaveGroupOverlay.hidden = true;
+    pendingLeaveGroupId = null;
+
+    const group = selected();
+
+    if (group && group.isGroup) {
+        openGroupInfo();
+    }
+}
+
+// Tombol Batal
+cancelLeaveGroupBtn.addEventListener(
+    'click',
+    closeLeaveGroup
+);
+
+// Klik area luar popup untuk menutup
+leaveGroupOverlay.addEventListener('click', event => {
+    if (event.target === leaveGroupOverlay) {
+        closeLeaveGroup();
+    }
+});
+
+// Konfirmasi Keluar Grup
+confirmLeaveGroupBtn.addEventListener('click', () => {
+    if (pendingLeaveGroupId === null) return;
+
+    const group = chats.find(
+        c => c.id === pendingLeaveGroupId
+    );
+
+    if (!group || !group.isGroup) {
+        closeLeaveGroup();
+        return;
+    }
+
+    const members = Array.isArray(group.members)
+        ? group.members
+        : [];
+
+    // Validasi ulang sebelum mengeluarkan pengguna
+    // Validasi ulang sebelum keluar grup
+const admins = (group.admins || []).filter(
+    admin => members.includes(admin)
+);
+
+const currentUserIsAdmin = admins.includes('Kamu');
+
+if (currentUserIsAdmin && admins.length <= 1) {
+    leaveGroupOverlay.hidden = true;
+    pendingLeaveGroupId = null;
+
+    showAdminWarning();
+    return;
+}
+    // Hilangkan grup dari daftar percakapan lokal
+    chats = chats.filter(c => c.id !== group.id);
+
+    // Pilih percakapan lain yang masih tersedia
+    selectedId = chats[0]?.id ?? null;
+
+    // Tutup kedua popup
+    leaveGroupOverlay.hidden = true;
+    groupInfoOverlay.hidden = true;
+    pendingLeaveGroupId = null;
+
+    // Simpan perubahan ke localStorage
+    save();
+
+    // Perbarui tampilan
+    renderList();
+    renderRoom();
+
+    // Kembali ke daftar percakapan pada mobile
+    messenger.classList.remove('room-open');
+});
+
+
+/* =========================================
+   FITUR KELUARKAN ANGGOTA GRUP
+========================================= */
+
+const removeMemberOverlay = $('removeMemberOverlay');
+const removeMemberText = $('removeMemberText');
+const cancelRemoveMemberBtn = $('cancelRemoveMemberBtn');
+const confirmRemoveMemberBtn = $('confirmRemoveMemberBtn');
+
+let pendingRemoveMember = null;
+
+// Membuka popup konfirmasi
+function openRemoveMember(groupId, memberName) {
+    const group = chats.find(c => c.id === groupId);
+
+    if (!group || !group.isGroup) return;
+
+    // Admin demo adalah anggota pertama
+    if (group.members?.[0] === memberName) return;
+
+    if (!group.members?.includes(memberName)) return;
+
+    pendingRemoveMember = {
+        groupId,
+        memberName
+    };
+
+    removeMemberText.textContent =
+        `Yakin ingin mengeluarkan ${memberName} dari grup ${group.name}?`;
+
+    groupInfoOverlay.hidden = true;
+    removeMemberOverlay.hidden = false;
+}
+
+// Menutup popup dan kembali ke Informasi Grup
+function closeRemoveMember() {
+    removeMemberOverlay.hidden = true;
+    pendingRemoveMember = null;
+
+    if (selected()?.isGroup) {
+        openGroupInfo();
+    }
+}
+
+// Tombol batal
+cancelRemoveMemberBtn.addEventListener(
+    'click',
+    closeRemoveMember
+);
+
+// Klik di luar popup
+removeMemberOverlay.addEventListener('click', event => {
+    if (event.target === removeMemberOverlay) {
+        closeRemoveMember();
+    }
+});
+
+// Konfirmasi keluarkan anggota
+confirmRemoveMemberBtn.addEventListener('click', () => {
+    if (!pendingRemoveMember) return;
+
+    const { groupId, memberName } = pendingRemoveMember;
+
+    const group = chats.find(c => c.id === groupId);
+
+    if (!group || !group.isGroup) {
+        closeRemoveMember();
+        return;
+    }
+
+    // Jangan sampai admin dikeluarkan
+    if (
+        group.members?.[0] === memberName ||
+        !group.members?.includes(memberName)
+    ) {
+        closeRemoveMember();
+        return;
+    }
+
+    // Hapus anggota dari daftar
+    group.members = group.members.filter(
+        name => name !== memberName
+    );
+
+    // Tambahkan pengumuman sistem
+    group.messages.push({
+        id: Date.now(),
+        from: 'system',
+        type: 'system',
+        text: `${memberName} telah dikeluarkan dari grup.`,
+        at: new Date().toISOString()
+    });
+
+    // Simpan perubahan
+    save();
+
+    // Perbarui tampilan
+    renderList();
+    renderRoom();
+
+    // Tutup konfirmasi dan perbarui popup informasi
+    closeRemoveMember();
+});
+
+
+/* ==========================================
+   FITUR TAMBAH ANGGOTA GRUP - FINS UB
+========================================== */
+
+const addGroupMemberOverlay = $('addGroupMemberOverlay');
+const addGroupMemberForm = $('addGroupMemberForm');
+const addGroupMemberSearch = $('addGroupMemberSearch');
+const addGroupMemberList = $('addGroupMemberList');
+
+const openAddGroupMemberBtn = $('openAddGroupMemberBtn');
+const closeAddGroupMemberBtn = $('closeAddGroupMemberBtn');
+const cancelAddGroupMemberBtn = $('cancelAddGroupMemberBtn');
+
+// ID grup yang sedang dikelola
+let activeGroupId = null;
+
+// ID kontak yang dipilih
+const selectedNewMembers = new Set();
+
+// Menampilkan daftar kontak yang bisa ditambahkan
+function renderAvailableGroupMembers() {
+    const group = chats.find(c => c.id === activeGroupId);
+
+    if (!group || !group.isGroup) return;
+
+    const keyword = addGroupMemberSearch.value
+        .trim()
+        .toLowerCase();
+
+    addGroupMemberList.replaceChildren();
+
+    // Kontak yang sudah menjadi anggota tidak ditampilkan
+    const availableContacts = chats.filter(c =>
+        !c.isGroup &&
+        !(group.members || []).includes(c.name) &&
+        c.name.toLowerCase().includes(keyword)
+    );
+
+    if (availableContacts.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'add-group-member-empty';
+        empty.textContent = 'Tidak ada kontak yang tersedia.';
+
+        addGroupMemberList.append(empty);
+        return;
+    }
+
+    availableContacts.forEach(contact => {
+        const item = document.createElement('label');
+        item.className = 'add-group-member-item';
+
+        const avatar = document.createElement('span');
+        avatar.className = 'add-group-member-avatar';
+        avatar.textContent = initials(contact.name);
+
+        const name = document.createElement('span');
+        name.className = 'add-group-member-name';
+        name.textContent = contact.name;
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = String(contact.id);
+
+        checkbox.checked = selectedNewMembers.has(contact.id);
+
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                selectedNewMembers.add(contact.id);
+            } else {
+                selectedNewMembers.delete(contact.id);
+            }
+        });
+
+        item.append(avatar, name, checkbox);
+        addGroupMemberList.append(item);
+    });
+}
+
+// Membuka popup Tambah Anggota
+openAddGroupMemberBtn.addEventListener('click', () => {
+    const group = selected();
+
+    if (!group || !group.isGroup) return;
+
+    activeGroupId = group.id;
+    selectedNewMembers.clear();
+
+    addGroupMemberForm.reset();
+    addGroupMemberSearch.value = '';
+
+    renderAvailableGroupMembers();
+
+    groupInfoOverlay.hidden = true;
+    addGroupMemberOverlay.hidden = false;
+
+    addGroupMemberSearch.focus();
+});
+
+// Menutup popup Tambah Anggota
+function closeAddGroupMember() {
+    addGroupMemberOverlay.hidden = true;
+    activeGroupId = null;
+    selectedNewMembers.clear();
+
+    // Kembali ke popup Informasi Grup
+    const group = selected();
+
+    if (group && group.isGroup) {
+        openGroupInfo();
+    }
+}
+
+closeAddGroupMemberBtn.addEventListener(
+    'click',
+    closeAddGroupMember
+);
+
+cancelAddGroupMemberBtn.addEventListener(
+    'click',
+    closeAddGroupMember
+);
+
+// Tutup ketika klik bagian luar popup
+addGroupMemberOverlay.addEventListener('click', event => {
+    if (event.target === addGroupMemberOverlay) {
+        closeAddGroupMember();
+    }
+});
+
+// Pencarian kontak
+addGroupMemberSearch.addEventListener(
+    'input',
+    renderAvailableGroupMembers
+);
+
+// Menyimpan anggota baru
+addGroupMemberForm.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const group = chats.find(c => c.id === activeGroupId);
+
+    if (!group || !group.isGroup) return;
+
+    if (selectedNewMembers.size === 0) {
+        alert('Pilih minimal satu anggota.');
+        return;
+    }
+
+    const newMembers = chats
+        .filter(c =>
+            !c.isGroup &&
+            selectedNewMembers.has(c.id) &&
+            !(group.members || []).includes(c.name)
+        )
+        .map(c => c.name);
+
+    if (newMembers.length === 0) {
+        alert('Anggota yang dipilih sudah ada di grup.');
+        return;
+    }
+
+    // Tambahkan anggota tanpa menghapus anggota lama
+    group.members = [
+        ...(group.members || []),
+        ...newMembers
+    ];
+
+    // Tambahkan pengumuman grup
+    group.messages.push({
+        id: Date.now(),
+        from: 'system',
+        type: 'system',
+        text: newMembers.join(', ') +
+              ' telah ditambahkan ke grup.',
+        at: new Date().toISOString()
+    });
+
+    save();
+    renderList();
+    renderRoom();
+
+    closeAddGroupMember();
+});
+
+
+closeGroupInfoBtn.addEventListener('click', closeGroupInfo);
+closeGroupInfoFooter.addEventListener('click', closeGroupInfo);
+
+groupInfoOverlay.addEventListener('click', event => {
+    if (event.target === groupInfoOverlay) {
+        closeGroupInfo();
+    }
+});
+
     let pendingDeleteChatId = null;
 
     roomMenuButton.addEventListener('click', (event) => {
@@ -662,16 +1504,12 @@ const bubble = node(
         if (!c) return;
 
         if (c.isGroup) {
-            roomDropdown.hidden = true;
-            roomMenuButton.setAttribute('aria-expanded', 'false');
+    roomDropdown.hidden = true;
+    roomMenuButton.setAttribute('aria-expanded', 'false');
 
-            alert(
-                'Grup: ' + c.name +
-                '\n\nAnggota:\n' +
-                (c.members || []).join('\n')
-            );
-            return;
-        }
+    openGroupInfo();
+    return;
+}
 
         roomDropdown.hidden = !roomDropdown.hidden;
         roomMenuButton.setAttribute(
