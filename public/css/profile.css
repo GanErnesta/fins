@@ -353,7 +353,6 @@ button {
 }
 
 .fins-avatar {
-  display: grid;
   place-items: center;
   overflow: hidden;
   border-radius: 50%;
@@ -1394,7 +1393,6 @@ button {
   border-radius: inherit;
   object-fit: cover;
 }
-
-/* Navbar FINS menggunakan public/css/navbar.css.
-   Hindari override .fins-header di file ini agar tema merah konsisten
-   pada halaman Profile dan halaman FINS lainnya. */
+.fins-user-card .fins-avatar-large {
+    transform: translateY(20px);
+}

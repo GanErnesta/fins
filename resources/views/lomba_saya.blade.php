@@ -46,115 +46,17 @@
         rel="stylesheet"
     >
 
-    <!-- CSS Lomba Saya -->
+    <!-- CSS Global dan Lomba Saya -->
+    <link rel="stylesheet" href="/css/navbar.css?v=20">
     
-    <link rel="stylesheet" href="{{ asset('css/lomba_saya.css') }}?v=12">
+    <link rel="stylesheet" href="/css/lomba_saya.css?v=20">
 </head>
 
 
 <body>
 
-    {{-- ================= NAVBAR ================= --}}
-
-    <header class="navbar">
-
-        
-        <a href="{{ url('/home') }}" class="navbar__logo" aria-label="FINS UB">
-            <img
-                src="{{ asset('assets/images/logo fins.png') }}"
-                alt="Logo FINS UB"
-                style="width: 48px; height: 48px; object-fit: contain; display: block;"
-            >
-        </a>
-
-
-        <nav class="navbar__menu">
-
-            <a href="{{ url('/home') }}">
-                Beranda
-            </a>
-
-            <a href="{{ url('/cari-lomba') }}">
-                Cari Lomba
-            </a>
-
-            <a href="{{ url('/cari-partner') }}">
-                Cari Partner
-            </a>
-
-            <a href="{{ url('/lomba-saya') }}" class="active">
-                Lomba Saya
-            </a>
-
-        </nav>
-
-        
-    <div class="navbar__actions">
-
-        <!-- IKON CHAT -->
-        <a href="{{ url('/chat') }}"
-        class="nav-icon"
-        aria-label="Chat">
-
-            <svg width="25" height="25"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.7"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-
-                <path d="M20 11.5a8 8 0 0 1-8 8
-                        8.5 8.5 0 0 1-3.5-.8L4 20l1.3-4.5
-                        A8 8 0 1 1 20 11.5Z"/>
-
-                <path d="M8 10h8"/>
-                <path d="M8 14h5"/>
-
-            </svg>
-        </a>
-
-        <!-- IKON NOTIFIKASI -->
-        <a href="{{ url('/notifikasi') }}"
-        class="nav-icon notification-icon"
-        aria-label="Notifikasi">
-
-            <svg width="25" height="25"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.7"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-
-                <path d="M18 8a6 6 0 0 0-12 0
-                        c0 7-3 8-3 8h18s-3-1-3-8"/>
-
-                <path d="M10 20a2 2 0 0 0 4 0"/>
-
-            </svg>
-
-            <span class="notification-dot"></span>
-        </a>
-
-        <!-- IKON PROFIL -->
-        <a href="{{ url('/profile') }}"
-        class="navbar-profile"
-        aria-label="Profil">
-
-            <img
-                src="{{ asset('assets/images/logo fins.png') }}"
-                alt="Profil FINS"
-                class="navbar-profile-img"
-            >
-
-        </a>
-
-    </div>
-
-
-    </header>
-
+    {{-- Navbar global FINS --}}
+    @include('components.navbar')
 
     {{-- ================= MAIN ================= --}}
 
@@ -306,7 +208,7 @@
                                 {{ $l['kesiapan'] }}%
                             </span>
 
-                            <a href="{{ url('/chat') }}" class="link">
+                            <a href="/chat" class="link">
                                 Buka Diskusi Tim →
                             </a>
 
@@ -394,7 +296,7 @@
                                 Google Drive & Chat FINS
                             </span>
 
-                            <a href="{{ url('/chat') }}" class="link">
+                            <a href="/chat" class="link">
                                 Buka Chat Grup
                             </a>
 
@@ -536,10 +438,20 @@
     </div>
 </div>
 
-{{-- Data contoh dari controller untuk tampilan awal --}}
+{{-- Data awal untuk CRUD rekrutmen; aman untuk HTML dan tidak memicu parser JS VS Code --}}
+<div id="postingRekrutData"
+     data-posting="{{ \Illuminate\Support\Js::encode($postingRekrut) }}"
+     hidden></div>
 <script>
-    window.postingRekrutAwal =
-        {{ Illuminate\Support\Js::from($postingRekrut) }};
+    const postingRekrutData = document.getElementById('postingRekrutData');
+    try {
+        window.postingRekrutAwal = postingRekrutData
+            ? JSON.parse(postingRekrutData.dataset.posting || '[]')
+            : [];
+    } catch (error) {
+        console.error('Data posting rekrutmen tidak valid:', error);
+        window.postingRekrutAwal = [];
+    }
 </script>
 
 
@@ -594,7 +506,7 @@
                             Diajukan pada: {{ $p['waktu'] }}
                         </span>
 
-                        <a href="{{ url('/chat') }}" class="link">
+                        <a href="/chat" class="link">
                             Hubungi Ketua Tim →
                         </a>
 
@@ -626,7 +538,7 @@
             <div>
 
                 <img
-                    src="{{ asset('assets/images/logo fins.png') }}"
+                    src="/assets/images/Group4.png"
                     alt="Logo FINS UB"
                     class="logo-fins-footer"
                 >
@@ -654,31 +566,31 @@
                 <ul>
 
                     <li>
-                        <a href="{{ url('/cari-lomba') }}">
+                        <a href="/cari-lomba">
                             Daftar Kompetisi Mahasiswa
                         </a>
                     </li>
 
                     <li>
-                        <a href="{{ url('/cari-partner') }}">
+                        <a href="/cari-partner">
                             Cari Rekan & Partner Tim
                         </a>
                     </li>
 
                     <li>
-                        <a href="{{ url('/posting-lomba') }}">
+                        <a href="/posting-lomba">
                             Publikasi Kebutuhan Tim
                         </a>
                     </li>
 
                     <li>
-                        <a href="{{ url('/lomba-saya') }}">
+                        <a href="/lomba-saya">
                             Dashboard Lomba Saya
                         </a>
                     </li>
 
                     <li>
-                        <a href="{{ url('/lomba-saya') }}#tim-saya">
+                        <a href="/lomba-saya#tim-saya">
                             Manajemen Tim Saya
                         </a>
                     </li>
@@ -789,7 +701,7 @@
 
     {{-- ================= JAVASCRIPT ================= --}}
 
-    <script src="{{ asset('js/lomba_saya.js') }}?v=12"></script>
+    <script src="/js/lomba_saya.js?v=20"></script>
 
 </body>
 </html>

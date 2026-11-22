@@ -12,6 +12,10 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PostingLombaController;
 use App\Http\Controllers\LombaSayaController;
 use App\Http\Controllers\ChatFileController;
+use App\Http\Controllers\ChatAttachmentController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\PartnerInvitationController;
+use App\Http\Controllers\CariPartnerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -222,9 +226,10 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/cari-partner', function () {
-        return view('cari_partner');
-    })->name('cari-partner');
+    Route::get('/cari-partner', [
+    CariPartnerController::class,
+    'index'
+])->middleware('auth')->name('cari-partner');
 
     /*
     |--------------------------------------------------------------------------
@@ -311,3 +316,67 @@ Route::middleware('auth')->group(function () {
     ->name('chat.file.download');
 
 });
+/*
+|--------------------------------------------------------------------------
+| CHAT ATTACHMENTS - SUPABASE STORAGE
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function () {
+
+    // Upload file chat ke Supabase Storage
+    Route::post('/chat/attachments/upload', [
+        ChatAttachmentController::class,
+        'upload'
+    ])->name('chat.attachments.upload');
+
+    // Download file chat dari Supabase Storage
+    Route::get('/chat/attachments/{attachmentId}/download', [
+        ChatAttachmentController::class,
+        'download'
+    ])->whereNumber('attachmentId')
+      ->name('chat.attachments.download');
+
+});
+Route::middleware('auth')->get(
+    '/chat/conversations',
+    [ChatController::class, 'index']
+)->name('chat.conversations.index');
+
+Route::middleware('auth')->get(
+    '/chat/conversations/{conversationId}/messages',
+    [ChatController::class, 'messages']
+)->whereNumber('conversationId')
+ ->name('chat.conversations.messages');
+
+ Route::middleware('auth')->post(
+    '/chat/conversations/{conversationId}/messages',
+    [ChatController::class, 'sendMessage']
+)->whereNumber('conversationId')
+ ->name('chat.conversations.messages.send');
+
+ Route::middleware('auth')->group(function () {
+
+    Route::post(
+        '/partner-invitations',
+        [PartnerInvitationController::class, 'store']
+    )->name('partner-invitations.store');
+
+    Route::get(
+        '/partner-invitations/received',
+        [PartnerInvitationController::class, 'received']
+    )->name('partner-invitations.received');
+
+    Route::get(
+        '/partner-invitations/sent',
+        [PartnerInvitationController::class, 'sent']
+    )->name('partner-invitations.sent');
+
+    Route::patch(
+        '/partner-invitations/{id}/respond',
+        [PartnerInvitationController::class, 'respond']
+    )->whereNumber('id')
+     ->name('partner-invitations.respond');
+
+});
+

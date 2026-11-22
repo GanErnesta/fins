@@ -2,10 +2,70 @@
 (() => {
     'use strict';
 
-    // STORAGE
+    /*
+    |--------------------------------------------------------------------------
+    | KONFIGURASI
+    |--------------------------------------------------------------------------
+    */
+
     const STORAGE_KEY = 'fins_chat_demo_v1';
 
-    // INITIAL CONVERSATIONS
+    const $ = (id) => document.getElementById(id);
+
+    const list = $('conversationList');
+    const area = $('messagesArea');
+    const form = $('messageForm');
+    const search = $('chatSearch');
+    const input = $('messageInput');
+    const sort = $('sortChats');
+    const messenger = document.querySelector('.messenger');
+
+    const fileInput = $('fileInput');
+    const attachButton = $('attachButton');
+    const uploadStatus = $('uploadStatus');
+
+    const csrfToken = document.querySelector(
+        'meta[name="csrf-token"]'
+    )?.content || '';
+    const conversationsUrl =
+        form.dataset.conversationsUrl ||
+        '/chat/conversations';
+
+    const messagesUrlTemplate =
+        form.dataset.messagesUrlTemplate ||
+        '/chat/conversations/__ID__/messages';
+    const uploadUrl =
+        form?.dataset.uploadUrl ||
+        '/chat/attachments/upload';
+
+    const downloadUrlTemplate =
+        form?.dataset.downloadUrlTemplate ||
+        '/chat/attachments/__ID__/download';
+
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+    const ALLOWED_MIME_TYPES = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'application/pdf'
+    ];
+
+    if (!list || !area || !form || !search || !input || !sort) {
+        console.error('Elemen halaman Chat FINS tidak lengkap.');
+        return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DATA PERCAKAPAN DEMO
+    |--------------------------------------------------------------------------
+    |
+    | ID di bawah adalah ID lokal, bukan ID database Supabase.
+    | Upload baru bisa dilakukan ketika dbConversationId tersedia.
+    |
+    */
+
     const initialConversations = [
         {
             id: 1,
@@ -118,226 +178,323 @@
         }
     ];
 
-    // DOM ELEMENTS
-    const $ = (id) => document.getElementById(id);
+    /*
+    |--------------------------------------------------------------------------
+    | LOAD DATA LOCAL STORAGE
+    |--------------------------------------------------------------------------
+    */
 
-    const list = $('conversationList');
-    const area = $('messagesArea');
-    const form = $('messageForm');
-    const search = $('chatSearch');
-    const input = $('messageInput');
-    const sort = $('sortChats');
-
-    const messenger = document.querySelector('.messenger');
-
-    // LOAD CHAT DATA
     let chats;
 
     try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        const saved = JSON.parse(
+            localStorage.getItem(STORAGE_KEY)
+        );
 
         chats = Array.isArray(saved)
             ? saved
             : structuredClone(initialConversations);
 
-    } catch (_) {
+    } catch (error) {
         chats = structuredClone(initialConversations);
     }
 
-    // INITIAL STATE
+    chats = chats.map(chat => ({
+        ...chat,
+        unread: Number(chat.unread) || 0,
+        messages: Array.isArray(chat.messages)
+            ? chat.messages
+            : [],
+        dbConversationId:
+            Number.isSafeInteger(Number(chat.dbConversationId)) &&
+            Number(chat.dbConversationId) > 0
+                ? Number(chat.dbConversationId)
+                : null
+    }));
+
     let selectedId = chats.some(c => c.id === 2)
         ? 2
         : (chats[0]?.id ?? null);
 
     let filter = 'all';
-    
+    let pendingDeleteChatId = null;
+    let isUploading = false;
 
-   // FITUR GRUP DEMO
-const groupOverlay = $('groupOverlay');
-const groupForm = $('createGroupForm');
-const groupName = $('groupName');
-const memberSearch = $('groupMemberSearch');
-const memberList = $('groupMemberList');
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE DATA
+    |--------------------------------------------------------------------------
+    */
 
-// Menyimpan anggota yang dipilih
-const selectedGroupMembers = new Set();
-
-// Menampilkan daftar anggota
-function renderGroupMembers() {
-    const keyword = memberSearch.value.toLowerCase();
-
-    memberList.replaceChildren();
-
-    chats.filter(c => !c.isGroup)
-        .filter(c => c.name.toLowerCase().includes(keyword))
-        .forEach(c => {
-            const label = document.createElement('label');
-            label.className = 'group-member-item';
-
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.value = String(c.id);
-            checkbox.checked = selectedGroupMembers.has(c.id);
-
-            checkbox.addEventListener('change', () => {
-                if (checkbox.checked) {
-                    selectedGroupMembers.add(c.id);
-                } else {
-                    selectedGroupMembers.delete(c.id);
-                }
-            });
-
-            const name = document.createElement('span');
-            name.textContent = c.name;
-
-            label.append(checkbox, name);
-            memberList.append(label);
-        });
-}
-
-    $('createGroupBtn').addEventListener('click', () => {
-        groupForm.reset();
-        memberSearch.value = '';
-        renderGroupMembers();
-        groupOverlay.hidden = false;
-        groupName.focus();
-    });
-
-    $('closeGroupBtn').addEventListener('click', () => {
-        groupOverlay.hidden = true;
-    });
-
-    groupOverlay.addEventListener('click', event => {
-        if (event.target === groupOverlay) {
-            groupOverlay.hidden = true;
-        }
-    });
-
-    memberSearch.addEventListener('input', () => {
-        // Simpan pilihan saat pengguna mencari anggota lain
-        renderGroupMembers();
-    });
-
-    groupForm.addEventListener('submit', event => {
-        event.preventDefault();
-
-        const name = groupName.value.trim();
-
-        const ids = [...memberList.querySelectorAll('input:checked')]
-            .map(el => Number(el.value));
-
-        const members = chats
-            .filter(c => ids.includes(c.id) && !c.isGroup)
-            .map(c => c.name);
-
-        if (!name) return;
-
-        if (members.length === 0) {
-            alert('Pilih minimal satu anggota.');
-            return;
-        }
-
-        const group = {
-            id: Date.now(),
-            name: name,
-            isGroup: true,
-            members: ['Kamu', ...members],
-            unread: 0,
-            messages: [{
-    id: Date.now() + 1,
-    from: 'system',
-    type: 'system',
-    text: 'Grup ' + name + ' berhasil dibuat!',
-    at: new Date().toISOString()
-}]
-        };
-
-        chats.push(group);
-        groupOverlay.hidden = true;
-
-        save();
-        selectChat(group.id);
-    });
-
-    // SAVE DATA
-    const save = () => {
+    function save() {
         try {
             localStorage.setItem(
                 STORAGE_KEY,
                 JSON.stringify(chats)
             );
-        } catch (_) {}
-    };
+        } catch (error) {
+            console.warn('Gagal menyimpan chat lokal:', error);
+        }
+    }
 
-    // HELPER FUNCTIONS
-    const initials = (name) => {
+    /*
+    |--------------------------------------------------------------------------
+    | HELPER
+    |--------------------------------------------------------------------------
+    */
+
+    function selected() {
+        return chats.find(c => c.id === selectedId);
+    }
+
+    function initials(name) {
         return String(name || '?')
             .trim()
             .split(/\s+/)
             .filter(Boolean)
             .slice(0, 2)
-            .map(w => Array.from(w)[0].toUpperCase())
+            .map(word => Array.from(word)[0].toUpperCase())
             .join('') || '?';
-    };
+    }
 
-    const lastAt = c => {
-        return c.messages.length
-            ? new Date(c.messages[c.messages.length - 1].at).getTime()
-            : 0;
-    };
+    function node(tag, className = '', text) {
+        const element = document.createElement(tag);
 
-    const selected = () => {
-        return chats.find(c => c.id === selectedId);
-    };
+        if (className) {
+            element.className = className;
+        }
 
-    const formatTime = iso => {
+        if (text !== undefined) {
+            element.textContent = String(text);
+        }
+
+        return element;
+    }
+
+    function formatTime(iso) {
+        const date = new Date(iso);
+
+        if (Number.isNaN(date.getTime())) {
+            return '';
+        }
+
         return new Intl.DateTimeFormat('id-ID', {
             hour: '2-digit',
             minute: '2-digit'
-        }).format(new Date(iso));
-    };
+        }).format(date);
+    }
 
-    const formatDay = iso => {
+    function formatDay(iso) {
+        const date = new Date(iso);
+
+        if (Number.isNaN(date.getTime())) {
+            return '';
+        }
+
         return new Intl.DateTimeFormat('id-ID', {
             day: 'numeric',
             month: 'long',
             year: 'numeric'
-        }).format(new Date(iso));
-    };
-
-    function node(tag, className, text) {
-        const el = document.createElement(tag);
-
-        if (className) {
-            el.className = className;
-        }
-
-        if (text !== undefined) {
-            el.textContent = String(text);
-        }
-
-        return el;
+        }).format(date);
     }
 
-    // RENDER CONVERSATION LIST
+    function lastAt(chat) {
+        const messages = chat.messages || [];
+
+        if (!messages.length) {
+            return 0;
+        }
+
+        const date = new Date(messages.at(-1).at);
+
+        return Number.isNaN(date.getTime())
+            ? 0
+            : date.getTime();
+    }
+
+    function getPreview(message) {
+        if (!message) {
+            return 'Mulai percakapan';
+        }
+
+        if (message.type === 'file' || message.type === 'image') {
+            return '📎 ' + (message.fileName || 'Lampiran');
+        }
+
+        return message.text || 'Mulai percakapan';
+    }
+
+    function getDownloadUrl(attachmentId) {
+        return downloadUrlTemplate.replace(
+            '__ID__',
+            encodeURIComponent(String(attachmentId))
+        );
+    }
+
+    function showUploadStatus(message, isError = false) {
+        if (!uploadStatus) {
+            if (isError) {
+                alert(message);
+            }
+            return;
+        }
+
+        uploadStatus.textContent = message;
+        uploadStatus.hidden = !message;
+        uploadStatus.style.color = isError
+            ? '#c0392b'
+            : '';
+
+        uploadStatus.style.padding = message
+            ? '8px 16px'
+            : '';
+    }
+
+    function getServerConversationId(chat) {
+        const id = Number(chat?.dbConversationId);
+
+        return Number.isSafeInteger(id) && id > 0
+            ? id
+            : null;
+    }
+
+async function loadConversations() {
+    try {
+        const response = await fetch(conversationsUrl, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                'Gagal mengambil percakapan. HTTP ' +
+                response.status
+            );
+        }
+
+        const result = await response.json();
+
+        if (!result.success || !Array.isArray(result.data)) {
+            throw new Error('Format data percakapan tidak valid.');
+        }
+
+        chats = result.data.map(chat => ({
+            ...chat,
+            id: Number(chat.id),
+            dbConversationId: Number(chat.dbConversationId),
+            messages: Array.isArray(chat.messages)
+                ? chat.messages
+                : [],
+            unread: Number(chat.unread) || 0
+        }));
+
+        selectedId = chats[0]?.id ?? null;
+
+        renderList();
+        renderRoom();
+
+        if (selectedId !== null) {
+            await loadMessages(selectedId);
+        }
+
+    } catch (error) {
+        console.error('Gagal mengambil percakapan:', error);
+        showUploadStatus(
+            'Gagal memuat percakapan dari server.',
+            true
+        );
+    }
+}
+
+async function loadMessages(conversationId) {
+    const chat = chats.find(
+        item => item.id === conversationId
+    );
+
+    if (!chat) {
+        return;
+    }
+
+    try {
+        const url = messagesUrlTemplate.replace(
+            '__ID__',
+            encodeURIComponent(String(conversationId))
+        );
+
+        const response = await fetch(url, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                'Gagal mengambil pesan. HTTP ' +
+                response.status
+            );
+        }
+
+        const result = await response.json();
+
+        if (!result.success || !Array.isArray(result.data)) {
+            throw new Error('Format riwayat pesan tidak valid.');
+        }
+
+        chat.messages = result.data;
+
+        if (selectedId === conversationId) {
+            renderRoom();
+        }
+
+        renderList();
+
+    } catch (error) {
+        console.error('Gagal memuat pesan:', error);
+    }
+}
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RENDER DAFTAR PERCAKAPAN
+    |--------------------------------------------------------------------------
+    */
+
     function renderList() {
-        const term = search.value
+        const keyword = search.value
             .trim()
             .toLocaleLowerCase('id');
 
-        let visible = chats.filter(c =>
-            (filter === 'all' || c.unread > 0) &&
-            (
-                !term ||
-                c.name.toLocaleLowerCase('id').includes(term) ||
-                c.messages.some(m =>
-                   (m.text || '').toLocaleLowerCase('id').includes(term) ||
-                (m.fileName || '').toLocaleLowerCase('id').includes(term)   
-                )
-            )
-        );
+        let visible = chats.filter(chat => {
+            const matchesFilter =
+                filter === 'all' || chat.unread > 0;
 
-        // SORT CONVERSATIONS
+            const matchesSearch =
+                !keyword ||
+                chat.name.toLocaleLowerCase('id').includes(keyword) ||
+                chat.messages.some(message => {
+                    const text = String(
+                        message.text || ''
+                    ).toLocaleLowerCase('id');
+
+                    const fileName = String(
+                        message.fileName || ''
+                    ).toLocaleLowerCase('id');
+
+                    return (
+                        text.includes(keyword) ||
+                        fileName.includes(keyword)
+                    );
+                });
+
+            return matchesFilter && matchesSearch;
+        });
+
         visible.sort((a, b) => {
             if (sort.value === 'az') {
                 return a.name.localeCompare(b.name, 'id');
@@ -347,82 +504,80 @@ function renderGroupMembers() {
                 return b.name.localeCompare(a.name, 'id');
             }
 
-            return sort.value === 'oldest'
-                ? lastAt(a) - lastAt(b)
-                : lastAt(b) - lastAt(a);
+            if (sort.value === 'oldest') {
+                return lastAt(a) - lastAt(b);
+            }
+
+            return lastAt(b) - lastAt(a);
         });
 
         list.replaceChildren();
 
-        // DISPLAY EACH CONVERSATION
-        for (const c of visible) {
+        for (const chat of visible) {
             const item = node(
                 'button',
                 'conversation-item' +
-                (c.id === selectedId ? ' active' : '')
+                (chat.id === selectedId ? ' active' : '')
             );
 
             item.type = 'button';
 
             item.setAttribute(
                 'aria-pressed',
-                String(c.id === selectedId)
+                String(chat.id === selectedId)
             );
 
-            // AVATAR
-            item.append(
-                node('span', 'avatar', initials(c.name))
+            const avatar = node(
+                'span',
+                'avatar',
+                initials(chat.name)
             );
 
-            // CONTACT INFORMATION
             const meta = node('span', 'contact-meta');
 
             meta.append(
-                node('span', 'contact-name', c.name)
+                node('span', 'contact-name', chat.name)
             );
 
             meta.append(
                 node(
                     'span',
                     'contact-preview',
-                    c.messages.at(-1)?.type === 'file'
-                    ? '📎 ' + c.messages.at(-1).fileName
-                    : (c.messages.at(-1)?.text || 'Mulai percakapan')
+                    getPreview(chat.messages.at(-1))
                 )
             );
 
-            item.append(meta);
-
-            // TIME AND UNREAD BADGE
             const right = node('span', 'contact-right');
 
-            if (c.messages.length) {
+            if (chat.messages.length) {
                 right.append(
                     node(
                         'span',
                         'contact-time',
-                        formatTime(c.messages.at(-1).at)
+                        formatTime(chat.messages.at(-1).at)
                     )
                 );
             }
 
-            if (c.unread > 0) {
+            if (chat.unread > 0) {
                 right.append(
-                    node('span', 'unread-badge', c.unread)
+                    node(
+                        'span',
+                        'unread-badge',
+                        chat.unread
+                    )
                 );
             }
 
-            item.append(right);
+            item.append(avatar, meta, right);
 
-            // SELECT CONVERSATION
             item.addEventListener('click', () => {
-                selectChat(c.id);
+                selectChat(chat.id);
             });
 
             list.append(item);
         }
 
-        // EMPTY SEARCH RESULT
         if (!visible.length) {
             list.append(
                 node(
@@ -433,13 +588,13 @@ function renderGroupMembers() {
             );
         }
 
-        // UPDATE UNREAD COUNT
-        $('unreadCount').textContent = chats.reduce(
-            (sum, c) => sum + c.unread,
+        const totalUnread = chats.reduce(
+            (sum, chat) => sum + (chat.unread || 0),
             0
         );
 
-        // UPDATE FILTER BUTTONS
+        $('unreadCount').textContent = totalUnread;
+
         $('filterAll').classList.toggle(
             'active',
             filter === 'all'
@@ -461,31 +616,42 @@ function renderGroupMembers() {
         );
     }
 
-    // RENDER CHAT ROOM
+    /*
+    |--------------------------------------------------------------------------
+    | RENDER RUANG CHAT
+    |--------------------------------------------------------------------------
+    */
+
     function renderRoom() {
-        const c = selected();
+        const chat = selected();
 
         area.replaceChildren();
 
-        // NO CONVERSATION SELECTED
-        if (!c) {
-    $('selectedName').textContent = 'Pilih percakapan';
-    $('selectedAvatar').textContent = '?';
-    $('selectedStatus').textContent = '';
-    input.disabled = true;
+        if (!chat) {
+            $('selectedName').textContent = 'Pilih percakapan';
+            $('selectedAvatar').textContent = '?';
+            $('selectedStatus').textContent = '';
+            input.disabled = true;
+            attachButton.disabled = true;
+            return;
+        }
 
-    return;
-}
-
-        // UPDATE CHAT HEADER
         input.disabled = false;
+        attachButton.disabled = isUploading;
 
-        $('selectedName').textContent = c.name;
-        $('selectedAvatar').textContent = initials(c.name);
-        $('selectedStatus').textContent = c.isGroup ? `${c.members.length} anggota`: 'Percakapan';
+        $('selectedName').textContent = chat.name;
 
-        // EMPTY CHAT
-        if (!c.messages.length) {
+        $('selectedAvatar').textContent = initials(chat.name);
+
+        const memberCount = Array.isArray(chat.members)
+            ? chat.members.length
+            : 1;
+
+        $('selectedStatus').textContent = chat.isGroup
+            ? `${memberCount} anggota`
+            : 'Percakapan';
+
+        if (!chat.messages.length) {
             area.append(
                 node(
                     'p',
@@ -493,17 +659,14 @@ function renderGroupMembers() {
                     'Belum ada pesan. Mulai percakapan!'
                 )
             );
-
             return;
         }
 
-        // DISPLAY MESSAGES
         let previousDay = '';
 
-        for (const msg of c.messages) {
-            const day = formatDay(msg.at);
+        for (const message of chat.messages) {
+            const day = formatDay(message.at);
 
-            // DAY SEPARATOR
             if (day !== previousDay) {
                 area.append(
                     node('div', 'day-separator', day)
@@ -511,43 +674,67 @@ function renderGroupMembers() {
 
                 previousDay = day;
             }
-            
-         // MESSAGE BUBBLE
 
-// PENGUMUMAN SISTEM GRUP
-if (
-    msg.type === 'system' ||
-    msg.from === 'system' ||
-    (c.isGroup && msg.text?.startsWith('Grup ') &&
-     msg.text?.endsWith(' berhasil dibuat!'))
-) {
+            /*
+            | PESAN SISTEM GRUP
+            */
 
-    area.append(announcement);
-    continue;
-}
+            if (
+                message.type === 'system' ||
+                message.from === 'system' ||
+                (
+                    chat.isGroup &&
+                    message.text?.startsWith('Grup ') &&
+                    message.text?.endsWith(' berhasil dibuat!')
+                )
+            ) {
+                const announcement = node(
+                    'div',
+                    'system-announcement',
+                    message.text || ''
+                );
 
-const bubble = node(
-    'div',
-    'message ' +
-    (msg.from === 'me' ? 'mine' : 'theirs')
-);
+                announcement.style.textAlign = 'center';
+                announcement.style.margin = '12px auto';
+                announcement.style.fontSize = '12px';
+                announcement.style.opacity = '0.8';
 
-            if (msg.type === 'file' && msg.fileUrl) {
+                area.append(announcement);
+                continue;
+            }
 
+            /*
+            | BUBBLE PESAN
+            */
+
+            const bubble = node(
+                'div',
+                'message ' +
+                (message.from === 'me' ? 'mine' : 'theirs')
+            );
+
+            const isAttachment =
+                message.type === 'file' ||
+                message.type === 'image';
+
+            const fileUrl = message.attachmentId
+                ? getDownloadUrl(message.attachmentId)
+                : message.fileUrl;
+
+            if (isAttachment && fileUrl) {
                 const attachment = node(
                     'a',
                     'message-attachment'
                 );
 
-                attachment.href = msg.fileUrl;
-                attachment.setAttribute('download', '');
+                attachment.href = fileUrl;
                 attachment.target = '_blank';
                 attachment.rel = 'noopener noreferrer';
 
                 const fileIcon = node(
                     'span',
                     'attachment-file-icon',
-                    '📄'
+                    message.type === 'image' ? '🖼️' : '📄'
                 );
 
                 const fileInfo = node(
@@ -558,14 +745,14 @@ const bubble = node(
                 const fileName = node(
                     'strong',
                     'attachment-file-name',
-                    msg.fileName || 'Lampiran'
+                    message.fileName || 'Lampiran'
                 );
 
                 const fileSize = node(
                     'small',
                     'attachment-file-size',
-                    msg.fileSize
-                        ? (msg.fileSize / 1024).toFixed(1) + ' KB'
+                    message.fileSize
+                        ? (message.fileSize / 1024).toFixed(1) + ' KB'
                         : 'File'
                 );
 
@@ -579,44 +766,74 @@ const bubble = node(
 
                 bubble.append(attachment);
 
+            } else if (isAttachment) {
+                bubble.append(
+                    node(
+                        'span',
+                        'message-text',
+                        message.fileName || 'Lampiran'
+                    )
+                );
+
             } else {
                 bubble.append(
-                    node('span', 'message-text', msg.text || '')
+                    node(
+                        'span',
+                        'message-text',
+                        message.text || ''
+                    )
                 );
             }
 
             bubble.append(
-                node('span', 'message-time', formatTime(msg.at))
+                node(
+                    'span',
+                    'message-time',
+                    formatTime(message.at)
+                )
             );
-
 
             area.append(bubble);
         }
 
-        // AUTO SCROLL TO LATEST MESSAGE
         requestAnimationFrame(() => {
             area.scrollTop = area.scrollHeight;
         });
     }
 
-    // SELECT CHAT
-    function selectChat(id) {
-        selectedId = id;
+    /*
+    |--------------------------------------------------------------------------
+    | PILIH PERCAKAPAN
+    |--------------------------------------------------------------------------
+    */
 
-        const c = selected();
+    async function selectChat(id) {
+    selectedId = id;
 
-        if (!c) return;
+    const chat = selected();
 
-        c.unread = 0;
-
-        save();
-        renderList();
-        renderRoom();
-
-        messenger.classList.add('room-open');
+    if (!chat) {
+        return;
     }
 
-    // FILTER EVENTS
+    chat.unread = 0;
+
+    renderList();
+    renderRoom();
+
+    messenger.classList.add('room-open');
+
+    if (getServerConversationId(chat)) {
+        await loadMessages(chat.id);
+    }
+}
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILTER, SORT, SEARCH
+    |--------------------------------------------------------------------------
+    */
+
     $('filterAll').addEventListener('click', () => {
         filter = 'all';
         renderList();
@@ -627,10 +844,8 @@ const bubble = node(
         renderList();
     });
 
-    // SORT EVENT
     sort.addEventListener('change', renderList);
 
-    // SEARCH EVENTS
     search.addEventListener('input', renderList);
 
     $('searchButton').addEventListener('click', () => {
@@ -638,148 +853,367 @@ const bubble = node(
         renderList();
     });
 
-    // BACK TO CONVERSATION LIST
     $('backToList').addEventListener('click', () => {
         messenger.classList.remove('room-open');
     });
 
-   
-    // ROOM MENU - PERSONAL CHAT
+    /*
+    |--------------------------------------------------------------------------
+    | BUAT GRUP
+    |--------------------------------------------------------------------------
+    */
+
+    const groupOverlay = $('groupOverlay');
+    const groupForm = $('createGroupForm');
+    const groupName = $('groupName');
+    const memberSearch = $('groupMemberSearch');
+    const memberList = $('groupMemberList');
+
+    const selectedGroupMembers = new Set();
+
+    function renderGroupMembers() {
+        const keyword = memberSearch.value
+            .trim()
+            .toLowerCase();
+
+        memberList.replaceChildren();
+
+        chats
+            .filter(chat => !chat.isGroup)
+            .filter(chat =>
+                chat.name.toLowerCase().includes(keyword)
+            )
+            .forEach(chat => {
+                const label = document.createElement('label');
+
+                label.className = 'group-member-item';
+
+                const checkbox = document.createElement('input');
+
+                checkbox.type = 'checkbox';
+                checkbox.value = String(chat.id);
+                checkbox.checked = selectedGroupMembers.has(
+                    chat.id
+                );
+
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        selectedGroupMembers.add(chat.id);
+                    } else {
+                        selectedGroupMembers.delete(chat.id);
+                    }
+                });
+
+                const name = node(
+                    'span',
+                    '',
+                    chat.name
+                );
+
+                label.append(checkbox, name);
+                memberList.append(label);
+            });
+    }
+
+    $('createGroupBtn').addEventListener('click', () => {
+        selectedGroupMembers.clear();
+
+        groupForm.reset();
+        memberSearch.value = '';
+
+        renderGroupMembers();
+
+        groupOverlay.hidden = false;
+        groupName.focus();
+    });
+
+    $('closeGroupBtn').addEventListener('click', () => {
+        groupOverlay.hidden = true;
+    });
+
+    groupOverlay.addEventListener('click', event => {
+        if (event.target === groupOverlay) {
+            groupOverlay.hidden = true;
+        }
+    });
+
+    memberSearch.addEventListener('input', () => {
+        renderGroupMembers();
+    });
+
+    groupForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const name = groupName.value.trim();
+
+        const ids = [...selectedGroupMembers];
+
+        const members = chats
+            .filter(chat =>
+                ids.includes(chat.id) && !chat.isGroup
+            )
+            .map(chat => chat.name);
+
+        if (!name) {
+            return;
+        }
+
+        if (!members.length) {
+            alert('Pilih minimal satu anggota.');
+            return;
+        }
+
+        const group = {
+            id: Date.now(),
+            dbConversationId: null,
+            name,
+            isGroup: true,
+            members: ['Kamu', ...members],
+            unread: 0,
+            messages: [
+                {
+                    id: Date.now() + 1,
+                    from: 'system',
+                    type: 'system',
+                    text: `Grup ${name} berhasil dibuat!`,
+                    at: new Date().toISOString()
+                }
+            ]
+        };
+
+        chats.push(group);
+
+        groupOverlay.hidden = true;
+
+        save();
+        selectChat(group.id);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | MENU PERCAKAPAN
+    |--------------------------------------------------------------------------
+    */
+
     const roomDropdown = $('roomDropdown');
     const roomMenuButton = $('roomMenu');
     const deletePersonalChat = $('deletePersonalChat');
+
     const deleteConfirmOverlay = $('deleteConfirmOverlay');
     const deleteConfirmText = $('deleteConfirmText');
     const cancelDeleteBtn = $('cancelDeleteBtn');
     const confirmDeleteBtn = $('confirmDeleteBtn');
 
-    let pendingDeleteChatId = null;
-
-    roomMenuButton.addEventListener('click', (event) => {
+    roomMenuButton.addEventListener('click', event => {
         event.stopPropagation();
 
-        const c = selected();
-        if (!c) return;
+        const chat = selected();
 
-        if (c.isGroup) {
+        if (!chat) {
+            return;
+        }
+
+        if (chat.isGroup) {
             roomDropdown.hidden = true;
-            roomMenuButton.setAttribute('aria-expanded', 'false');
+
+            roomMenuButton.setAttribute(
+                'aria-expanded',
+                'false'
+            );
 
             alert(
-                'Grup: ' + c.name +
+                'Grup: ' + chat.name +
                 '\n\nAnggota:\n' +
-                (c.members || []).join('\n')
+                (chat.members || []).join('\n')
             );
+
             return;
         }
 
         roomDropdown.hidden = !roomDropdown.hidden;
+
         roomMenuButton.setAttribute(
             'aria-expanded',
             String(!roomDropdown.hidden)
         );
     });
 
-    // TUTUP MENU SAAT KLIK DI LUAR
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', event => {
         if (!event.target.closest('.room-menu-wrapper')) {
             roomDropdown.hidden = true;
-            roomMenuButton.setAttribute('aria-expanded', 'false');
+
+            roomMenuButton.setAttribute(
+                'aria-expanded',
+                'false'
+            );
         }
     });
 
-    // HAPUS PERCAKAPAN PERSONAL
-deletePersonalChat.addEventListener('click', () => {
-    const c = selected();
+    /*
+    |--------------------------------------------------------------------------
+    | HAPUS PERCAKAPAN PERSONAL
+    |--------------------------------------------------------------------------
+    */
 
-    if (!c || c.isGroup) return;
+    deletePersonalChat.addEventListener('click', () => {
+        const chat = selected();
 
-    pendingDeleteChatId = c.id;
+        if (!chat || chat.isGroup) {
+            return;
+        }
 
-    deleteConfirmText.textContent =
-        'Yakin ingin menghapus percakapan dengan ' +
-        c.name +
-        '? Semua pesan pada percakapan ini akan dihapus dari browser.';
+        pendingDeleteChatId = chat.id;
 
-    roomDropdown.hidden = true;
-    roomMenuButton.setAttribute('aria-expanded', 'false');
+        deleteConfirmText.textContent =
+            'Yakin ingin menghapus percakapan dengan ' +
+            chat.name +
+            '? Semua pesan pada percakapan ini akan dihapus dari browser.';
 
-    deleteConfirmOverlay.hidden = false;
-});
+        roomDropdown.hidden = true;
 
+        roomMenuButton.setAttribute(
+            'aria-expanded',
+            'false'
+        );
 
-// TOMBOL BATAL
-cancelDeleteBtn.addEventListener('click', () => {
-    pendingDeleteChatId = null;
-    deleteConfirmOverlay.hidden = true;
-});
+        deleteConfirmOverlay.hidden = false;
+    });
 
-
-// KLIK DI LUAR POPUP UNTUK MENUTUP
-deleteConfirmOverlay.addEventListener('click', (event) => {
-    if (event.target === deleteConfirmOverlay) {
+    cancelDeleteBtn.addEventListener('click', () => {
         pendingDeleteChatId = null;
         deleteConfirmOverlay.hidden = true;
-    }
-});
+    });
 
+    deleteConfirmOverlay.addEventListener('click', event => {
+        if (event.target === deleteConfirmOverlay) {
+            pendingDeleteChatId = null;
+            deleteConfirmOverlay.hidden = true;
+        }
+    });
 
-// TOMBOL KONFIRMASI HAPUS
-confirmDeleteBtn.addEventListener('click', () => {
-    if (pendingDeleteChatId === null) return;
+    confirmDeleteBtn.addEventListener('click', () => {
+        if (pendingDeleteChatId === null) {
+            return;
+        }
 
-    chats = chats.filter(chat => chat.id !== pendingDeleteChatId);
+        chats = chats.filter(
+            chat => chat.id !== pendingDeleteChatId
+        );
 
-    selectedId = chats[0]?.id ?? null;
+        selectedId = chats[0]?.id ?? null;
 
-    pendingDeleteChatId = null;
-    deleteConfirmOverlay.hidden = true;
+        pendingDeleteChatId = null;
+        deleteConfirmOverlay.hidden = true;
 
-    save();
-    renderList();
-    renderRoom();
-});
+        save();
+        renderList();
+        renderRoom();
+    });
 
-
-    // ATTACHMENT BUTTON - UPLOAD FILE
-    const fileInput = $('fileInput');
-    const attachButton = $('attachButton');
+    /*
+    |--------------------------------------------------------------------------
+    | UPLOAD FILE KE SUPABASE STORAGE
+    |--------------------------------------------------------------------------
+    */
 
     attachButton.addEventListener('click', () => {
+        if (!selected()) {
+            alert('Pilih percakapan terlebih dahulu.');
+            return;
+        }
+
+        if (isUploading) {
+            return;
+        }
+
         fileInput.click();
     });
 
     fileInput.addEventListener('change', async () => {
-        const file = fileInput.files[0];
-        const c = selected();
+        const file = fileInput.files?.[0];
+        const chat = selected();
 
-        if (!file) return;
+        if (!file) {
+            return;
+        }
 
-        if (!c) {
+        if (!chat) {
             alert('Pilih percakapan terlebih dahulu.');
             fileInput.value = '';
             return;
         }
 
-        if (file.size > 10 * 1024 * 1024) {
-            alert('Maksimal ukuran file adalah 10 MB.');
+        /*
+        | WAJIB MEMAKAI ID DATABASE ASLI
+        */
+
+        const conversationId = getServerConversationId(chat);
+
+        if (!conversationId) {
+            alert(
+                'Percakapan ini masih menggunakan data demo lokal.\n\n' +
+                'Upload ke Supabase belum dapat dilakukan sampai ' +
+                'percakapan terhubung ke database.'
+            );
+
+            fileInput.value = '';
+            return;
+        }
+
+        if (file.size > MAX_FILE_SIZE) {
+            alert('Ukuran file maksimal 10 MB.');
+            fileInput.value = '';
+            return;
+        }
+
+        const extension = file.name
+            .split('.')
+            .pop()
+            ?.toLowerCase();
+
+        const allowedExtensions = [
+            'jpg',
+            'jpeg',
+            'png',
+            'webp',
+            'pdf'
+        ];
+
+        if (
+            !allowedExtensions.includes(extension) ||
+            !ALLOWED_MIME_TYPES.includes(file.type)
+        ) {
+            alert(
+                'Format file tidak didukung.\n' +
+                'Gunakan JPG, JPEG, PNG, WEBP, atau PDF.'
+            );
+
             fileInput.value = '';
             return;
         }
 
         const formData = new FormData();
+
+        formData.append(
+            'conversation_id',
+            String(conversationId)
+        );
+
         formData.append('file', file);
 
-        const csrfToken = document.querySelector(
-            'meta[name="csrf-token"]'
-        ).content;
+        isUploading = true;
 
         attachButton.disabled = true;
         attachButton.title = 'Mengunggah file...';
 
+        showUploadStatus(
+            `Mengunggah ${file.name}...`
+        );
+
         try {
-            const response = await fetch('/chat/upload', {
+            const response = await fetch(uploadUrl, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'X-CSRF-TOKEN': csrfToken,
                     'Accept': 'application/json'
@@ -787,22 +1221,88 @@ confirmDeleteBtn.addEventListener('click', () => {
                 body: formData
             });
 
-            const result = await response.json();
+            let result;
+
+            try {
+                result = await response.json();
+            } catch (error) {
+                throw new Error(
+                    'Server tidak mengembalikan respons JSON.'
+                );
+            }
 
             if (!response.ok || !result.success) {
+                if (response.status === 401) {
+                    throw new Error(
+                        'Sesi login tidak ditemukan. Silakan login kembali.'
+                    );
+                }
+
+                if (response.status === 403) {
+                    throw new Error(
+                        'Kamu tidak memiliki akses ke percakapan ini.'
+                    );
+                }
+
+                if (response.status === 419) {
+                    throw new Error(
+                        'Sesi halaman kedaluwarsa. Refresh halaman.'
+                    );
+                }
+
+                if (response.status === 422) {
+                    const errors = result.errors || {};
+
+                    const firstError = Object.values(errors)
+                        .flat()
+                        .find(Boolean);
+
+                    throw new Error(
+                        firstError ||
+                        result.message ||
+                        'Data upload tidak valid.'
+                    );
+                }
+
                 throw new Error(
                     result.message || 'Gagal mengunggah file.'
                 );
             }
 
-            c.messages.push({
-                id: Date.now(),
+            /*
+            | RESPONS CHAT ATTACHMENT CONTROLLER
+            |
+            | {
+            |   success: true,
+            |   data: {
+            |       message_id: 1,
+            |       attachment_id: 1
+            |   }
+            | }
+            */
+
+            const messageId = result.data?.message_id;
+            const attachmentId = result.data?.attachment_id;
+
+            if (!messageId || !attachmentId) {
+                throw new Error(
+                    'Upload berhasil, tetapi ID lampiran tidak ditemukan.'
+                );
+            }
+
+            const messageType = file.type.startsWith('image/')
+                ? 'image'
+                : 'file';
+
+            chat.messages.push({
+                id: messageId,
                 from: 'me',
-                type: 'file',
+                type: messageType,
                 text: '',
-                fileName: result.name,
-                fileSize: result.size,
-                fileUrl: result.url,
+                fileName: file.name,
+                fileSize: file.size,
+                attachmentId: attachmentId,
+                fileUrl: getDownloadUrl(attachmentId),
                 at: new Date().toISOString()
             });
 
@@ -810,46 +1310,128 @@ confirmDeleteBtn.addEventListener('click', () => {
             renderList();
             renderRoom();
 
+            showUploadStatus(
+                'File berhasil dikirim.'
+            );
+
         } catch (error) {
-            console.error('Upload gagal:', error);
-            alert(error.message || 'Gagal mengunggah file.');
+            console.error('Upload file gagal:', error);
+
+            showUploadStatus(
+                error.message || 'Gagal mengunggah file.',
+                true
+            );
+
+            alert(
+                error.message || 'Gagal mengunggah file.'
+            );
+
         } finally {
+            isUploading = false;
+
             attachButton.disabled = false;
             attachButton.title = 'Kirim file';
+
             fileInput.value = '';
         }
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | KIRIM PESAN TEKS
+    |--------------------------------------------------------------------------
+    |
+    | Pesan teks masih disimpan ke localStorage.
+    | Integrasi database pesan teks dilakukan setelah
+    | endpoint percakapan dan pesan tersedia.
+    |
+    */
 
+    
+form.addEventListener('submit', async event => {
+    event.preventDefault();
 
-    // SEND MESSAGE
-    form.addEventListener('submit', event => {
-        event.preventDefault();
+    const message = input.value.trim();
+    const chat = selected();
 
-        const message = input.value.trim();
-        const c = selected();
+    if (!chat || !message) {
+        return;
+    }
 
-        if (!c || !message) return;
+    const conversationId = getServerConversationId(chat);
 
-        c.messages.push({
-            id: Date.now(),
-            from: 'me',
-            text: message,
-            at: new Date().toISOString()
+    if (!conversationId) {
+        alert(
+            'Percakapan belum terhubung ke database.'
+        );
+        return;
+    }
+
+    const sendButton = form.querySelector(
+        'button[type="submit"]'
+    );
+
+    if (sendButton) {
+        sendButton.disabled = true;
+    }
+
+    try {
+        const url = messagesUrlTemplate.replace(
+            '__ID__',
+            encodeURIComponent(String(conversationId))
+        );
+
+        const response = await fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                message: message
+            })
         });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message ||
+                'Gagal mengirim pesan.'
+            );
+        }
 
         input.value = '';
 
-        save();
-        renderList();
-        renderRoom();
+        // Ambil kembali pesan dari database
+        await loadMessages(conversationId);
 
-        input.focus();
-    });
+    } catch (error) {
+        console.error('Gagal mengirim pesan:', error);
 
-    // INITIAL RENDER
-    // Pemilihan awal tidak langsung menghapus indikator belum dibaca.
+        alert(
+            error.message ||
+            'Terjadi kesalahan saat mengirim pesan.'
+        );
+
+    } finally {
+        if (sendButton) {
+            sendButton.disabled = false;
+        }
+    }
+});
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | INITIAL RENDER
+    |--------------------------------------------------------------------------
+    */
+
     renderList();
-    renderRoom();
+renderRoom();
+loadConversations();
 
 })();
