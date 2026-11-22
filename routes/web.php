@@ -7,6 +7,8 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CompetitionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PostingLombaController;
 use App\Http\Controllers\LombaSayaController;
 use App\Http\Controllers\ChatFileController;
@@ -29,13 +31,11 @@ Route::get('/', function () {
 
 Route::middleware('guest')->group(function () {
 
-    // Halaman Login
     Route::get('/login', [
         LoginController::class,
         'showLogin'
     ])->name('login');
 
-    // Proses Login
     Route::post('/login', [
         LoginController::class,
         'login'
@@ -51,19 +51,16 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('guest')->group(function () {
 
-    // Halaman Signup
     Route::get('/signup', [
         SignupController::class,
         'showSignup'
     ])->name('signup');
 
-    // Proses Signup Step 1
     Route::post('/signup/step-1', [
         SignupController::class,
         'step1'
     ])->name('signup.step1');
 
-    // Proses Signup Step 2
     Route::post('/signup/step-2', [
         SignupController::class,
         'step2'
@@ -79,25 +76,21 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('guest')->group(function () {
 
-    // Halaman Verifikasi
     Route::get('/verification', [
         VerificationController::class,
         'show'
     ])->name('verification');
 
-    // Proses Verifikasi OTP
     Route::post('/verification', [
         VerificationController::class,
         'verify'
     ])->name('verification.verify');
 
-    // Kirim Ulang OTP
     Route::post('/verification/resend', [
         VerificationController::class,
         'resend'
     ])->name('verification.resend');
 
-    // Halaman Verifikasi Berhasil
     Route::get('/verification-success', function () {
 
         if (!session('account_verified')) {
@@ -108,17 +101,11 @@ Route::middleware('guest')->group(function () {
 
     })->name('verification-success');
 
-    // Halaman Verifikasi Gagal
     Route::get('/verification-failed', function () {
         return view('verification-failed');
     })->name('verification-failed');
 
-    /*
-    |--------------------------------------------------------------------------
-    | ALIAS ROUTE VERIFIKASI
-    |--------------------------------------------------------------------------
-    | Mempertahankan nama route dari branch posting_lomba.
-    */
+    // Alias untuk kompatibilitas route lama
 
     Route::get('/verification/success', function () {
         return redirect()->route('verification-success');
@@ -127,6 +114,44 @@ Route::middleware('guest')->group(function () {
     Route::get('/verification/failed', function () {
         return redirect()->route('verification-failed');
     })->name('verification.failed');
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| FORGOT PASSWORD & RESET PASSWORD
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('guest')->group(function () {
+
+    // Halaman lupa password
+    Route::get('/forgot-password', [
+        PasswordResetController::class,
+        'requestForm'
+    ])->name('password.request');
+
+    // Kirim email reset password
+    Route::post('/forgot-password', [
+        PasswordResetController::class,
+        'sendLink'
+    ])
+    ->middleware('throttle:3,1')
+    ->name('password.email');
+
+    // Halaman reset password
+    Route::get('/reset-password', [
+        PasswordResetController::class,
+        'resetForm'
+    ])->name('password.reset');
+
+    // Simpan password baru
+    Route::post('/reset-password', [
+        PasswordResetController::class,
+        'resetPassword'
+    ])
+    ->middleware('throttle:5,1')
+    ->name('password.update');
 
 });
 
@@ -145,7 +170,7 @@ Route::post('/logout', [
 
 /*
 |--------------------------------------------------------------------------
-| HALAMAN UTAMA FINS
+| HALAMAN FINS - WAJIB LOGIN
 |--------------------------------------------------------------------------
 */
 
@@ -163,13 +188,33 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | PROFILE
+    | PROFILE MAHASISWA
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/profile', function () {
-        return view('profile');
-    })->name('profile');
+    // Menampilkan profil
+    Route::get('/profile', [
+        ProfileController::class,
+        'index'
+    ])->name('profile');
+
+    // Update data profil
+    Route::put('/profile', [
+        ProfileController::class,
+        'update'
+    ])->name('profile.update');
+
+    // Upload foto profil
+    Route::post('/profile/photo', [
+        ProfileController::class,
+        'uploadPhoto'
+    ])->name('profile.photo.upload');
+
+    // Hapus foto profil
+    Route::delete('/profile/photo', [
+        ProfileController::class,
+        'removePhoto'
+    ])->name('profile.photo.remove');
 
     /*
     |--------------------------------------------------------------------------
@@ -187,13 +232,11 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    // Menampilkan daftar lomba
     Route::get('/cari-lomba', [
         CompetitionController::class,
         'index'
     ])->name('cari-lomba');
 
-    // Menampilkan detail lomba
     Route::get('/cari-lomba/{id}', [
         CompetitionController::class,
         'show'
@@ -207,25 +250,22 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    // Halaman Posting Lomba
     Route::get('/posting-lomba', [
         PostingLombaController::class,
         'create'
     ])->name('posting-lomba');
 
-    // Alias route untuk branch posting_lomba
     Route::get('/posting-lomba/create', [
         PostingLombaController::class,
         'create'
     ])->name('posting-lomba.create');
 
-    // Menyimpan posting lomba melalui PostingLombaController
     Route::post('/posting-lomba', [
         PostingLombaController::class,
         'store'
     ])->name('posting-lomba.store');
 
-    // Mempertahankan route penyimpanan dari branch main
+    // Route lama tetap dipertahankan
     Route::post('/tambah-lomba', [
         CompetitionController::class,
         'store'
@@ -237,7 +277,6 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    // Halaman Lomba Saya menggunakan Controller
     Route::get('/lomba-saya', [
         LombaSayaController::class,
         'index'
@@ -249,7 +288,6 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    // Halaman Chat
     Route::get('/chat', function () {
         return view('chat');
     })->name('chat');
@@ -260,13 +298,11 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    // Upload File Chat
     Route::post('/chat/upload', [
         ChatFileController::class,
         'upload'
     ])->name('chat.file.upload');
 
-    // Download File Chat
     Route::get('/chat/files/{filename}', [
         ChatFileController::class,
         'download'

@@ -44,10 +44,10 @@ $interestOptions = ['Hackathon', 'UI/UX Design Competition', 'Business Plan (BPC
 
     <title>Cari Partner | FINS</title>
 
-    <link rel="stylesheet" href="{{ asset('css/cari_partner.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+    <link rel="stylesheet" href="/css/cari_partner.css?v=44">
+    <link rel="stylesheet" href="/css/navbar.css?v=43">
 
-    <script src="{{ asset('js/cari_partner.js') }}" defer></script>
+    <script src="/js/cari_partner.js?v=44" defer></script>
 
 </head>
 

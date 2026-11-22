@@ -1,160 +1,520 @@
-/* Navbar FINS: terisolasi dari CSS halaman lainnya. */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+/* =========================================
+   NAVBAR FINS
+   Layout mengikuti halaman Profile
+   Tema tetap merah
+========================================= */
+
 .fins-header,
-.fins-header * { box-sizing: border-box; }
+.fins-header * {
+    box-sizing: border-box;
+}
 
 .fins-header {
     position: sticky;
     top: 0;
     z-index: 1000;
+
     width: 100%;
+    min-height: 78px;
+
+    margin: 0;
+    padding: 0;
+
     background: #860000;
-    box-shadow: 0 2px 12px rgba(0,0,0,.10);
+    border: 0;
+    border-bottom: 1px solid rgba(255,255,255,.15);
+    border-radius: 0;
+
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+
     font-family: 'Poppins', Arial, sans-serif;
 }
 
+/* =========================================
+   CONTAINER NAVBAR
+========================================= */
+
 .fins-header__inner {
     width: 100%;
-    max-width: 1440px;
-    min-height: 72px;
+    max-width: none;
+    min-height: 78px;
+
     margin: 0 auto;
-    padding: 0 46px;
+    padding: 0 3.2%;
+
     display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
     align-items: center;
     justify-content: space-between;
-    gap: 32px;
+
+    gap: 30px;
 }
 
+/* =========================================
+   LOGO FINS
+========================================= */
+
 .fins-header__brand {
-    flex-shrink: 0;
-    display: inline-flex;
+    width: 42px;
+    min-width: 42px;
+    height: 38px;
+
+    flex: 0 0 42px;
+
+    display: flex;
     align-items: flex-start;
+    justify-content: center;
+
     gap: 2px;
-    color: #fff;
+
+    padding: 5px 4px;
+    margin: 0;
+
+    background: #fff8f5;
+    color: #860000;
+
+    border: none;
+    border-radius: 7px;
+
     text-decoration: none;
     line-height: 1;
 }
-.fins-header__brand-f { font-size: 39px; font-weight: 800; }
-.fins-header__brand-ub { font-size: 11px; font-weight: 800; margin-top: 5px; }
+
+.fins-header__brand-f {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+}
+
+.fins-header__brand-ub {
+    font-size: 8px;
+    font-weight: 800;
+    margin-top: 3px;
+    line-height: 1;
+}
+
+/* =========================================
+   MENU NAVIGASI
+========================================= */
 
 .fins-header__nav {
-    flex: 1;
+    flex: 0 1 auto;
     min-width: 0;
+
+    width: auto;
+    height: auto;
+
+    margin: 0 auto;
+    padding: 0;
+
     display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
     justify-content: center;
     align-items: center;
-    gap: 30px;
+
+    gap: clamp(20px, 2.5vw, 38px);
+
+    overflow: visible;
+    white-space: nowrap;
+
+    background: transparent;
+    border: 0;
 }
+
 .fins-header__nav a {
     position: relative;
-    padding: 26px 0;
+
+    display: inline-block;
+    flex: 0 0 auto;
+
+    width: auto;
+    height: auto;
+
+    margin: 0;
+    padding: 7px 0;
+
     color: rgba(255,255,255,.85);
-    font-size: 13px;
+    background: transparent;
+
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
     font-weight: 500;
+    line-height: 1.4;
+
     text-decoration: none;
     white-space: nowrap;
+
     transition: color .2s ease;
 }
+
 .fins-header__nav a:hover,
-.fins-header__nav a.active { color: #fff; }
-.fins-header__nav a.active { font-weight: 700; }
+.fins-header__nav a.active {
+    color: #ffffff;
+}
+
+.fins-header__nav a.active {
+    font-weight: 600;
+}
+
+/* Garis bawah menu aktif */
 .fins-header__nav a.active::after {
     content: '';
+
     position: absolute;
-    bottom: 18px;
+    bottom: 0;
     left: 0;
+
     width: 100%;
     height: 2px;
+
     border-radius: 2px;
-    background: #fff;
+    background: #ffffff;
 }
+
+/* =========================================
+   ACTIONS KANAN
+========================================= */
 
 .fins-header__actions {
     display: flex;
+    flex: 0 0 auto;
+
+    flex-direction: row;
     align-items: center;
     justify-content: flex-end;
-    gap: 14px;
-    flex-shrink: 0;
-}
-.fins-header__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    padding: 6px;
-    border: 0;
-    border-radius: 50%;
+
+    width: auto;
+    height: auto;
+
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+
     background: transparent;
-    color: #fff;
+    border: 0;
+}
+
+/* =========================================
+   ICON CHAT DAN NOTIFIKASI
+========================================= */
+
+.fins-header__icon {
+    position: relative;
+
+    display: grid;
+    flex: 0 0 26px;
+
+    place-items: center;
+
+    width: 26px;
+    min-width: 26px;
+    height: 28px;
+
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+    color: #ffffff;
+
+    border: 0;
+    border-radius: 6px;
+
     cursor: pointer;
     text-decoration: none;
     list-style: none;
+
     transition: background .2s ease;
 }
-.fins-header__icon:hover { background: rgba(255,255,255,.16); }
-.fins-header__icon svg { display: block; width: 21px; height: 21px; }
-.fins-header__notification { position: relative; }
-.fins-header__notification summary::-webkit-details-marker { display: none; }
+
+.fins-header__icon:hover {
+    background: rgba(255,255,255,.14);
+}
+
+.fins-header__icon svg {
+    display: block;
+
+    width: 22px;
+    height: 22px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* =========================================
+   NOTIFICATION DROPDOWN
+========================================= */
+
+.fins-header__notification {
+    position: relative;
+}
+
+.fins-header__notification summary {
+    list-style: none;
+}
+
+.fins-header__notification summary::-webkit-details-marker {
+    display: none;
+}
+
 .fins-header__dropdown {
     position: absolute;
-    top: 45px;
-    right: -48px;
-    width: 260px;
-    padding: 16px;
-    background: #fff;
-    color: #252525;
-    border: 1px solid #ededed;
-    border-radius: 12px;
-    box-shadow: 0 8px 28px rgba(0,0,0,.15);
+    top: 42px;
+    right: -42px;
+
+    width: 280px;
+    max-width: 85vw;
+
+    padding: 18px;
+
+    background: #ffffff;
+    color: #292323;
+
+    border: 1px solid #eadfdf;
+    border-radius: 14px;
+
+    box-shadow: 0 12px 35px rgba(0,0,0,.14);
+
+    z-index: 1010;
 }
-.fins-header__dropdown strong { font-size: 14px; }
-.fins-header__dropdown p { margin: 10px 0 0; font-size: 12px; color: #666; }
+
+.fins-header__dropdown strong {
+    font-size: 14px;
+    font-weight: 600;
+    color: #860000;
+}
+
+.fins-header__dropdown p {
+    margin: 10px 0 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #666;
+}
+
+/* =========================================
+   FOTO PROFIL NAVBAR
+========================================= */
 
 .fins-header__profile {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 36px;
-    height: 36px;
-    margin-left: 5px;
-    border-radius: 50%;
+    position: relative;
+
+    display: grid;
+    flex: 0 0 42px;
+
+    place-items: center;
+
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    min-height: 42px;
+
+    margin: 0;
+    padding: 0;
+
     overflow: hidden;
-    background: #f2f2f2;
-    flex-shrink: 0;
-}
-.fins-header__profile img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+
+    border: 2px solid rgba(255,255,255,.8);
+    border-radius: 50%;
+
+    background: #fff8f5;
+
+    text-decoration: none;
 }
 
-@media (max-width: 1050px) {
-    .fins-header__inner { padding: 0 22px; gap: 20px; }
-    .fins-header__nav { gap: 16px; }
-    .fins-header__nav a { font-size: 12px; }
-    .fins-header__actions { gap: 7px; }
+.fins-header__profile img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+    max-width: none;
+
+    margin: 0;
+    padding: 0;
+
+    object-fit: cover;
+    object-position: center;
+
+    border: 0;
+    border-radius: 50%;
 }
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+.fins-header a:focus-visible,
+.fins-header button:focus-visible,
+.fins-header summary:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 4px;
+}
+
+/* =========================================
+   RESPONSIVE TABLET
+========================================= */
+
+@media (max-width: 1050px) {
+
+    .fins-header__inner {
+        padding: 0 3%;
+        gap: 15px;
+    }
+
+    .fins-header__nav {
+        gap: 17px;
+    }
+
+    .fins-header__nav a {
+        font-size: 12px;
+    }
+
+    .fins-header__actions {
+        gap: 12px;
+    }
+
+}
+
+/* =========================================
+   RESPONSIVE MOBILE
+========================================= */
+
 @media (max-width: 760px) {
+
     .fins-header__inner {
         min-height: 62px;
-        padding: 10px 16px;
+
+        padding: 10px 4%;
+
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 10px;
     }
-    .fins-header__brand { order: 1; }
-    .fins-header__brand-f { font-size: 31px; }
-    .fins-header__actions { order: 2; margin-left: auto; }
+
+    .fins-header__brand {
+        order: 1;
+
+        width: 38px;
+        min-width: 38px;
+        height: 34px;
+
+        flex-basis: 38px;
+    }
+
+    .fins-header__brand-f {
+        font-size: 23px;
+    }
+
+    .fins-header__brand-ub {
+        font-size: 7px;
+    }
+
+    .fins-header__actions {
+        order: 2;
+
+        margin-left: auto;
+        gap: 12px;
+    }
+
+    .fins-header__profile {
+        width: 34px;
+        min-width: 34px;
+        height: 34px;
+        min-height: 34px;
+
+        flex-basis: 34px;
+    }
+
     .fins-header__nav {
         order: 3;
         flex: 0 0 100%;
+
+        width: 100%;
+
+        margin: 0;
+        padding: 0 2px 5px;
+
         justify-content: flex-start;
-        gap: 20px;
+        gap: 22px;
+
         overflow-x: auto;
         scrollbar-width: none;
     }
-    .fins-header__nav::-webkit-scrollbar { display: none; }
-    .fins-header__nav a { padding: 10px 0; }
-    .fins-header__nav a.active::after { bottom: 2px; }
-    .fins-header__dropdown { right: -44px; max-width: 85vw; }
+
+    .fins-header__nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .fins-header__nav a {
+        font-size: 12px;
+        padding: 10px 0;
+    }
+
+    .fins-header__nav a.active::after {
+        bottom: 2px;
+    }
+
+    .fins-header__dropdown {
+        right: -44px;
+        max-width: 85vw;
+    }
+
+}
+
+/* =====================================
+   FOTO PROFIL NAVBAR FINS
+===================================== */
+
+.fins-header__profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #fbe9ee;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+/* Icon default people */
+.fins-header__default-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #d14f65;
+}
+
+.fins-header__default-avatar svg {
+    width: 23px;
+    height: 23px;
+}
+
+/* Foto asli menutupi icon default */
+.fins-header__profile img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* Hover */
+.fins-header__profile:hover {
+    box-shadow: 0 0 0 3px rgba(209, 79, 101, 0.15);
+    transition: box-shadow 0.2s ease;
 }

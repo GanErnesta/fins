@@ -1277,3 +1277,93 @@ select:focus-visible {
         animation-duration: 0.01ms !important;
     }
 }
+
+/* ============================================
+   FINS CARI LOMBA - PARALLAX DUA ARAH
+   Efek visual scroll naik & turun.
+   Jangan hapus CSS halaman sebelumnya.
+============================================ */
+
+/* Judul bergerak mengikuti scroll */
+.intro > div {
+    transform: translate3d(0, var(--cl-title-shift, 0px), 0);
+}
+
+/* Jumlah hasil bergerak berlawanan arah */
+.intro > .result-count {
+    transform: translate3d(0, var(--cl-count-shift, 0px), 0);
+}
+
+/* Filter bergerak perlahan tanpa mengubah posisi input */
+.filter-panel {
+    position: relative;
+    transform: translate3d(0, var(--cl-filter-shift, 0px), 0);
+}
+
+/* Poster: crop tetap rapi, gambar bergerak naik-turun */
+.competition-card .poster-wrap {
+    overflow: hidden;
+}
+
+.competition-card .poster-wrap > img {
+    transform: translate3d(0, var(--cl-poster-shift, 0px), 0) scale(1.25);
+    transform-origin: center center;
+    will-change: transform;
+}
+
+/* Scroll reveal. Pakai 'translate' agar transform hover kartu tidak tertimpa */
+.cl-scroll-reveal {
+    opacity: 0;
+    translate: 0 28px;
+    transition:
+        opacity 650ms ease,
+        translate 650ms cubic-bezier(.22, 1, .36, 1);
+    transition-delay: var(--cl-reveal-delay, 0ms);
+}
+
+.cl-scroll-reveal.cl-is-visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+/* Hover kartu dari CSS asli tetap berlaku */
+.competition-card.cl-scroll-reveal {
+    transition:
+        transform 250ms ease,
+        box-shadow 250ms ease,
+        opacity 650ms ease,
+        translate 650ms cubic-bezier(.22, 1, .36, 1);
+    transition-delay: 0ms, 0ms, var(--cl-reveal-delay, 0ms), var(--cl-reveal-delay, 0ms);
+}
+
+/* Filter yang menyembunyikan kartu tetap bekerja */
+.competition-card[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 650px) {
+    .competition-card .poster-wrap > img {
+        transform: translate3d(0, var(--cl-poster-shift, 0px), 0) scale(1.2);
+    }
+
+    .cl-scroll-reveal {
+        translate: 0 16px;
+        transition-duration: 520ms;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .intro > div,
+    .intro > .result-count,
+    .filter-panel,
+    .competition-card .poster-wrap > img {
+        transform: none !important;
+        will-change: auto;
+    }
+
+    .cl-scroll-reveal {
+        opacity: 1 !important;
+        translate: none !important;
+        transition: none !important;
+    }
+}

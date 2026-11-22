@@ -105,6 +105,18 @@ document.addEventListener("DOMContentLoaded", function () {
             return !isOpen;
         }
 
+        // Segera tutup: hari ini sampai maksimal 3 hari lagi.
+        if (selectedDeadline === "closing") {
+            if (!isOpen || !card.dataset.deadline) return false;
+            const [year, month, day] = card.dataset.deadline.split("-").map(Number);
+            if (!year || !month || !day) return false;
+            const deadlineDay = new Date(year, month - 1, day);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const daysLeft = Math.round((deadlineDay - today) / 86400000);
+            return daysLeft >= 0 && daysLeft <= 3;
+        }
+
         return true;
     }
 
@@ -135,10 +147,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (Number.isNaN(teamNumber)) {
             return false;
-        }
-
-        if (selectedTeam === "4") {
-            return teamNumber >= 4;
         }
 
         return teamNumber === Number(selectedTeam);
@@ -421,5 +429,123 @@ document.addEventListener("DOMContentLoaded", function () {
     ===================================== */
 
     filterCompetitions();
+
+
+    /* =====================================
+       PARALLAX DUA ARAH - CARI LOMBA
+       Tetap aktif saat scroll naik/turun.
+       Efek hanya pada elemen visual, bukan filter.
+    ===================================== */
+
+    const introSection = document.querySelector(".intro");
+    const filterPanel = document.querySelector(".filter-panel");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const posterImages = competitionCards.map(card => ({
+        card,
+        image: card.querySelector(".poster-wrap img")
+    }));
+
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    let parallaxQueued = false;
+
+    // Progress bernilai 0 (di bawah viewport) hingga 1 (di atas).
+    function sectionProgress(rect) {
+        return clamp(
+            (window.innerHeight - rect.top) / (window.innerHeight + rect.height),
+            0,
+            1
+        );
+    }
+
+    function updateParallax() {
+        parallaxQueued = false;
+        if (reduceMotion.matches) return;
+
+        const mobile = window.innerWidth <= 650;
+        const viewHeight = window.innerHeight;
+
+        if (introSection) {
+            const rect = introSection.getBoundingClientRect();
+            const progress = sectionProgress(rect);
+
+            // Judul dan jumlah lomba bergerak berlawanan arah.
+            introSection.style.setProperty(
+                "--cl-title-shift",
+                `${((progress - 0.5) * (mobile ? 20 : 42)).toFixed(2)}px`
+            );
+            introSection.style.setProperty(
+                "--cl-count-shift",
+                `${((0.5 - progress) * (mobile ? 12 : 24)).toFixed(2)}px`
+            );
+        }
+
+        if (filterPanel) {
+            const progress = sectionProgress(filterPanel.getBoundingClientRect());
+            filterPanel.style.setProperty(
+                "--cl-filter-shift",
+                `${((0.5 - progress) * (mobile ? 10 : 20)).toFixed(2)}px`
+            );
+        }
+
+        // Poster tetap berada dalam kartu; hanya gambar di dalamnya bergerak.
+        posterImages.forEach(({ card, image }) => {
+            if (!image || card.hidden) return;
+            const rect = card.getBoundingClientRect();
+            if (rect.bottom < -60 || rect.top > viewHeight + 60) return;
+            const progress = sectionProgress(rect);
+            const shift = (progress - 0.5) * (mobile ? 27 : 40);
+            image.style.setProperty("--cl-poster-shift", `${shift.toFixed(2)}px`);
+        });
+    }
+
+    function requestParallax() {
+        if (parallaxQueued) return;
+        parallaxQueued = true;
+        window.requestAnimationFrame(updateParallax);
+    }
+
+    window.addEventListener("scroll", requestParallax, { passive: true });
+    window.addEventListener("resize", requestParallax);
+    reduceMotion.addEventListener?.("change", requestParallax);
+
+    /* =====================================
+       SCROLL REVEAL BERULANG
+       Menggunakan CSS translate agar hover card tetap normal.
+    ===================================== */
+    const revealElements = [
+        ...document.querySelectorAll(
+            ".intro > div, .intro > .result-count, " +
+            ".filter-panel, .competition-card, " +
+            ".fys-footer-content > div"
+        )
+    ];
+
+    if ("IntersectionObserver" in window && !reduceMotion.matches) {
+        const revealObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.target.hidden) return;
+                entry.target.classList.toggle(
+                    "cl-is-visible",
+                    entry.isIntersecting
+                );
+            });
+        }, {
+            threshold: 0.06,
+            rootMargin: "0px 0px -4% 0px"
+        });
+
+        revealElements.forEach((element, index) => {
+            element.classList.add("cl-scroll-reveal");
+            if (element.classList.contains("competition-card")) {
+                element.style.setProperty(
+                    "--cl-reveal-delay",
+                    `${(competitionCards.indexOf(element) % 4) * 65}ms`
+                );
+            }
+            revealObserver.observe(element);
+        });
+    }
+
+    requestParallax();
 
 });

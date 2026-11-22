@@ -5,15 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cari Lomba | Find Your Skills Partner</title>
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="{{ asset('css/cari_lomba.css') }}?v=41">
-    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}?v=1">
-    <link rel="stylesheet" href="{{ asset('css/cari_lomba_detail.css') }}?v=3">
-
-    <!-- JavaScript: masing-masing cukup sekali -->
-    <script src="{{ asset('js/cari_lomba.js') }}?v=41" defer></script>
-    <script src="{{ asset('js/cari_lomba_detail.js') }}?v=11" defer></script>
+    <link rel="stylesheet" href="/css/cari_lomba.css?v=42">
+    <link rel="stylesheet" href="/css/navbar.css?v=41">
+    <link rel="stylesheet" href="/css/cari_lomba_detail.css?v=3">
+    <script src="/js/cari_lomba.js?v=42" defer></script>
+    <script src="/js/cari_lomba_detail.js?v=11" defer></script>
 </head>
 <body>
 
@@ -164,7 +160,7 @@
                     $posterUrl = $image
                         ? (\Illuminate\Support\Str::startsWith($image, ['http://', 'https://'])
                             ? $image
-                            : asset(ltrim($image, '/')))
+                            : '/' . ltrim($image, '/'))
                         : null;
                 @endphp
 
@@ -230,7 +226,7 @@
                         </div>
 
                         <a
-                            href="{{ route('cari_lomba.show', ['id' => $competition->id]) }}"
+                            href="{{ route('cari_lomba.show', ['id' => $competition->id], false) }}"
                             class="detail-button"
                             data-detail-link
                         >
@@ -250,7 +246,7 @@
     <footer class="fys-footer">
         <div class="fys-footer-content">
             <div class="fys-footer-left">
-                <a href="{{ route('home') }}" class="fys-footer-logo">
+                <a href="/home" class="fys-footer-logo">
                     <span>F</span><small>UB</small>
                 </a>
                 <p>
@@ -300,7 +296,7 @@
     <div class="tambah-lomba-container">
         <span class="tambah-lomba-label">Posting Lomba</span>
         <a
-            href="{{ route('posting-lomba') }}"
+            href="{{ route('posting-lomba', [], false) }}"
             class="tambah-lomba"
             title="Tambah Lomba"
             aria-label="Tambah Lomba"
