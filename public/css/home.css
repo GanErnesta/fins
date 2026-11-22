@@ -810,3 +810,309 @@ select {
         white-space: normal
     }
 }
+
+/* ========================================
+   FINS HOME - PARALLAX ANIMATION
+======================================== */
+
+/* HERO PARALLAX */
+.home-hero {
+    position: relative;
+    overflow: hidden;
+    background-position:
+        center calc(50% + var(--hero-bg-shift, 0px));
+    background-size: cover;
+}
+
+.home-hero .hero-shade {
+    pointer-events: none;
+}
+
+.home-hero .hero-content {
+    position: relative;
+    z-index: 2;
+    transform:
+        translate3d(0, var(--hero-text-shift, 0px), 0);
+    will-change: transform;
+}
+
+/* INTRO IMAGE PARALLAX */
+.home-intro .intro-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.home-intro .intro-image img {
+    display: block;
+    transform:
+        translate3d(0, var(--intro-img-shift, 0px), 0)
+        scale(1.12);
+    will-change: transform;
+}
+
+/* SCROLL REVEAL */
+.fins-scroll-reveal {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0);
+    transition:
+        opacity 750ms ease,
+        transform 750ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.fins-scroll-reveal.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+/* DELAY KARTU KOMPETISI */
+.competition-card.fins-scroll-reveal {
+    transition-duration: 700ms;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .home-intro .intro-image img {
+        transform:
+            translate3d(0, var(--intro-img-shift, 0px), 0)
+            scale(1.08);
+    }
+
+    .fins-scroll-reveal {
+        transform: translate3d(0, 16px, 0);
+        transition-duration: 550ms;
+    }
+}
+
+
+
+
+/* ============================================
+   FINS HOME - TWO WAY PARALLAX ANIMATION
+   Scroll ke atas & ke bawah
+============================================ */
+
+/* ============================================
+   1. HERO BACKGROUND PARALLAX
+============================================ */
+
+.home-hero {
+    position: relative;
+    overflow: hidden;
+
+    background-position:
+        center calc(50% + var(--hero-bg-shift, 0px));
+
+    background-size: cover;
+}
+
+/* Overlay hero */
+.home-hero .hero-shade {
+    pointer-events: none;
+}
+
+/* Teks hero bergerak mengikuti scroll */
+.home-hero .hero-content {
+    position: relative;
+    z-index: 2;
+
+    transform: translate3d(
+        0,
+        var(--hero-text-shift, 0px),
+        0
+    );
+
+    will-change: transform;
+}
+
+
+/* ============================================
+   2. INTRO IMAGE PARALLAX
+============================================ */
+
+/* Container gambar */
+.home-intro .intro-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+}
+
+/* Gambar bergerak secara vertikal */
+.home-intro .intro-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transform:
+        translate3d(
+            0,
+            var(--intro-img-shift, 0px),
+            0
+        )
+        scale(1.35);
+
+    transform-origin: center;
+    will-change: transform;
+}
+
+
+/* ============================================
+   3. INTRO TEXT PARALLAX
+============================================ */
+
+/* Teks bergerak berlawanan arah dengan gambar */
+.home-intro .intro-copy {
+    position: relative;
+
+    transform: translate3d(
+        0,
+        var(--intro-copy-shift, 0px),
+        0
+    );
+
+    will-change: transform;
+}
+
+/* Tampilan teks tetap mengikuti CSS utama */
+.home-intro .intro-copy h2,
+.home-intro .intro-copy p,
+.home-intro .intro-copy a {
+    position: relative;
+}
+
+
+/* ============================================
+   4. SEARCH BAR PARALLAX
+============================================ */
+
+.team-search {
+    position: relative;
+    z-index: 5;
+
+    translate: 0 var(--search-shift, 0px);
+
+    will-change: translate;
+}
+
+
+/* ============================================
+   5. SCROLL REVEAL ANIMATION
+   Aktif saat scroll naik dan turun
+============================================ */
+
+/* Kondisi awal */
+.fins-scroll-reveal {
+    opacity: 0;
+    translate: 0 35px;
+
+    transition:
+        opacity 0.7s ease,
+        translate 0.7s cubic-bezier(
+            0.22, 1, 0.36, 1
+        );
+}
+
+/* Saat elemen masuk viewport */
+.fins-scroll-reveal.is-visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+/* Kartu kompetisi */
+.competition-card.fins-scroll-reveal {
+    transition:
+        opacity 0.7s ease,
+        translate 0.7s cubic-bezier(
+            0.22, 1, 0.36, 1
+        );
+}
+
+/* Kartu yang disembunyikan carousel */
+.competition-card[hidden] {
+    display: none !important;
+}
+
+
+/* ============================================
+   6. MOBILE RESPONSIVE PARALLAX
+============================================ */
+
+@media (max-width: 768px) {
+
+    /* Hero */
+    .home-hero .hero-content {
+        transform: translate3d(
+            0,
+            var(--hero-text-shift, 0px),
+            0
+        );
+    }
+
+    /* Gambar intro */
+    .home-intro .intro-image {
+        border-radius: 18px;
+    }
+
+    .home-intro .intro-image img {
+        transform:
+            translate3d(
+                0,
+                var(--intro-img-shift, 0px),
+                0
+            )
+            scale(1.27);
+    }
+
+    /* Teks intro */
+    .home-intro .intro-copy {
+        transform: translate3d(
+            0,
+            var(--intro-copy-shift, 0px),
+            0
+        );
+    }
+
+    /* Search bar */
+    .team-search {
+        translate: 0 var(--search-shift, 0px);
+    }
+
+    /* Reveal lebih ringan di HP */
+    .fins-scroll-reveal {
+        translate: 0 20px;
+        transition-duration: 0.55s;
+    }
+
+}
+
+
+/* ============================================
+   7. REDUCED MOTION
+   Aksesibilitas
+============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .home-hero {
+        background-position: center;
+    }
+
+    .home-hero .hero-content,
+    .home-intro .intro-image img,
+    .home-intro .intro-copy {
+        transform: none !important;
+        will-change: auto;
+    }
+
+    .team-search {
+        translate: none !important;
+        will-change: auto;
+    }
+
+    .fins-scroll-reveal {
+        opacity: 1 !important;
+        translate: none !important;
+        transition: none !important;
+    }
+}

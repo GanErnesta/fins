@@ -6,6 +6,8 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CompetitionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -106,6 +108,28 @@ Route::middleware('guest')->group(function () {
 
 });
 
+Route::middleware('guest')->group(function () {
+
+    Route::get('/forgot-password', [
+        PasswordResetController::class, 'requestForm'
+    ])->name('password.request');
+
+    Route::post('/forgot-password', [
+        PasswordResetController::class, 'sendLink'
+    ])->middleware('throttle:3,1')->name('password.email');
+
+    // Menampilkan form reset ketika link email diklik
+    Route::get('/reset-password', [
+        PasswordResetController::class, 'resetForm'
+    ])->name('password.reset');
+
+    // Menyimpan password baru
+    Route::post('/reset-password', [
+        PasswordResetController::class, 'resetPassword'
+    ])->middleware('throttle:5,1')->name('password.update');
+
+});
+
 /*
 |--------------------------------------------------------------------------
 | LOGOUT
@@ -130,10 +154,35 @@ Route::middleware('auth')->group(function () {
         return view('home');
     })->name('home');
 
-    // Profile
-    Route::get('/profile', function () {
-        return view('profile');
-    })->name('profile');
+    /*
+|--------------------------------------------------------------------------
+| PROFILE MAHASISWA
+|--------------------------------------------------------------------------
+*/
+
+// Menampilkan Profile
+Route::get('/profile', [
+    ProfileController::class,
+    'index'
+])->name('profile');
+
+// Menyimpan perubahan Profile
+Route::put('/profile', [
+    ProfileController::class,
+    'update'
+])->name('profile.update');
+
+// Upload foto Profile
+Route::post('/profile/photo', [
+    ProfileController::class,
+    'uploadPhoto'
+])->name('profile.photo.upload');
+
+// Menghapus foto Profile
+Route::delete('/profile/photo', [
+    ProfileController::class,
+    'removePhoto'
+])->name('profile.photo.remove');
 
     /*
     |--------------------------------------------------------------------------

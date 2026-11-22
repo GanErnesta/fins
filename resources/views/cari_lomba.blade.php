@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cari Lomba | Find Your Skills Partner</title>
-    <link rel="stylesheet" href="{{ asset('css/cari_lomba.css') }}?v=40">
-    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}?v=1">
-    <script src="{{ asset('js/cari_lomba.js') }}?v=40" defer></script>
+    <link rel="stylesheet" href="/css/cari_lomba.css?v=42">
+    <link rel="stylesheet" href="/css/navbar.css?v=41">
+    <script src="/js/cari_lomba.js?v=42" defer></script>
 </head>
 <body>
 
@@ -51,7 +51,7 @@
                 <select id="deadline" aria-label="Filter deadline">
                     <option value="">Semua Deadline</option>
                     <option value="open">Masih Dibuka</option>
-                     <option value="open">Segera Tutup</option>
+                     <option value="closing">Segera Tutup</option>
                     <option value="closed">Sudah Ditutup</option>
                 </select>
 
@@ -179,8 +179,16 @@
                     <div class="poster-wrap">
 
                         @if($competition->image)
+                            @php
+                                // Poster lokal mengikuti domain aktif (localhost / Cloudflare).
+                                // URL eksternal HTTPS tetap digunakan tanpa diubah.
+                                $posterPath = trim((string) $competition->image);
+                                $posterUrl = preg_match('~^https?://~i', $posterPath)
+                                    ? $posterPath
+                                    : '/' . ltrim($posterPath, '/');
+                            @endphp
                             <img
-                                src="{{ asset(ltrim($competition->image, '/')) }}"
+                                src="{{ $posterUrl }}"
                                 alt="Poster {{ $competition->title }}"
                                 loading="lazy"
                             >
@@ -244,7 +252,7 @@
                         </div>
 
                         <a
-                            href="{{ route('cari_lomba.show', ['id' => $competition->id]) }}"
+                            href="{{ route('cari_lomba.show', ['id' => $competition->id], false) }}"
                             class="detail-button"
                         >
                             Lihat Detail
@@ -268,7 +276,7 @@
         <div class="fys-footer-content">
 
             <div class="fys-footer-left">
-                <a href="{{ url('/home') }}" class="fys-footer-logo">
+                <a href="/home" class="fys-footer-logo">
                     <span>F</span>
                     <small>UB</small>
                 </a>
@@ -325,7 +333,7 @@
         <span class="tambah-lomba-label">Posting Lomba</span>
 
         <a
-            href="{{ route('posting-lomba') }}"
+            href="{{ route('posting-lomba', [], false) }}"
             class="tambah-lomba"
             title="Tambah Lomba"
             aria-label="Tambah Lomba"

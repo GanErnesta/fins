@@ -1,0 +1,201 @@
+/* FINS Profile: tombol dan modal logout (terisolasi). */
+.fins-logout-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-width: 158px;
+    min-height: 42px;
+    margin-top: 12px;
+    padding: 10px 19px;
+    border: 1px solid #cfa8a5;
+    border-radius: 999px;
+    background: #fff8f5;
+    color: #91464a;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.fins-logout-trigger svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+}
+
+.fins-logout-trigger:hover {
+    background: #f5e8e3;
+    border-color: #91464a;
+    transform: translateY(-1px);
+}
+
+.fins-logout-trigger:focus-visible {
+    outline: 3px solid #c58e90;
+    outline-offset: 3px;
+}
+
+.fins-logout-overlay[hidden] {
+    display: none !important;
+}
+
+.fins-logout-overlay {
+    position: fixed;
+    z-index: 2500;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(28, 20, 22, .54);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    animation: finsLogoutFade .2s ease-out;
+}
+
+.fins-logout-dialog {
+    width: min(420px, 100%);
+    padding: 32px 28px 27px;
+    border-radius: 22px;
+    background: #fffdfa;
+    box-shadow: 0 24px 70px rgba(41, 26, 29, .22);
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    animation: finsLogoutUp .22s cubic-bezier(.2, .7, .3, 1);
+}
+
+.fins-logout-symbol {
+    width: 62px;
+    height: 62px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 17px;
+    border-radius: 50%;
+    background: #f6e7e2;
+    color: #91464a;
+}
+
+.fins-logout-symbol svg {
+    width: 27px;
+    height: 27px;
+}
+
+.fins-logout-dialog h2 {
+    margin: 0 0 9px;
+    color: #72383d;
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.fins-logout-dialog p {
+    margin: 0 auto 24px;
+    max-width: 340px;
+    color: #77706d;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.fins-logout-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.fins-logout-actions form {
+    margin: 0;
+}
+
+.fins-logout-actions button {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    border-radius: 11px;
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .18s ease, transform .18s ease;
+}
+
+.fins-logout-cancel {
+    color: #6b5b58;
+    background: #f2eeeb;
+}
+
+.fins-logout-cancel:hover {
+    background: #e9dfda;
+}
+
+.fins-logout-confirm {
+    color: #fff;
+    background: #91464a;
+}
+
+.fins-logout-confirm:hover {
+    background: #7d393e;
+}
+
+.fins-logout-actions button:active {
+    transform: scale(.98);
+}
+
+.fins-logout-actions button:focus-visible {
+    outline: 3px solid #b97980;
+    outline-offset: 3px;
+}
+
+body.fins-logout-open {
+    overflow: hidden;
+}
+
+@keyframes finsLogoutFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes finsLogoutUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(.985);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 480px) {
+    .fins-logout-dialog {
+        padding: 27px 20px 22px;
+        border-radius: 17px;
+    }
+
+    .fins-logout-dialog h2 {
+        font-size: 19px;
+    }
+
+    .fins-logout-actions {
+        gap: 9px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .fins-logout-dialog,
+    .fins-logout-overlay {
+        animation: none;
+    }
+
+    .fins-logout-trigger,
+    .fins-logout-actions button {
+        transition: none;
+    }
+}

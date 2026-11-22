@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --fins-maroon: #860000;
-  --fins-cream: #fff3e5;
-  --fins-peach: #ffecd7;
-  --fins-text: #171717;
-  --fins-muted: #858585;
-  --fins-border: #e7a4a4;
-  --fins-white: #fff;
+  --fins-maroon: #91464a;
+  --fins-cream: #ffe6e6;
+  --fins-peach: #f5e9e4;
+  --fins-text: #383331;
+  --fins-muted: #817b78;
+  --fins-border: #dec9c5;
+  --fins-white: #fffdfa;
 }
 
 * {
@@ -50,9 +50,9 @@ button {
 .fins-profile-page>header.fins-navbar,
 .fins-profile-page .fins-navbar {
   width: 100% !important;
-  height: 72px !important;
-  min-height: 72px !important;
-  max-height: 72px !important;
+  height: 78px !important;
+  min-height: 78px !important;
+  max-height: 78px !important;
   margin: 0 !important;
   padding: 0 3.2% !important;
   display: flex !important;
@@ -60,13 +60,13 @@ button {
   flex-wrap: nowrap !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 24px !important;
+  gap: 30px !important;
   position: relative !important;
   inset: auto !important;
   z-index: 20 !important;
-  background: #fff5e9 !important;
+  background: #fbf7f3 !important;
   border: 0 !important;
-  border-bottom: 1px solid #f1e4d6 !important;
+  border-bottom: 1px solid #ede4df !important;
   border-radius: 0 !important;
   box-shadow: none !important;
   box-sizing: border-box !important;
@@ -91,8 +91,8 @@ button {
   place-items: center !important;
   padding: 0 !important;
   margin: 0 !important;
-  background: #ffead3 !important;
-  color: #860000 !important;
+  background: #f6ebe5 !important;
+  color: var(--fins-maroon) !important;
   border: 0 !important;
   border-radius: 7px !important;
 }
@@ -103,7 +103,7 @@ button {
   line-height: .75 !important;
   font-weight: 800 !important;
   letter-spacing: -2px !important;
-  color: #860000 !important;
+  color: var(--fins-maroon) !important;
 }
 
 .fins-profile-page .fins-navbar .fins-brand-mark span {
@@ -122,7 +122,7 @@ button {
   flex-wrap: nowrap !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: clamp(17px, 3vw, 36px) !important;
+  gap: clamp(20px, 2.5vw, 38px) !important;
   width: auto !important;
   height: auto !important;
   margin: 0 auto !important;
@@ -140,12 +140,12 @@ button {
   height: auto !important;
   margin: 0 !important;
   padding: 7px 0 !important;
-  color: #292521 !important;
+  color: #433d3a !important;
   background: transparent !important;
   border: 0 !important;
   border-radius: 0 !important;
   font-family: Poppins, sans-serif !important;
-  font-size: 12px !important;
+  font-size: 14px !important;
   line-height: 1.4 !important;
   font-weight: 500 !important;
   text-decoration: none !important;
@@ -153,7 +153,7 @@ button {
 
 .fins-profile-page .fins-navbar .fins-nav-links a:hover,
 .fins-profile-page .fins-navbar .fins-nav-links a.active {
-  color: #860000 !important;
+  color: var(--fins-maroon) !important;
 }
 
 .fins-profile-page .fins-navbar .fins-nav-links a.active {
@@ -179,15 +179,15 @@ button {
 
 .fins-profile-page .fins-navbar .fins-nav-icon {
   display: grid !important;
-  flex: 0 0 20px !important;
+  flex: 0 0 24px !important;
   place-items: center !important;
   position: relative !important;
-  width: 20px !important;
-  min-width: 20px !important;
-  height: 23px !important;
+  width: 24px !important;
+  min-width: 24px !important;
+  height: 26px !important;
   padding: 0 !important;
   margin: 0 !important;
-  color: #860000 !important;
+  color: var(--fins-maroon) !important;
   background: transparent !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -195,8 +195,8 @@ button {
 
 .fins-profile-page .fins-navbar .fins-nav-icon svg {
   display: block !important;
-  width: 19px !important;
-  height: 19px !important;
+  width: 22px !important;
+  height: 22px !important;
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 1.7 !important;
@@ -212,24 +212,24 @@ button {
   top: 1px !important;
   right: 0 !important;
   border-radius: 50% !important;
-  background: #860000 !important;
+  background: var(--fins-maroon) !important;
 }
 
 .fins-profile-page .fins-navbar .fins-nav-avatar {
   display: grid !important;
-  flex: 0 0 38px !important;
+  flex: 0 0 42px !important;
   place-items: center !important;
   position: relative !important;
-  width: 38px !important;
-  min-width: 38px !important;
-  height: 38px !important;
-  min-height: 38px !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
   margin: 0 !important;
   padding: 0 !important;
   overflow: hidden !important;
-  border: 2px solid #860000 !important;
+  border: 2px solid var(--fins-maroon) !important;
   border-radius: 50% !important;
-  background: #ffe9d6 !important;
+  background: #f7ece6 !important;
 }
 
 .fins-profile-page .fins-navbar .fins-nav-avatar img {
@@ -303,14 +303,14 @@ button {
 }
 
 .fins-profile-main {
-  max-width: 1450px;
-  width: 89%;
-  margin: 14px auto 60px;
+  max-width: 1560px;
+  width: 92%;
+  margin: 22px auto 72px;
 }
 
 .fins-breadcrumb {
-  font-size: 15px;
-  margin: 0 0 34px;
+  font-size: 16px;
+  margin: 0 0 28px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -323,8 +323,8 @@ button {
 
 .fins-profile-grid {
   display: grid;
-  grid-template-columns: minmax(300px, .72fr) minmax(500px, 1.28fr);
-  gap: 30px;
+  grid-template-columns: minmax(310px, .76fr) minmax(540px, 1.24fr);
+  gap: 28px;
   align-items: start;
 }
 
@@ -332,18 +332,20 @@ button {
 .fins-profile-right {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 26px;
   min-width: 0;
 }
 
 .fins-card {
   background: var(--fins-white);
+  border: 1px solid #eee6e1;
   border-radius: 22px;
+  box-shadow: 0 7px 26px rgba(93, 67, 62, .035);
 }
 
 .fins-user-card {
-  min-height: 342px;
-  padding: 48px 26px 26px;
+  min-height: 380px;
+  padding: 40px 28px 30px;
   text-align: center;
   display: flex;
   align-items: center;
@@ -357,17 +359,17 @@ button {
   border-radius: 50%;
   flex-shrink: 0;
   color: var(--fins-maroon);
-  background: #ffead6;
-  border: 1px solid #e8b1a8;
+  background: #f6eae4;
+  border: 1px solid #e5ccc5;
   font-weight: 600;
 }
 
 .fins-avatar-large {
-  width: 88px;
-  height: 88px;
-  background: linear-gradient(135deg, #f5d8c0, #fff1e5);
+  width: 108px;
+  height: 108px;
+  background: linear-gradient(135deg, #f1dfd9, #faf2ec);
   color: var(--fins-maroon);
-  font-size: 24px;
+  font-size: 29px;
 }
 
 .fins-avatar img {
@@ -377,33 +379,33 @@ button {
 }
 
 .fins-user-card h1 {
-  margin: 20px 0 2px;
-  font-size: 20px;
+  margin: 21px 0 4px;
+  font-size: 23px;
   color: var(--fins-maroon);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .fins-study-program {
-  color: #8c8c8c;
-  font-size: 14px;
+  color: #817a76;
+  font-size: 15px;
   margin: 0;
 }
 
 .fins-bio-quote {
-  color: #898989;
-  font-size: 13px;
+  color: #817b78;
+  font-size: 14px;
   font-style: italic;
   line-height: 1.55;
-  max-width: 330px;
-  margin: 28px 0 20px;
+  max-width: 420px;
+  margin: 22px 0 21px;
 }
 
 .fins-button {
   border: 0;
   border-radius: 999px;
-  min-height: 42px;
-  padding: 10px 22px;
-  font-size: 13px;
+  min-height: 44px;
+  padding: 11px 24px;
+  font-size: 14px;
   font-weight: 400;
   display: inline-flex;
   align-items: center;
@@ -422,18 +424,18 @@ button {
 }
 
 .fins-button-primary:hover {
-  background: #650000;
+  background: #79393d;
 }
 
 .fins-edit-profile {
-  min-width: 142px;
-  min-height: 35px;
-  padding: 7px 18px;
+  min-width: 158px;
+  min-height: 42px;
+  padding: 10px 20px;
 }
 
 .fins-skills-card {
-  min-height: 130px;
-  padding: 24px 28px;
+  min-height: 155px;
+  padding: 26px 29px;
 }
 
 .fins-section-heading {
@@ -447,13 +449,13 @@ button {
 .fins-section-heading h2,
 .fins-contact-card h2 {
   color: var(--fins-maroon);
-  font-size: 19px;
-  font-weight: 500;
+  font-size: 21px;
+  font-weight: 600;
   margin: 0;
 }
 
 .fins-section-heading>span {
-  font-size: 12px;
+  font-size: 13px;
   color: #555;
   white-space: nowrap;
 }
@@ -461,23 +463,23 @@ button {
 .fins-skill-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 9px 10px;
+  gap: 10px 11px;
 }
 
 .fins-skill-chip {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 5px 12px;
-  background: var(--fins-cream);
+  padding: 7px 13px;
+  background: var(--fins-peach);
   color: var(--fins-maroon);
-  font-size: 10px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
 .fins-contact-card {
-  padding: 23px 30px 28px;
-  min-height: 215px;
+  padding: 27px 30px 30px;
+  min-height: 244px;
 }
 
 .fins-contact-card h2 {
@@ -487,14 +489,14 @@ button {
 .fins-contact-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 11px 0;
+  gap: 13px;
+  margin: 14px 0;
 }
 
 .fins-contact-logo {
-  width: 17px;
+  width: 22px;
   text-align: center;
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 700;
 }
 
@@ -518,70 +520,70 @@ button {
 
 .fins-contact-row small {
   color: #929292;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .fins-contact-row a {
   color: var(--fins-maroon);
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .fins-stats-card {
-  min-height: 188px;
-  padding: 38px 25px;
+  min-height: 215px;
+  padding: 40px 26px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   align-items: center;
   text-align: center;
-  gap: 10px;
+  gap: 16px;
 }
 
 .fins-stat {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 5px;
 }
 
 .fins-stat strong {
   color: var(--fins-maroon);
-  font-size: 40px;
+  font-size: 47px;
   line-height: 1.2;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .fins-stat span {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .fins-stat small {
   color: #929292;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .fins-interest-card {
-  padding: 24px 34px 28px;
-  min-height: 180px;
+  padding: 29px 33px 32px;
+  min-height: 208px;
 }
 
 .fins-interest-card h2,
 .fins-activity-card h2 {
-  font-size: 13px;
-  font-weight: 400;
+  font-size: 17px;
+  font-weight: 500;
   margin: 0 0 22px;
 }
 
 .fins-interest-card h2 span,
 .fins-activity-card h2 span {
   color: var(--fins-maroon);
-  font-size: 19px;
+  font-size: 21px;
   margin-left: 6px;
 }
 
 .fins-interest-list {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 14px;
 }
 
 .fins-interest-item {
@@ -589,30 +591,30 @@ button {
   align-items: center;
   flex-direction: column;
   text-align: center;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
 }
 
 .fins-interest-icon {
   color: var(--fins-maroon);
-  font-size: 31px;
-  height: 38px;
+  font-size: 36px;
+  height: 43px;
   line-height: 1.1;
 }
 
 .fins-interest-item b {
-  font-size: 11px;
-  font-weight: 400;
-  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: normal;
 }
 
 .fins-interest-item small {
-  font-size: 10px;
+  font-size: 11px;
   color: #929292;
 }
 
 .fins-activity-card {
-  padding: 27px 34px 25px;
+  padding: 30px 34px 32px;
 }
 
 .fins-activity-card h2 {
@@ -622,19 +624,19 @@ button {
 .fins-activity-list {
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 23px;
 }
 
 .fins-activity-row {
   display: grid;
-  grid-template-columns: 26px minmax(0, 1fr) 125px;
-  gap: 14px;
+  grid-template-columns: 30px minmax(0, 1fr) 120px;
+  gap: 15px;
   align-items: center;
 }
 
 .fins-activity-icon {
   color: var(--fins-maroon);
-  font-size: 20px;
+  font-size: 23px;
   text-align: center;
 }
 
@@ -643,7 +645,7 @@ button {
 }
 
 .fins-activity-title {
-  font-size: 13px;
+  font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -657,35 +659,35 @@ button {
 .fins-activity-title small,
 .fins-activity-details p {
   color: #909090;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 400;
 }
 
 .fins-activity-details p {
-  margin: 3px 0 0;
+  margin: 5px 0 0;
 }
 
 .fins-status {
   border-radius: 999px;
-  padding: 4px 9px;
+  padding: 6px 11px;
   text-align: center;
-  font-size: 9px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
 .fins-status.done {
-  background: #91df89;
-  color: #3c7040;
+  background: #e5f0e5;
+  color: #46744d;
 }
 
 .fins-status.final {
-  background: #ffead6;
-  color: var(--fins-maroon);
+  background: #f6e8e1;
+  color: #97584a;
 }
 
 .fins-status.ongoing {
-  background: #fff1a9;
-  color: var(--fins-maroon);
+  background: #faf0da;
+  color: #917041;
 }
 
 /* Modal Edit Profile */
@@ -697,7 +699,7 @@ button {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(25, 18, 18, .56);
+  background: rgba(36, 30, 29, .43);
 }
 
 .fins-modal-backdrop.is-open {
@@ -706,12 +708,12 @@ button {
 
 .fins-edit-modal {
   position: relative;
-  width: min(960px, 100%);
+  width: min(1040px, 100%);
   max-height: min(92vh, 900px);
   overflow-y: auto;
-  background: #fff;
+  background: #fffdfa;
   border-radius: 28px;
-  box-shadow: 0 24px 90px rgba(0, 0, 0, .25);
+  box-shadow: 0 24px 75px rgba(66, 45, 41, .18);
 }
 
 .fins-modal-banner {
@@ -727,13 +729,13 @@ button {
 
 .fins-modal-banner h2 {
   margin: 0 0 5px;
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 500;
 }
 
 .fins-modal-banner p {
   margin: 0;
-  color: #f2dada;
+  color: #fcefeb;
   font-size: 16px;
 }
 
@@ -749,9 +751,9 @@ button {
 }
 
 .fins-avatar-modal {
-  width: 102px;
-  height: 102px;
-  font-size: 27px;
+  width: 112px;
+  height: 112px;
+  font-size: 30px;
 }
 
 .fins-photo-actions {
@@ -793,7 +795,7 @@ button {
 }
 
 .fins-field>span {
-  font-size: 15px;
+  font-size: 16px;
   color: #151515;
 }
 
@@ -801,12 +803,12 @@ button {
 .fins-field select,
 .fins-field textarea {
   width: 100%;
-  border: 1px solid #df8f8f;
+  border: 1px solid #dec9c5;
   border-radius: 13px;
   background: #fff;
   color: #666;
-  padding: 0 26px;
-  min-height: 50px;
+  padding: 0 20px;
+  min-height: 52px;
   outline: none;
   transition: border .2s, box-shadow .2s;
 }
@@ -826,7 +828,7 @@ button {
 .fins-field select:focus,
 .fins-field textarea:focus {
   border-color: var(--fins-maroon);
-  box-shadow: 0 0 0 3px rgba(134, 0, 0, .08);
+  box-shadow: 0 0 0 3px rgba(145, 70, 74, .11);
 }
 
 .fins-field-full {
@@ -846,16 +848,16 @@ button {
 }
 
 .fins-skills-editor-heading label {
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .fins-skills-editor-heading span {
   color: var(--fins-maroon);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .fins-skill-input-box {
-  border: 1px solid #df8f8f;
+  border: 1px solid #dec9c5;
   border-radius: 13px;
   min-height: 104px;
   padding: 16px 26px;
@@ -871,11 +873,11 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: var(--fins-cream);
+  background: var(--fins-peach);
   color: var(--fins-maroon);
   border-radius: 999px;
   padding: 6px 11px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .fins-edit-skill-chip button {
@@ -894,10 +896,10 @@ button {
   margin-top: 13px;
   border: 0;
   border-radius: 999px;
-  padding: 6px 14px;
-  background: #ededed;
-  color: #999;
-  font-size: 10px;
+  padding: 8px 15px;
+  background: #f1eae6;
+  color: #817a77;
+  font-size: 12px;
   cursor: pointer;
 }
 
@@ -910,10 +912,10 @@ button {
 .fins-skill-dropdown {
   margin-top: 15px;
   padding: 16px 20px 18px;
-  border: 1px solid #eee;
+  border: 1px solid #eee5e0;
   border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 3px 13px rgba(0, 0, 0, .16);
+  background: #fffdfa;
+  box-shadow: 0 6px 20px rgba(93, 67, 62, .09);
 }
 
 .fins-skill-dropdown[hidden] {
@@ -926,9 +928,9 @@ button {
   gap: 10px;
   min-height: 38px;
   padding: 0 14px;
-  border: 1px solid #dedede;
+  border: 1px solid #e8deda;
   border-radius: 999px;
-  background: #f0f0f0;
+  background: #f6f1ee;
   color: #999;
 }
 
@@ -945,7 +947,7 @@ button {
   outline: 0;
   background: transparent;
   color: #333;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .fins-skill-dropdown-heading {
@@ -955,7 +957,7 @@ button {
   gap: 12px;
   margin: 17px 0 12px;
   color: var(--fins-maroon);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .fins-skill-dropdown-heading span:last-child {
@@ -974,12 +976,12 @@ button {
   justify-content: space-between;
   gap: 8px;
   min-width: 0;
-  padding: 8px 0;
+  padding: 10px 0;
   border: 0;
   background: transparent;
   color: #111;
   text-align: left;
-  font-size: 11px;
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -1028,11 +1030,11 @@ button {
 
 .fins-skill-empty {
   color: #888;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .fins-skill-hint {
-  font-size: 11px;
+  font-size: 12px;
   color: #888;
   margin: 7px 0 0;
 }
@@ -1051,7 +1053,7 @@ button {
 
 .fins-form-message {
   color: #237b37;
-  font-size: 12px;
+  font-size: 13px;
   margin: 0;
 }
 
@@ -1061,12 +1063,12 @@ button {
 }
 
 .fins-button-light {
-  background: #f2f2f2;
-  color: #444;
+  background: #f3eeeb;
+  color: #59514e;
 }
 
 .fins-button-light:hover {
-  background: #e8e8e8;
+  background: #e9dfda;
 }
 
 @media (max-width: 900px) {
@@ -1282,3 +1284,117 @@ button {
     font-size: 10px;
   }
 }
+/* =========================
+   17. Finishing warna lembut
+   Penyesuaian visual tanpa mengubah struktur dan fungsi halaman.
+========================= */
+
+.fins-profile-page .fins-breadcrumb {
+  color: #635c58;
+}
+
+.fins-profile-page .fins-card {
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+
+.fins-profile-page .fins-card:hover {
+  border-color: #e7dad4;
+  box-shadow: 0 10px 30px rgba(93, 67, 62, .055);
+}
+
+.fins-profile-page .fins-field input,
+.fins-profile-page .fins-field select,
+.fins-profile-page .fins-field textarea,
+.fins-profile-page .fins-skill-input-box {
+  background-color: #fffdfa;
+}
+
+.fins-profile-page .fins-field input::placeholder,
+.fins-profile-page .fins-field textarea::placeholder {
+  color: #a09792;
+}
+
+
+/* =========================
+   18. Ukuran proporsional pada laptop, tablet, dan mobile
+   Dipasang setelah aturan lama agar font tetap mudah dibaca.
+========================= */
+
+@media (min-width: 901px) and (max-width: 1199px) {
+  .fins-profile-main { width: 94%; }
+  .fins-profile-grid {
+    grid-template-columns: minmax(285px, .8fr) minmax(0, 1.2fr);
+    gap: 22px;
+  }
+  .fins-interest-item b { font-size: 12px; }
+  .fins-interest-item small { font-size: 10px; }
+}
+
+@media (max-width: 900px) {
+  .fins-profile-main { width: 93%; }
+  .fins-profile-page .fins-navbar .fins-nav-links a { font-size: 13px !important; }
+  .fins-profile-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .fins-user-card { min-height: 340px; }
+  .fins-profile-left { gap: 20px; }
+  .fins-stat strong { font-size: 43px; }
+}
+
+@media (max-width: 600px) {
+  .fins-profile-main { width: calc(100% - 32px); margin: 18px auto 45px; }
+  .fins-breadcrumb { font-size: 14px; margin-bottom: 20px; }
+  .fins-profile-left, .fins-profile-right { gap: 18px; }
+  .fins-user-card { min-height: auto; padding: 32px 18px; }
+  .fins-avatar-large { width: 92px; height: 92px; font-size: 25px; }
+  .fins-user-card h1 { font-size: 20px; }
+  .fins-study-program { font-size: 14px; }
+  .fins-bio-quote { font-size: 13px; }
+  .fins-skills-card, .fins-contact-card { padding: 22px 20px; min-height: auto; }
+  .fins-section-heading h2, .fins-contact-card h2 { font-size: 18px; }
+  .fins-stat strong { font-size: 34px; }
+  .fins-stat span { font-size: 12px; }
+  .fins-stat small { font-size: 10px; }
+  .fins-interest-card, .fins-activity-card { padding: 23px 18px; }
+  .fins-interest-card h2, .fins-activity-card h2 { font-size: 16px; }
+  .fins-interest-item b { font-size: 12px; }
+  .fins-interest-item small { font-size: 11px; }
+  .fins-interest-icon { font-size: 32px; height: 38px; }
+  .fins-activity-row { grid-template-columns: 23px minmax(0, 1fr); gap: 10px; }
+  .fins-activity-title { font-size: 13px; }
+  .fins-activity-title small, .fins-activity-details p { font-size: 11px; }
+  .fins-status { font-size: 11px; }
+  .fins-field > span { font-size: 14px; }
+  .fins-skill-option { font-size: 12px; }
+  .fins-modal-banner h2 { font-size: 19px; }
+  .fins-modal-banner p { font-size: 13px; }
+  .fins-avatar-modal { width: 82px; height: 82px; }
+}
+
+/* FINS Profile: tambahan untuk data users yang dinamis */
+.fins-profile-nim {
+  font-size: 12px;
+  color: #8e8783;
+  margin: 4px 0 0;
+}
+.fins-empty-data {
+  font-size: 13px;
+  color: #8f8884;
+  line-height: 1.65;
+  margin: 6px 0;
+}
+.fins-contact-row a[href="#"] {
+  cursor: default;
+  text-decoration: none;
+}
+.fins-form-message.is-error { color: #ae4348; }
+.fins-form-message.is-success { color: #377a59; }
+.fins-avatar .profile-photo-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+/* Navbar FINS menggunakan public/css/navbar.css.
+   Hindari override .fins-header di file ini agar tema merah konsisten
+   pada halaman Profile dan halaman FINS lainnya. */
