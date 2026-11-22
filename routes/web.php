@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -8,6 +9,9 @@ use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\PostingLombaController;
+use App\Http\Controllers\LombaSayaController;
+use App\Http\Controllers\ChatFileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,25 +76,21 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('guest')->group(function () {
 
-    // Halaman verifikasi
     Route::get('/verification', [
         VerificationController::class,
         'show'
     ])->name('verification');
 
-    // Proses verifikasi OTP
     Route::post('/verification', [
         VerificationController::class,
         'verify'
     ])->name('verification.verify');
 
-    // Kirim ulang OTP
     Route::post('/verification/resend', [
         VerificationController::class,
         'resend'
     ])->name('verification.resend');
 
-    // Verifikasi berhasil
     Route::get('/verification-success', function () {
 
         if (!session('account_verified')) {
@@ -101,32 +101,57 @@ Route::middleware('guest')->group(function () {
 
     })->name('verification-success');
 
-    // Verifikasi gagal
     Route::get('/verification-failed', function () {
         return view('verification-failed');
     })->name('verification-failed');
 
+    // Alias untuk kompatibilitas route lama
+
+    Route::get('/verification/success', function () {
+        return redirect()->route('verification-success');
+    })->name('verification.success');
+
+    Route::get('/verification/failed', function () {
+        return redirect()->route('verification-failed');
+    })->name('verification.failed');
+
 });
+
+/*
+|--------------------------------------------------------------------------
+| FORGOT PASSWORD & RESET PASSWORD
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware('guest')->group(function () {
 
+    // Halaman lupa password
     Route::get('/forgot-password', [
-        PasswordResetController::class, 'requestForm'
+        PasswordResetController::class,
+        'requestForm'
     ])->name('password.request');
 
+    // Kirim email reset password
     Route::post('/forgot-password', [
-        PasswordResetController::class, 'sendLink'
-    ])->middleware('throttle:3,1')->name('password.email');
+        PasswordResetController::class,
+        'sendLink'
+    ])
+    ->middleware('throttle:3,1')
+    ->name('password.email');
 
-    // Menampilkan form reset ketika link email diklik
+    // Halaman reset password
     Route::get('/reset-password', [
-        PasswordResetController::class, 'resetForm'
+        PasswordResetController::class,
+        'resetForm'
     ])->name('password.reset');
 
-    // Menyimpan password baru
+    // Simpan password baru
     Route::post('/reset-password', [
-        PasswordResetController::class, 'resetPassword'
-    ])->middleware('throttle:5,1')->name('password.update');
+        PasswordResetController::class,
+        'resetPassword'
+    ])
+    ->middleware('throttle:5,1')
+    ->name('password.update');
 
 });
 
@@ -139,50 +164,57 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [
     LoginController::class,
     'logout'
-])->middleware('auth')->name('logout');
+])
+->middleware('auth')
+->name('logout');
 
 /*
 |--------------------------------------------------------------------------
-| HALAMAN UTAMA FINS
+| HALAMAN FINS - WAJIB LOGIN
 |--------------------------------------------------------------------------
 */
 
 Route::middleware('auth')->group(function () {
 
-    // Home
+    /*
+    |--------------------------------------------------------------------------
+    | HOME
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/home', function () {
         return view('home');
     })->name('home');
 
     /*
-|--------------------------------------------------------------------------
-| PROFILE MAHASISWA
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | PROFILE MAHASISWA
+    |--------------------------------------------------------------------------
+    */
 
-// Menampilkan Profile
-Route::get('/profile', [
-    ProfileController::class,
-    'index'
-])->name('profile');
+    // Menampilkan profil
+    Route::get('/profile', [
+        ProfileController::class,
+        'index'
+    ])->name('profile');
 
-// Menyimpan perubahan Profile
-Route::put('/profile', [
-    ProfileController::class,
-    'update'
-])->name('profile.update');
+    // Update data profil
+    Route::put('/profile', [
+        ProfileController::class,
+        'update'
+    ])->name('profile.update');
 
-// Upload foto Profile
-Route::post('/profile/photo', [
-    ProfileController::class,
-    'uploadPhoto'
-])->name('profile.photo.upload');
+    // Upload foto profil
+    Route::post('/profile/photo', [
+        ProfileController::class,
+        'uploadPhoto'
+    ])->name('profile.photo.upload');
 
-// Menghapus foto Profile
-Route::delete('/profile/photo', [
-    ProfileController::class,
-    'removePhoto'
-])->name('profile.photo.remove');
+    // Hapus foto profil
+    Route::delete('/profile/photo', [
+        ProfileController::class,
+        'removePhoto'
+    ])->name('profile.photo.remove');
 
     /*
     |--------------------------------------------------------------------------
@@ -200,17 +232,17 @@ Route::delete('/profile/photo', [
     |--------------------------------------------------------------------------
     */
 
-    // Daftar kompetisi
     Route::get('/cari-lomba', [
         CompetitionController::class,
         'index'
     ])->name('cari-lomba');
 
-    // Detail kompetisi
     Route::get('/cari-lomba/{id}', [
         CompetitionController::class,
         'show'
-    ])->whereNumber('id')->name('cari_lomba.show');
+    ])
+    ->whereNumber('id')
+    ->name('cari_lomba.show');
 
     /*
     |--------------------------------------------------------------------------
@@ -218,12 +250,22 @@ Route::delete('/profile/photo', [
     |--------------------------------------------------------------------------
     */
 
-    // Halaman posting
-    Route::get('/posting-lomba', function () {
-        return view('posting_lomba');
-    })->name('posting-lomba');
+    Route::get('/posting-lomba', [
+        PostingLombaController::class,
+        'create'
+    ])->name('posting-lomba');
 
-    // Menyimpan posting lomba
+    Route::get('/posting-lomba/create', [
+        PostingLombaController::class,
+        'create'
+    ])->name('posting-lomba.create');
+
+    Route::post('/posting-lomba', [
+        PostingLombaController::class,
+        'store'
+    ])->name('posting-lomba.store');
+
+    // Route lama tetap dipertahankan
     Route::post('/tambah-lomba', [
         CompetitionController::class,
         'store'
@@ -235,9 +277,10 @@ Route::delete('/profile/photo', [
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/lomba-saya', function () {
-        return view('lomba_saya');
-    })->name('lomba-saya');
+    Route::get('/lomba-saya', [
+        LombaSayaController::class,
+        'index'
+    ])->name('lomba-saya');
 
     /*
     |--------------------------------------------------------------------------
@@ -248,5 +291,23 @@ Route::delete('/profile/photo', [
     Route::get('/chat', function () {
         return view('chat');
     })->name('chat');
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHAT FILE - UPLOAD DAN DOWNLOAD
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post('/chat/upload', [
+        ChatFileController::class,
+        'upload'
+    ])->name('chat.file.upload');
+
+    Route::get('/chat/files/{filename}', [
+        ChatFileController::class,
+        'download'
+    ])
+    ->where('filename', '[A-Za-z0-9._-]+')
+    ->name('chat.file.download');
 
 });

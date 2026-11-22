@@ -1,0 +1,1035 @@
+:root {
+    --maroon: #8b0000;
+    --maroon-dark: #7a0000;
+    --cream: #fff1e3;
+    --card: #fff8f3;
+    --pink-soft: #fff1f1;
+    --pink-border: #f1d3d3;
+    --text: #444;
+    --muted: #888;
+    --green: #16c53a;
+    --green-bg: #c9f7d3;
+    --orange: #f59300;
+    --orange-bg: #fde3c8;
+    --radius: 28px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--cream); color: var(--text); }
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+
+/* ---------- Navbar ---------- */
+.navbar { display: flex; align-items: center; justify-content: space-between; padding: 24px 24px; height: 102px; border-bottom: 1px solid #aaa; background: var(--cream); position: relative; }
+.logo-box { display: inline-flex; align-items: flex-end; justify-content: center; width: 48px; height: 48px; border-radius: 10px; background: #ffe4cc; color: var(--maroon); font-weight: 800; font-size: 30px; line-height: 1; padding-bottom: 4px; position: relative; }
+.logo-box small { font-size: 8px; background: var(--maroon); color: #fff; border-radius: 3px; padding: 0 3px; position: absolute; right: 6px; bottom: 5px; }
+.logo-box--light { background: var(--cream); }
+.navbar__menu { display: flex; gap: 34px; position: absolute; left: 50%; transform: translateX(-50%); }
+.navbar__menu a { font-size: 16px; font-weight: 500; color: #111; padding-bottom: 6px; border-bottom: 3px solid transparent; }
+.navbar__menu a.active { color: var(--maroon); border-color: var(--maroon); }
+.navbar__actions { display: flex; align-items: center; gap: 24px; margin-right: 24px; }
+.icon-btn { background: none; border: 0; color: #222; cursor: pointer; position: relative; display: grid; place-items: center; }
+.icon-btn.has-dot::after { content: ''; position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: #e11; border-radius: 50%; }
+.avatar { display: inline-grid; place-items: center; border-radius: 50%; color: #fff; font-weight: 700; flex-shrink: 0; border: 2px solid rgba(255,255,255,.7); }
+
+/* ---------- Layout ---------- */
+.page { max-width: 1280px; margin: 0 auto; padding: 64px 32px 64px; min-height: 60vh; }
+.hero { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 28px; border-bottom: 1px solid #ccc; }
+.hero__eyebrow { font-size: 14px; font-weight: 700; color: #111; margin-left: 2px; }
+.hero h1 { font-size: 42px; color: var(--maroon); font-weight: 800; letter-spacing: -.5px; line-height: 1.15; }
+.hero__desc { max-width: 880px; margin-top: 12px; font-size: 15px; color: #222; line-height: 1.25; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 10px; font-family: inherit; font-weight: 700; cursor: pointer; }
+.btn--primary { background: var(--maroon); color: #fff; padding: 10px 24px; font-size: 15px; margin-top: 18px; }
+.btn--primary:hover { background: var(--maroon-dark); }
+.btn--ghost { background: transparent; color: var(--maroon); border: 1px solid var(--maroon); }
+.btn--sm { padding: 6px 16px; font-size: 13px; margin-top: 0; }
+
+/* ---------- Tabs ---------- */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid #ccc; margin-bottom: 58px; }
+.tab { background: none; border: 0; border-bottom: 3px solid transparent; font-family: inherit; font-size: 17px; font-weight: 500; color: #666; padding: 14px 9px; margin-right: 78px; cursor: pointer; transition: .2s; margin-bottom: -1px; }
+.tab:hover { color: var(--maroon); }
+.tab.active { color: var(--maroon); font-weight: 700; border-color: var(--maroon); }
+.panel { display: none; }
+.panel.active { display: block; animation: fade .3s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Cards ---------- */
+.grid { display: grid; gap: 40px; align-items: start; }
+.grid--3 { grid-template-columns: repeat(3, 1fr); gap: 36px; }
+.grid--2 { grid-template-columns: repeat(2, 1fr); }
+.card { background: var(--card); border: 1px solid #cfc4bf; border-radius: var(--radius); padding: 24px 26px; }
+.card--wide { margin-bottom: 22px; padding: 28px 32px; }
+.card--tim { padding: 24px 32px 28px; }
+.card__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.card__category { font-size: 14px; font-weight: 500; color: #555; text-transform: uppercase; }
+.card__title { font-size: 22px; font-weight: 600; color: var(--text); line-height: 1.15; margin-top: 6px; }
+.card__title--lg { font-size: 26px; margin-top: 12px; }
+.card--tim .card__title { margin-top: 4px; }
+.card__sub { color: var(--maroon); font-size: 14px; margin-top: 6px; }
+.card__team { color: var(--maroon); font-weight: 600; font-size: 14.5px; margin: 6px 0 14px; line-height: 1.2; }
+.card__team--plain { color: #555; font-weight: 400; font-size: 16px; margin: 6px 0 16px; }
+.card__team--plain b { font-weight: 700; }
+.card__foot { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; padding-top: 18px; border-top: 1px solid #e5d8d3; font-size: 14px; }
+.card--wide .card__foot { border: 0; padding-top: 0; margin-top: 18px; }
+.muted { color: var(--muted); font-size: 14px; }
+.link { color: var(--maroon); font-weight: 700; font-size: 13px; }
+.link:hover { text-decoration: underline; }
+.label { font-size: 14px; font-weight: 700; color: #555; margin: 38px 0 12px; letter-spacing: .3px; }
+.label--icon { display: flex; align-items: center; gap: 10px; font-size: 14px; margin: 26px 0 12px; }
+
+/* ---------- Badges ---------- */
+.badge { font-size: 14px; font-weight: 700; padding: 4px 14px; border-radius: 10px; white-space: nowrap; }
+.badge--aktif { background: var(--green-bg); color: var(--green); }
+.badge--menunggu { background: var(--orange-bg); color: var(--orange); font-size: 17px; }
+.badge--diterima { background: #ddd; color: #666; }
+.badge--diterima-hijau { background: var(--green-bg); color: var(--green); font-size: 17px; }
+.badge--pink { background: #fbb6c0; color: var(--maroon); font-size: 13px; padding: 4px 14px; border-radius: 20px; }
+.badge--green { background: var(--green-bg); color: #0a8a2a; }
+.badge--xs { font-size: 10px; padding: 2px 8px; border-radius: 4px; margin-left: 8px; }
+.badge--outline-green { background: #e6fbe9; color: #0aa02a; border: 1px solid #1c1; font-size: 18px; border-radius: 22px; padding: 6px 18px; }
+.tag { background: #d8525f; color: #fff; font-weight: 700; font-size: 16px; border-radius: 10px; padding: 8px 12px; }
+.post-meta { display: flex; align-items: center; gap: 8px; }
+
+/* ---------- Milestone & members ---------- */
+.milestone { background: var(--pink-soft); border: 1px solid var(--pink-border); border-radius: 14px; padding: 12px 12px; display: flex; flex-direction: column; gap: 4px; }
+.milestone small { font-size: 11px; color: #777; }
+.milestone strong { font-size: 14px; font-weight: 700; color: #333; line-height: 1.2; }
+.milestone em { font-style: normal; font-size: 11px; font-weight: 600; color: var(--maroon); margin-top: 4px; }
+.members--compact { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
+.members--compact li { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.members--compact b { font-weight: 600; }
+.members--compact span { margin-left: auto; color: var(--muted); }
+.card p.muted { margin-top: 18px; }
+.members--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.member-box { display: flex; align-items: center; gap: 14px; background: var(--pink-soft); border: 1px solid var(--pink-border); border-radius: 12px; padding: 14px 14px; }
+.member-box b { display: block; font-size: 14px; font-weight: 600; }
+.member-box span { font-size: 12.5px; color: var(--muted); }
+.coord { display: flex; justify-content: space-between; align-items: center; background: var(--pink-soft); border: 1px solid var(--pink-border); border-radius: 10px; padding: 12px 12px; margin-top: 14px; font-size: 12px; color: var(--muted); }
+.coord .link { font-size: 13px; }
+
+/* ---------- Posting rekrut ---------- */
+.slot-box { border: 1px solid var(--pink-border); background: var(--pink-soft); border-radius: 14px; padding: 16px 22px; max-width: 620px; margin-top: 22px; }
+.slot-box__top { display: flex; justify-content: space-between; font-size: 16px; }
+.slot-box__top strong { font-weight: 600; color: #444; }
+.slot-box__slot { color: var(--maroon); font-weight: 700; font-size: 14px; }
+.chips { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+.chip { border: 1px solid #aaa; border-radius: 14px; padding: 3px 11px; font-size: 13px; color: #555; }
+.applicant { display: flex; gap: 18px; background: var(--pink-soft); border: 1px solid var(--pink-border); border-radius: 22px; padding: 16px 20px; }
+.applicant__body { flex: 1; }
+.applicant__name b { font-size: 16px; }
+.applicant__name small { font-size: 8px; color: #888; }
+.applicant__role { color: var(--maroon); font-size: 14px; margin-bottom: 8px; }
+.applicant__row { display: flex; align-items: center; gap: 12px; }
+.applicant blockquote { flex: 0 1 700px; border: 1px solid #bbb; border-radius: 8px; padding: 8px 18px; font-size: 12px; color: #666; background: #fffafa; }
+.applicant__done { font-size: 14px; font-weight: 700; color: #555; line-height: 1.2; }
+.applicant__actions { display: flex; gap: 8px; }
+
+/* ---------- Pengajuan ---------- */
+.note { background: var(--pink-soft); border: 1px solid var(--pink-border); border-radius: 18px; padding: 16px 20px; }
+.note strong { font-size: 16px; color: #555; }
+.note p { font-size: 16px; color: #666; margin-top: 4px; }
+
+/* ---------- Footer ---------- */
+.footer { background: #8b0000; color: #e8b9b0; padding: 52px 24px 0; }
+.footer__grid { display: grid; grid-template-columns: 350px 315px 330px 1fr; max-width: 1280px; margin: 0 auto; padding: 0 6px; }
+.footer h4 { color: #f0a9a0; font-size: 15px; font-weight: 700; margin-bottom: 12px; letter-spacing: .3px; }
+.footer li { font-size: 14px; line-height: 20px; }
+.footer li a:hover { color: #fff; }
+.footer__desc { font-size: 13px; line-height: 16px; margin-top: 18px; max-width: 230px; }
+.footer__small { font-size: 11px; margin-top: 38px; line-height: 14px; opacity: .85; }
+.footer__faculty { font-size: 14px; line-height: 20px; max-width: 200px; }
+.tips { margin-top: 20px; border: 1px solid #e8b9b0; border-radius: 8px; padding: 10px 12px; font-size: 11px; line-height: 17px; max-width: 200px; }
+.tips strong { color: #ffc107; font-weight: 500; }
+.footer__bottom { display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,.25); margin-top: 28px; padding: 24px 19px; font-size: 12px; }
+.footer__links { display: flex; gap: 64px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+    .grid--3 { grid-template-columns: 1fr 1fr; }
+    .footer__grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .navbar__menu { display: none; }
+    .tab { margin-right: 24px; }
+}
+@media (max-width: 700px) {
+    .grid--3, .grid--2, .members--grid { grid-template-columns: 1fr; }
+    .hero { flex-direction: column; }
+    .hero h1 { font-size: 30px; }
+    .tabs { overflow-x: auto; }
+    .tab { white-space: nowrap; font-size: 15px; }
+    .footer__bottom, .footer__links { flex-direction: column; gap: 10px; }
+    .applicant__row { flex-direction: column; align-items: flex-start; }
+}
+
+/* Logo FINS pada navbar */
+.logo-fins {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+}
+
+/* Logo FINS pada footer */
+.logo-fins-footer {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+}
+
+/* Pengaturan posisi logo navbar */
+.navbar__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .logo-fins,
+    .logo-fins-footer {
+        width: 42px;
+        height: 42px;
+    }
+}
+.navbar__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 25px;
+    margin-right: 15px;
+}
+
+/* Ikon chat dan notifikasi */
+.nav-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 30px;
+    color: #8b0000;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.nav-icon:hover {
+    transform: translateY(-2px);
+}
+
+.nav-icon svg {
+    display: block;
+}
+
+/* Titik merah notifikasi */
+.notification-dot {
+    position: absolute;
+    top: 1px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background-color: #c90000;
+    border-radius: 50%;
+}
+
+/* Profil lingkaran */
+.navbar-profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 2px solid #8b0000;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #fff1e3;
+    flex-shrink: 0;
+}
+
+/* Gambar profil */
+.navbar-profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .navbar__actions {
+        gap: 15px;
+        margin-right: 0;
+    }
+
+    .navbar-profile {
+        width: 40px;
+        height: 40px;
+    }
+
+    .nav-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+
+.navbar {
+    background-color: #8B0000;
+    border-bottom: 1px solid #700000;
+}
+
+/* Menu navbar */
+.navbar__menu a {
+    color: #FFFFFF;
+}
+
+.navbar__menu a:hover {
+    color: #FFD6C6;
+}
+
+/* Menu yang aktif */
+.navbar__menu a.active {
+    color: #FFFFFF;
+    border-bottom: 3px solid #FFFFFF;
+}
+
+/* Ikon chat dan notifikasi */
+.nav-icon {
+    color: #FFFFFF;
+}
+
+/* Bingkai profil */
+.navbar-profile {
+    border: 2px solid #FFFFFF;
+}
+
+/* Titik notifikasi */
+.notification-dot {
+    background-color: #FF5252;
+}
+
+/* =====================================
+   STATUS BADGE - UKURAN KONSISTEN
+===================================== */
+
+.card__head .badge {
+    width: 85px;
+    height: 27px;
+    padding: 4px 10px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+
+    border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Aktif */
+.card__head .badge--aktif {
+    background-color: #C9F7D3;
+    color: #16A34A;
+}
+
+/* Menunggu */
+.card__head .badge--menunggu {
+    background-color: #FDE3C8;
+    color: #F59300;
+}
+
+/* Diterima */
+.card__head .badge--diterima {
+    background-color: #DDDDDD;
+    color: #666666;
+}
+
+/* ===================================
+   POSISI ANGGOTA TIM RATA KIRI
+=================================== */
+
+.members--compact {
+    width: 100%;
+    padding: 0;
+    margin-left: 0;
+}
+
+.members--compact li {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+    padding-left: 0;
+}
+
+/* Avatar tetap di kiri */
+.members--compact li .avatar {
+    flex-shrink: 0;
+    margin-left: 0;
+}
+
+/* Nama lebih dekat dengan avatar */
+.members--compact li b {
+    margin-left: 0;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* Peran tetap rata kanan */
+.members--compact li > span:not(.avatar) {
+    margin-left: auto;
+    text-align: right;
+    font-size: 12px;
+}
+
+/* =========================================
+   TIM SAYA - STATUS BERBEDA & KARTU RAPI
+========================================= */
+
+/* Grid tim saya */
+#tim-saya .grid.grid--2 {
+    align-items: stretch;
+}
+
+/* Kartu tim */
+.card--tim {
+    display: flex;
+    flex-direction: column;
+    min-height: 360px;
+    height: 100%;
+    padding: 20px 26px 24px;
+}
+
+/* Header kartu */
+.card--tim .card__head {
+    align-items: flex-start;
+}
+
+/* Judul dan subjudul */
+.card--tim .card__title {
+    margin-bottom: 6px;
+}
+
+.card--tim .card__sub {
+    min-height: 26px;
+    margin-bottom: 26px;
+}
+
+/* Area anggota dibuat stabil */
+.card--tim .members--grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-content: start;
+    min-height: 150px;
+}
+
+/* Box anggota */
+.card--tim .member-box {
+    min-height: 74px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+}
+
+/* Nama & peran anggota */
+.card--tim .member-box b {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* Koordinasi selalu di bawah */
+.card--tim .coord {
+    margin-top: auto;
+}
+
+/* =========================
+   BADGE STATUS TIM SAYA
+========================= */
+
+.badge--tim-aktif {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 84px;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: #f6b4c0;
+    color: #8b0000;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.badge--tim-menunggu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 104px;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: #f6b4c0;
+    color: #8b0000;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.badge--tim-diterima {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 96px;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: #f6b4c0;
+    color: #8b0000;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Jika mau warna benar-benar dibedakan */
+.badge--tim-aktif {
+    background: #c9f7d3;
+    color: #16a34a;
+}
+
+.badge--tim-menunggu {
+    background: #fde3c8;
+    color: #f59300;
+}
+
+.badge--tim-diterima {
+    background: #dddddd;
+    color: #666666;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .card--tim .members--grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card--tim {
+        min-height: 470px;
+    }
+}
+
+
+/* ==================================
+   PERBAIKAN INISIAL AVATAR TIM SAYA
+================================== */
+
+.card--tim .member-box .avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    margin: 0;
+
+    line-height: 1;
+    text-align: center;
+    letter-spacing: 0;
+
+    color: #ffffff;
+    font-weight: 700;
+    flex-shrink: 0;
+
+    border-radius: 50%;
+}
+
+/* Hanya mengatur tulisan nama dan peran */
+.card--tim .member-box > div span {
+    display: block;
+    font-size: 12.5px;
+    color: #8a8a8a;
+    margin-top: 4px;
+    line-height: 1.2;
+}
+
+
+/* =========================================
+   PENYESUAIAN UKURAN LOMBA SAYA
+   AGAR KONSISTEN DENGAN BERANDA FINS
+========================================= */
+
+/* Navbar */
+.navbar {
+    height: 74px;
+    padding: 12px 28px;
+}
+
+.navbar__menu {
+    gap: 32px;
+}
+
+.navbar__menu a {
+    font-size: 14px;
+}
+
+.navbar__actions {
+    gap: 20px;
+    margin-right: 12px;
+}
+
+/* Logo dan profil */
+.logo-fins {
+    width: 42px;
+    height: 42px;
+}
+
+.navbar-profile {
+    width: 42px;
+    height: 42px;
+}
+
+.nav-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Konten utama */
+.page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 45px 28px 55px;
+}
+
+/* Judul dashboard */
+.hero__eyebrow {
+    font-size: 12px;
+}
+
+.hero h1 {
+    font-size: 32px;
+    line-height: 1.2;
+}
+
+.hero__desc {
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 850px;
+}
+
+/* Tombol rekrut */
+.hero .btn--primary {
+    font-size: 13px;
+    padding: 9px 18px;
+    border-radius: 9px;
+}
+
+/* Tab navigasi */
+.tabs {
+    margin-bottom: 40px;
+}
+
+.tab {
+    font-size: 14px;
+    padding: 12px 9px;
+    margin-right: 58px;
+}
+
+/* Grid kartu lomba */
+.grid--3 {
+    gap: 26px;
+}
+
+.grid--2 {
+    gap: 28px;
+}
+
+/* Kartu utama */
+.card {
+    padding: 20px 22px;
+    border-radius: 22px;
+}
+
+.card--wide {
+    padding: 24px 28px;
+}
+
+.card--tim {
+    padding: 22px 26px;
+}
+
+/* Judul kartu */
+.card__category {
+    font-size: 12px;
+}
+
+.card__title {
+    font-size: 19px;
+}
+
+.card__title--lg {
+    font-size: 22px;
+}
+
+/* Informasi kartu */
+.card__team,
+.card__sub {
+    font-size: 12px;
+}
+
+.muted {
+    font-size: 12px;
+}
+
+.label {
+    font-size: 12px;
+}
+
+/* Milestone */
+.milestone {
+    padding: 12px;
+}
+
+.milestone small {
+    font-size: 10px;
+}
+
+.milestone strong {
+    font-size: 12px;
+}
+
+.milestone em {
+    font-size: 10px;
+}
+
+/* Anggota tim */
+.members--compact li {
+    font-size: 11px;
+}
+
+.member-box {
+    padding: 10px;
+    gap: 10px;
+}
+
+/* Footer */
+.footer {
+    padding: 40px 24px 0;
+}
+
+.footer h4 {
+    font-size: 13px;
+}
+
+.footer li,
+.footer__faculty {
+    font-size: 12px;
+}
+
+.footer__desc {
+    font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .grid--3,
+    .grid--2 {
+        grid-template-columns: 1fr;
+    }
+
+    .page {
+        padding: 28px 18px;
+    }
+
+    .hero h1 {
+        font-size: 27px;
+    }
+}
+
+
+/* ==========================================
+   CRUD POSTING REKRUT SAYA
+========================================== */
+
+/* Header posting */
+.rekrut-crud-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.rekrut-crud-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #8b0000;
+}
+
+.rekrut-crud-header p {
+    margin-top: 5px;
+    color: #777;
+    font-size: 13px;
+}
+
+/* Tombol tambah */
+.btn-tambah-rekrut {
+    background: #8b0000;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 20px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.btn-tambah-rekrut:hover {
+    background: #690000;
+}
+
+/* Kartu posting */
+.rekrut-item {
+    margin-bottom: 24px;
+}
+
+/* Tombol Edit dan Hapus */
+.rekrut-crud-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #ead6cf;
+}
+
+.btn-edit-rekrut,
+.btn-hapus-rekrut {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 18px;
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-edit-rekrut {
+    color: #8b0000;
+    background: #fff8f3;
+    border: 1px solid #8b0000;
+}
+
+.btn-edit-rekrut:hover {
+    background: #ffe5da;
+}
+
+.btn-hapus-rekrut {
+    color: white;
+    background: #8b0000;
+    border: 1px solid #8b0000;
+}
+
+.btn-hapus-rekrut:hover {
+    background: #690000;
+}
+
+/* Empty state */
+.rekrut-empty {
+    background: #fff8f3;
+    border: 1px dashed #d9b9ae;
+    border-radius: 18px;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.rekrut-empty h3 {
+    color: #8b0000;
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.rekrut-empty p {
+    color: #777;
+    font-size: 13px;
+}
+
+/* ==========================================
+   MODAL TAMBAH / EDIT
+========================================== */
+
+.modal-rekrut {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.55);
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-rekrut.show {
+    display: flex;
+}
+
+.modal-rekrut-content {
+    background: #fff8f3;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.15);
+}
+
+.modal-rekrut-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.modal-rekrut-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #8b0000;
+}
+
+.modal-rekrut-close {
+    border: none;
+    background: none;
+    color: #8b0000;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+/* Form */
+.form-group-rekrut {
+    margin-bottom: 17px;
+}
+
+.form-group-rekrut label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #444;
+}
+
+.form-group-rekrut input,
+.form-group-rekrut select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e7ceca;
+    border-radius: 10px;
+    background: #fff3f0;
+    color: #444;
+    font-family: inherit;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.form-group-rekrut input:focus,
+.form-group-rekrut select:focus {
+    outline: none;
+    border-color: #8b0000;
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.08);
+}
+
+.form-group-rekrut small {
+    display: block;
+    margin-top: 6px;
+    color: #888;
+    font-size: 11px;
+}
+
+/* Tombol modal */
+.modal-rekrut-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.btn-batal-rekrut,
+.btn-simpan-rekrut {
+    border-radius: 9px;
+    padding: 11px 19px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-batal-rekrut {
+    border: 1px solid #8b0000;
+    background: transparent;
+    color: #8b0000;
+}
+
+.btn-simpan-rekrut {
+    border: 1px solid #8b0000;
+    background: #8b0000;
+    color: white;
+}
+
+.btn-simpan-rekrut:hover {
+    background: #690000;
+}
+
+/* Pengaturan kartu pelamar */
+.rekrut-item .applicant {
+    margin-bottom: 12px;
+}
+
+.rekrut-item .applicant__name {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rekrut-item .applicant__name .badge {
+    margin-left: 4px;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .rekrut-crud-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .modal-rekrut-content {
+        padding: 20px;
+    }
+
+    .rekrut-crud-actions {
+        flex-wrap: wrap;
+    }
+
+    .rekrut-item .card__head {
+        flex-wrap: wrap;
+    }
+
+    .rekrut-item .post-meta {
+        flex-wrap: wrap;
+    }
+
+    .rekrut-item .slot-box {
+        max-width: 100%;
+    }
+}
