@@ -1,4 +1,3 @@
-
 @php
     // Data contoh kompetisi untuk tampilan Home.
     // Autentikasi ditangani Laravel.
@@ -60,10 +59,19 @@
 
     <title>Beranda | FINS</title>
 
-<link rel="stylesheet" href="/css/home.css?v=15">
-<link rel="stylesheet" href="/css/navbar.css?v=16">
+    {{-- CSS dengan versi otomatis --}}
+    <link rel="stylesheet"
+          href="/css/home.css?v={{ filemtime(public_path('css/home.css')) }}">
 
-<script src="/js/home.js?v=15" defer></script>
+    <link rel="stylesheet"
+          href="/css/navbar.css?v={{ filemtime(public_path('css/navbar.css')) }}">
+
+    {{-- JavaScript dengan versi otomatis --}}
+    <script
+        src="/js/home.js?v={{ filemtime(public_path('js/home.js')) }}"
+        defer>
+    </script>
+
 </head>
 
 <body>

@@ -9,9 +9,9 @@
     <title>Posting Lomba | FINS UB</title>
 
     <link rel="stylesheet"
-          href="{{ asset('css/posting_lomba.css') }}?v=8">
+          href="/css/posting_lomba.css?v={{ filemtime(public_path('css/posting_lomba.css')) }}">
 
-    <script src="{{ asset('js/posting_lomba.js') }}?v=8"
+    <script src="/js/posting_lomba.js?v={{ filemtime(public_path('js/posting_lomba.js')) }}"
             defer></script>
 </head>
 
@@ -20,7 +20,7 @@
 <!-- ================= NAVBAR ================= -->
 <header class="navbar">
 
-    <a href="{{ url('/home') }}"
+    <a href="/home"
        class="navbar-logo"
        aria-label="FINS UB">
         <span class="logo-f">F</span>
@@ -28,17 +28,17 @@
     </a>
 
     <nav class="nav-links">
-        <a href="{{ url('/home') }}">Beranda</a>
+        <a href="/home">Beranda</a>
 
-        <a href="{{ url('/cari-lomba') }}" class="active">
+        <a href="/cari-lomba" class="active">
             Lomba
         </a>
 
-        <a href="{{ url('/cari-partner') }}">
+        <a href="/cari-partner">
             Cari Partner
         </a>
 
-        <a href="{{ url('/lomba-saya') }}">
+        <a href="/lomba-saya">
             Lomba Saya
         </a>
     </nav>
@@ -46,7 +46,7 @@
     <div class="nav-actions">
 
         <!-- Chat -->
-        <a href="{{ url('/chat') }}"
+        <a href="/chat"
            class="nav-icon"
            title="Chat"
            aria-label="Chat">
@@ -71,7 +71,7 @@
         </a>
 
         <!-- Notifikasi -->
-        <a href="{{ url('/notifikasi') }}"
+        <a href="/notifikasi"
            class="nav-icon notification-icon"
            title="Notifikasi"
            aria-label="Notifikasi">
@@ -93,7 +93,7 @@
         </a>
 
         <!-- Profil -->
-        <a href="{{ url('/profile') }}"
+        <a href="/profile"
            class="profile-logo"
            title="Profil">
             <span>F</span>
@@ -127,7 +127,7 @@
 <main class="container main-layout">
 
     <form
-        action="{{ route('posting-lomba.store') }}"
+        action="{{ route('posting-lomba.store', [], false) }}"
         method="POST"
         enctype="multipart/form-data"
         id="postingForm"
@@ -214,7 +214,7 @@
                                 data-category="{{ $item->category }}"
                                 data-organizer="{{ $item->organizer }}"
                                 data-deadline="{{ $item->deadline }}"
-                                data-image="{{ $item->image ? (filter_var($item->image, FILTER_VALIDATE_URL) ? $item->image : asset(ltrim($item->image, '/'))) : '' }}"
+                                data-image="{{ $item->image ? (filter_var($item->image, FILTER_VALIDATE_URL) ? $item->image : ('/' . ltrim($item->image, '/'))) : '' }}"
                                 @selected(old('cari_lomba_id') == $item->id)
                             >
                                 {{ $item->title }} - {{ $item->organizer }}

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,8 +7,9 @@
 
     <title>Lupa Password | FINS</title>
 
-    {{-- Menggunakan path relatif terhadap domain yang sedang dibuka --}}
-    <link rel="stylesheet" href="/css/password-reset.css?v=4">
+    {{-- CSS dengan versi otomatis dan URL relatif --}}
+    <link rel="stylesheet"
+          href="/css/password-reset.css?v={{ filemtime(public_path('css/password-reset.css')) }}">
 </head>
 
 <body>
@@ -29,6 +29,7 @@
             </a>
 
             <div class="fins-auth-brand-copy">
+
                 <p class="fins-auth-kicker">
                     TEMUKAN PELUANGMU
                 </p>
@@ -44,6 +45,7 @@
                     kompetisi dan mahasiswa dengan skill
                     yang sesuai.
                 </p>
+
             </div>
 
             <img
@@ -80,24 +82,32 @@
 
                 <!-- PESAN SUKSES -->
                 @if (session('status'))
+
                     <div
                         class="fins-auth-alert fins-auth-alert--success"
                         role="status"
                     >
                         {{ session('status') }}
                     </div>
+
                 @endif
 
                 <!-- PESAN ERROR -->
                 @if ($errors->any())
+
                     <div
                         class="fins-auth-alert fins-auth-alert--error"
                         role="alert"
                     >
+
                         @foreach ($errors->all() as $error)
+
                             <p>{{ $error }}</p>
+
                         @endforeach
+
                     </div>
+
                 @endif
 
                 <!-- FORM FORGOT PASSWORD -->
@@ -107,6 +117,7 @@
                     action="{{ route('password.email', [], false) }}"
                     class="fins-auth-form"
                 >
+
                     @csrf
 
                     <label for="email">

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -9,8 +8,9 @@
 
     <title>Login | FINS</title>
 
-    <!-- CSS LOGIN: MENGIKUTI DOMAIN SAAT INI -->
-    <link rel="stylesheet" href="/css/login.css?v=5">
+    {{-- CSS LOGIN DENGAN VERSI OTOMATIS --}}
+    <link rel="stylesheet"
+          href="/css/login.css?v={{ filemtime(public_path('css/login.css')) }}">
 
     <!-- CSS KHUSUS LINK LUPA PASSWORD -->
     <style>
@@ -62,6 +62,7 @@
 
         <!-- PESAN BERHASIL -->
         @if (session('status'))
+
             <div class="success-message"
                  role="status"
                  style="
@@ -73,17 +74,26 @@
                     border: 1px solid #b7dec0;
                     font-size: 13px;
                  ">
+
                 {{ session('status') }}
+
             </div>
+
         @endif
 
         <!-- PESAN ERROR -->
         @if ($errors->any())
+
             <div class="error" role="alert">
+
                 @foreach ($errors->all() as $error)
+
                     <p>{{ $error }}</p>
+
                 @endforeach
+
             </div>
+
         @endif
 
         <!-- FORM LOGIN -->
@@ -91,6 +101,7 @@
             action="{{ route('login.submit', [], false) }}"
             method="POST"
         >
+
             @csrf
 
             <!-- INPUT NIM -->
@@ -135,6 +146,7 @@
                     aria-label="Tampilkan password"
                     aria-pressed="false"
                 >
+
                     <svg
                         viewBox="0 0 24 24"
                         width="20"
@@ -146,12 +158,16 @@
                         stroke-linejoin="round"
                         aria-hidden="true"
                     >
+
                         <path
                             d="M2 12s3.5-7 10-7 10 7
                                10 7-3.5 7-10 7S2 12 2 12z"
                         />
+
                         <circle cx="12" cy="12" r="3"/>
+
                     </svg>
+
                 </button>
 
             </div>
@@ -174,11 +190,13 @@
 
             <!-- LINK SIGN UP -->
             <p class="signup">
+
                 Belum punya akun?
 
                 <a href="{{ route('signup', [], false) }}">
                     Daftar
                 </a>
+
             </p>
 
         </form>
@@ -192,10 +210,12 @@
 
         <!-- LOGO -->
         <div class="logo">
+
             <img
                 src="/assets/images/Group4.png"
                 alt="Logo FINS UB"
             >
+
         </div>
 
         <!-- TEKS BANNER -->
@@ -219,10 +239,12 @@
 
         <!-- ILUSTRASI -->
         <div class="illustration">
+
             <img
                 src="/assets/images/fins-login.png"
                 alt="Ilustrasi mahasiswa FINS"
             >
+
         </div>
 
         <!-- FOOTER -->
@@ -234,8 +256,11 @@
 
 </div>
 
-<!-- JS LOGIN: MENGIKUTI DOMAIN SAAT INI -->
-<script src="/js/login.js?v=5" defer></script>
+{{-- JAVASCRIPT LOGIN DENGAN VERSI OTOMATIS --}}
+<script
+    src="/js/login.js?v={{ filemtime(public_path('js/login.js')) }}"
+    defer>
+</script>
 
 </body>
 </html>
