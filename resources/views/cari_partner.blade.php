@@ -1,4 +1,3 @@
-
 @php
     /** @var array $partners */
     /** @var array $skillOptions */
@@ -19,10 +18,19 @@
 
     <title>Cari Partner | FINS</title>
 
-<link rel="stylesheet" href="{{ secure_asset('css/navbar.css') }}?v=48">
-<link rel="stylesheet" href="{{ secure_asset('css/cari_partner.css') }}?v=48">
+    {{-- CSS dengan versi otomatis --}}
+    <link rel="stylesheet"
+          href="/css/navbar.css?v={{ filemtime(public_path('css/navbar.css')) }}">
 
-<script src="{{ secure_asset('js/cari_partner.js') }}?v=50" defer></script>
+    <link rel="stylesheet"
+          href="/css/cari_partner.css?v={{ filemtime(public_path('css/cari_partner.css')) }}">
+
+    {{-- JavaScript dengan versi otomatis --}}
+    <script
+        src="/js/cari_partner.js?v={{ filemtime(public_path('js/cari_partner.js')) }}"
+        defer>
+    </script>
+
 </head>
 
 <body>

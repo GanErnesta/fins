@@ -16,6 +16,8 @@ use App\Http\Controllers\ChatAttachmentController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PartnerInvitationController;
 use App\Http\Controllers\CariPartnerController;
+use App\Http\Controllers\RealtimeController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +31,7 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| AUTHENTICATION - LOGIN
+| LOGIN
 |--------------------------------------------------------------------------
 */
 
@@ -49,7 +51,7 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| AUTHENTICATION - SIGN UP
+| SIGN UP
 |--------------------------------------------------------------------------
 */
 
@@ -74,7 +76,7 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| VERIFIKASI OTP EMAIL
+| VERIFIKASI EMAIL
 |--------------------------------------------------------------------------
 */
 
@@ -109,8 +111,6 @@ Route::middleware('guest')->group(function () {
         return view('verification-failed');
     })->name('verification-failed');
 
-    // Alias untuk kompatibilitas route lama
-
     Route::get('/verification/success', function () {
         return redirect()->route('verification-success');
     })->name('verification.success');
@@ -123,19 +123,17 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| FORGOT PASSWORD & RESET PASSWORD
+| LUPA PASSWORD DAN RESET PASSWORD
 |--------------------------------------------------------------------------
 */
 
 Route::middleware('guest')->group(function () {
 
-    // Halaman lupa password
     Route::get('/forgot-password', [
         PasswordResetController::class,
         'requestForm'
     ])->name('password.request');
 
-    // Kirim email reset password
     Route::post('/forgot-password', [
         PasswordResetController::class,
         'sendLink'
@@ -143,13 +141,11 @@ Route::middleware('guest')->group(function () {
     ->middleware('throttle:3,1')
     ->name('password.email');
 
-    // Halaman reset password
     Route::get('/reset-password', [
         PasswordResetController::class,
         'resetForm'
     ])->name('password.reset');
 
-    // Simpan password baru
     Route::post('/reset-password', [
         PasswordResetController::class,
         'resetPassword'
@@ -192,29 +188,35 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | PROFILE MAHASISWA
+    | NOTIFIKASI
     |--------------------------------------------------------------------------
     */
 
-    // Menampilkan profil
+    Route::get('/notifikasi', function () {
+        return view('notifikasi');
+    })->name('notifikasi');
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROFILE
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/profile', [
         ProfileController::class,
         'index'
     ])->name('profile');
 
-    // Update data profil
     Route::put('/profile', [
         ProfileController::class,
         'update'
     ])->name('profile.update');
 
-    // Upload foto profil
     Route::post('/profile/photo', [
         ProfileController::class,
         'uploadPhoto'
     ])->name('profile.photo.upload');
 
-    // Hapus foto profil
     Route::delete('/profile/photo', [
         ProfileController::class,
         'removePhoto'
@@ -227,9 +229,9 @@ Route::middleware('auth')->group(function () {
     */
 
     Route::get('/cari-partner', [
-    CariPartnerController::class,
-    'index'
-])->middleware('auth')->name('cari-partner');
+        CariPartnerController::class,
+        'index'
+    ])->name('cari-partner');
 
     /*
     |--------------------------------------------------------------------------
@@ -270,7 +272,6 @@ Route::middleware('auth')->group(function () {
         'store'
     ])->name('posting-lomba.store');
 
-    // Route lama tetap dipertahankan
     Route::post('/tambah-lomba', [
         CompetitionController::class,
         'store'
@@ -299,7 +300,7 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | CHAT FILE - UPLOAD DAN DOWNLOAD
+    | CHAT FILE
     |--------------------------------------------------------------------------
     */
 
@@ -315,68 +316,105 @@ Route::middleware('auth')->group(function () {
     ->where('filename', '[A-Za-z0-9._-]+')
     ->name('chat.file.download');
 
-});
-/*
-|--------------------------------------------------------------------------
-| CHAT ATTACHMENTS - SUPABASE STORAGE
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | CHAT ATTACHMENTS - SUPABASE STORAGE
+    |--------------------------------------------------------------------------
+    */
 
-Route::middleware(['auth'])->group(function () {
-
-    // Upload file chat ke Supabase Storage
     Route::post('/chat/attachments/upload', [
         ChatAttachmentController::class,
         'upload'
     ])->name('chat.attachments.upload');
 
-    // Download file chat dari Supabase Storage
     Route::get('/chat/attachments/{attachmentId}/download', [
         ChatAttachmentController::class,
         'download'
-    ])->whereNumber('attachmentId')
-      ->name('chat.attachments.download');
+    ])
+    ->whereNumber('attachmentId')
+    ->name('chat.attachments.download');
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHAT CONVERSATIONS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/chat/conversations', [
+        ChatController::class,
+        'index'
+    ])->name('chat.conversations.index');
+
+    Route::get('/chat/conversations/{conversationId}/messages', [
+        ChatController::class,
+        'messages'
+    ])
+    ->whereNumber('conversationId')
+    ->name('chat.conversations.messages');
+
+    Route::post('/chat/conversations/{conversationId}/messages', [
+        ChatController::class,
+        'sendMessage'
+    ])
+    ->whereNumber('conversationId')
+    ->name('chat.conversations.messages.send');
+
+    /*
+    |--------------------------------------------------------------------------
+    | PARTNER INVITATIONS - CARI PARTNER
+    |--------------------------------------------------------------------------
+    */
+
+    // User A mengirim undangan
+    Route::post('/partner-invitations', [
+        PartnerInvitationController::class,
+        'store'
+    ])->name('partner-invitations.store');
+
+    // User B melihat undangan masuk
+    Route::get('/partner-invitations/received', [
+        PartnerInvitationController::class,
+        'received'
+    ])->name('partner-invitations.received');
+
+    // User A melihat undangan terkirim
+    Route::get('/partner-invitations/sent', [
+        PartnerInvitationController::class,
+        'sent'
+    ])->name('partner-invitations.sent');
+
+    // User B menerima atau menolak undangan
+    Route::patch('/partner-invitations/{id}/respond', [
+        PartnerInvitationController::class,
+        'respond'
+    ])
+    ->whereNumber('id')
+    ->name('partner-invitations.respond');
 
 });
-Route::middleware('auth')->get(
-    '/chat/conversations',
-    [ChatController::class, 'index']
-)->name('chat.conversations.index');
 
-Route::middleware('auth')->get(
-    '/chat/conversations/{conversationId}/messages',
-    [ChatController::class, 'messages']
-)->whereNumber('conversationId')
- ->name('chat.conversations.messages');
+// ================= SUPABASE REALTIME =================
 
- Route::middleware('auth')->post(
-    '/chat/conversations/{conversationId}/messages',
-    [ChatController::class, 'sendMessage']
-)->whereNumber('conversationId')
- ->name('chat.conversations.messages.send');
+Route::get('/realtime/token', [RealtimeController::class, 'token'])
+    ->middleware(['auth', 'throttle:60,1'])
+    ->block(30, 30)
+    ->name('realtime.token');
 
- Route::middleware('auth')->group(function () {
+// ================= NOTIFICATIONS =================
 
-    Route::post(
-        '/partner-invitations',
-        [PartnerInvitationController::class, 'store']
-    )->name('partner-invitations.store');
+Route::middleware('auth')->prefix('notifications')->group(function () {
 
-    Route::get(
-        '/partner-invitations/received',
-        [PartnerInvitationController::class, 'received']
-    )->name('partner-invitations.received');
+    Route::get('/', [NotificationController::class, 'index'])
+        ->name('notifications.index');
 
-    Route::get(
-        '/partner-invitations/sent',
-        [PartnerInvitationController::class, 'sent']
-    )->name('partner-invitations.sent');
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount'])
+        ->name('notifications.unread-count');
 
-    Route::patch(
-        '/partner-invitations/{id}/respond',
-        [PartnerInvitationController::class, 'respond']
-    )->whereNumber('id')
-     ->name('partner-invitations.respond');
+    Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
+        ->name('notifications.read-all');
+
+    Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])
+        ->whereNumber('id')
+        ->name('notifications.read');
 
 });
-

@@ -7,13 +7,13 @@
     <title>Profil Mahasiswa | FINS</title>
 
     {{-- Pertahankan CSS berukuran besar & warna soft dari revisi sebelumnya. --}}
-    <link rel="stylesheet" href="/css/navbar.css?v=16">
-    <link rel="stylesheet" href="/css/profile.css?v=12">
-    <link rel="stylesheet" href="/css/fins-academic-dropdown.css?v=32">
-    <link rel="stylesheet" href="/css/profile-logout.css?v=2">
-    <script src="/js/fins-academic-dropdown.js?v=32" defer></script>
-    <script src="/js/profile.js?v=32" defer></script>
-    <script src="/js/profile-logout.js?v=2" defer></script>
+    <link rel="stylesheet" href="/css/navbar.css?v={{ filemtime(public_path('css/navbar.css')) }}">
+    <link rel="stylesheet" href="/css/profile.css?v={{ filemtime(public_path('css/profile.css')) }}">
+    <link rel="stylesheet" href="/css/fins-academic-dropdown.css?v={{ filemtime(public_path('css/fins-academic-dropdown.css')) }}">
+    <link rel="stylesheet" href="/css/profile-logout.css?v={{ filemtime(public_path('css/profile-logout.css')) }}">
+    <script src="/js/fins-academic-dropdown.js?v={{ filemtime(public_path('js/fins-academic-dropdown.js')) }}" defer></script>
+    <script src="/js/profile.js?v={{ filemtime(public_path('js/profile.js')) }}" defer></script>
+    <script src="/js/profile-logout.js?v={{ filemtime(public_path('js/profile-logout.js')) }}" defer></script>
 </head>
 <body>
 <div class="fins-profile-page">
@@ -364,7 +364,7 @@
     data-initials="{{ $profile['initials'] ?? 'F' }}"
     data-photo-url="{{ $profile['photo_url'] ?? '' }}"
     data-photo-path="{{ $profile['photo_path'] ?? '' }}"
-    data-default-navbar-photo="{{ asset('assets/images/Group4.png') }}"
+    data-default-navbar-photo="/assets/images/Group4.png"
 ></div>
 
 <script>

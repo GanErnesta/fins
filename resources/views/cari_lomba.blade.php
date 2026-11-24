@@ -4,12 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Cari Lomba | Find Your Skills Partner</title>
-    <link rel="stylesheet" href="/css/cari_lomba.css?v=42">
-    <link rel="stylesheet" href="/css/navbar.css?v=41">
-    <link rel="stylesheet" href="/css/cari_lomba_detail.css?v=3">
-    <script src="/js/cari_lomba.js?v=42" defer></script>
-    <script src="/js/cari_lomba_detail.js?v=11" defer></script>
+
+    {{-- CSS dengan versi otomatis --}}
+    <link rel="stylesheet"
+          href="/css/cari_lomba.css?v={{ filemtime(public_path('css/cari_lomba.css')) }}">
+
+    <link rel="stylesheet"
+          href="/css/navbar.css?v={{ filemtime(public_path('css/navbar.css')) }}">
+
+    <link rel="stylesheet"
+          href="/css/cari_lomba_detail.css?v={{ filemtime(public_path('css/cari_lomba_detail.css')) }}">
+
+    {{-- JavaScript dengan versi otomatis --}}
+    <script
+        src="/js/cari_lomba.js?v={{ filemtime(public_path('js/cari_lomba.js')) }}"
+        defer>
+    </script>
+
+    <script
+        src="/js/cari_lomba_detail.js?v={{ filemtime(public_path('js/cari_lomba_detail.js')) }}"
+        defer>
+    </script>
+
 </head>
 <body>
 

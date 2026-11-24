@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,12 +7,18 @@
 
     <title>Chat | FINS UB</title>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="/css/navbar.css?v=20">
-    <link rel="stylesheet" href="/css/chat.css?v=21">
+    <!-- CSS DENGAN VERSI OTOMATIS -->
+    <link rel="stylesheet"
+          href="/css/navbar.css?v={{ filemtime(public_path('css/navbar.css')) }}">
 
-    <!-- JAVASCRIPT -->
-    <script src="{{ asset('js/chat.js') }}?v=22" defer></script>
+    <link rel="stylesheet"
+          href="/css/chat.css?v={{ filemtime(public_path('css/chat.css')) }}">
+
+    <!-- JAVASCRIPT DENGAN VERSI OTOMATIS -->
+    <script
+        src="/js/chat.js?v={{ filemtime(public_path('js/chat.js')) }}"
+        defer>
+    </script>
 </head>
 
 <body>
@@ -84,6 +89,7 @@
                         <option value="oldest">Terlama</option>
                         <option value="az">Abjad A–Z</option>
                         <option value="za">Abjad Z–A</option>
+
                     </select>
 
                 </div>
@@ -128,11 +134,13 @@
                     </div>
 
                     <div class="room-title">
+
                         <strong id="selectedName">
                             Pilih percakapan
                         </strong>
 
                         <span id="selectedStatus"></span>
+
                     </div>
 
                     <!-- MENU PERCAKAPAN -->
@@ -185,10 +193,10 @@
                 <form
                     class="composer"
                     id="messageForm"
-                    data-conversations-url="{{ route('chat.conversations.index') }}"
-                    data-messages-url-template="{{ url('/chat/conversations') }}/__ID__/messages"
-                    data-upload-url="{{ route('chat.attachments.upload') }}"
-                    data-download-url-template="{{ url('/chat/attachments') }}/__ID__/download"
+                    data-conversations-url="{{ route('chat.conversations.index', [], false) }}"
+                    data-messages-url-template="/chat/conversations/__ID__/messages"
+                    data-upload-url="{{ route('chat.attachments.upload', [], false) }}"
+                    data-download-url-template="/chat/attachments/__ID__/download"
                     enctype="multipart/form-data"
                 >
 
@@ -204,6 +212,7 @@
                             src="/assets/images/kirimFileChat.png"
                             alt=""
                             class="attach-icon">
+
                     </button>
 
                     <!-- FILE INPUT -->
@@ -244,6 +253,7 @@
             </section>
 
         </div>
+
     </section>
 </main>
 
@@ -312,6 +322,7 @@
         </form>
 
     </div>
+
 </div>
 
 <!-- MODAL KONFIRMASI HAPUS PERCAKAPAN -->
@@ -361,6 +372,7 @@
         </div>
 
     </div>
+
 </div>
 
 </body>

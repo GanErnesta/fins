@@ -1,4 +1,3 @@
-
 @php
     // Helper avatar menggunakan inisial nama
     $avatar = function (string $nama, int $size = 40) {
@@ -30,7 +29,6 @@
 <!DOCTYPE html>
 <html lang="id">
 
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,12 +44,15 @@
         rel="stylesheet"
     >
 
-    <!-- CSS Global dan Lomba Saya -->
-    <link rel="stylesheet" href="/css/navbar.css?v=20">
-    
-    <link rel="stylesheet" href="/css/lomba_saya.css?v=20">
-</head>
+    {{-- CSS GLOBAL DENGAN VERSI OTOMATIS --}}
+    <link rel="stylesheet"
+          href="/css/navbar.css?v={{ filemtime(public_path('css/navbar.css')) }}">
 
+    {{-- CSS LOMBA SAYA DENGAN VERSI OTOMATIS --}}
+    <link rel="stylesheet"
+          href="/css/lomba_saya.css?v={{ filemtime(public_path('css/lomba_saya.css')) }}">
+
+</head>
 
 <body>
 
@@ -64,9 +65,10 @@
 
         {{-- ================= HERO ================= --}}
 
-        
         <section class="hero">
+
             <div>
+
                 <p class="hero__eyebrow">
                     DASHBOARD PRIBADI MAHASISWA
                 </p>
@@ -79,10 +81,10 @@
                     yang mendaftar, serta status permohonan
                     gabung tim Anda.
                 </p>
+
             </div>
+
         </section>
-
-
 
         {{-- ================= TABS ================= --}}
 
@@ -125,7 +127,6 @@
             </button>
 
         </div>
-
 
         {{-- ========================================= --}}
         {{-- TAB 1 : LOMBA DIIKUTI --}}
@@ -228,7 +229,6 @@
 
         </section>
 
-
         {{-- ========================================= --}}
         {{-- TAB 2 : TIM SAYA --}}
         {{-- ========================================= --}}
@@ -250,7 +250,9 @@
                             <span class="badge
                                 {{ $t['status'] === 'Aktif' ? 'badge--tim-aktif' :
                                 ($t['status'] === 'Menunggu' ? 'badge--tim-menunggu' : 'badge--tim-diterima') }}">
+
                                 {{ $t['status'] }}
+
                             </span>
 
                         </div>
@@ -316,145 +318,212 @@
 
         </section>
 
+        {{-- ========================================= --}}
+        {{-- TAB 3 : POSTING REKRUT SAYA + CRUD --}}
+        {{-- ========================================= --}}
 
-        
-{{-- ========================================= --}}
-{{-- TAB 3 : POSTING REKRUT SAYA + CRUD --}}
-{{-- ========================================= --}}
+        <section class="panel" id="posting-rekrut">
 
-<section class="panel" id="posting-rekrut">
+            <div class="rekrut-crud-header">
 
-    <div class="rekrut-crud-header">
-        <div>
-            <h3>Posting Rekrut Saya</h3>
-            <p>Kelola postingan pencarian anggota tim kamu.</p>
-        </div>
+                <div>
 
-        <button type="button"
-                class="btn-tambah-rekrut"
-                id="btnTambahRekrut">
-            + Tambah Rekrutmen
-        </button>
-    </div>
+                    <h3>Posting Rekrut Saya</h3>
 
-    {{-- Daftar postingan ditampilkan oleh JavaScript --}}
-    <div id="daftarPostingRekrut"></div>
+                    <p>
+                        Kelola postingan pencarian anggota tim kamu.
+                    </p>
 
-</section>
+                </div>
 
-
-{{-- ========================================= --}}
-{{-- MODAL TAMBAH DAN EDIT REKRUTMEN --}}
-{{-- ========================================= --}}
-
-<div class="modal-rekrut" id="modalRekrut" aria-hidden="true">
-
-    <div class="modal-rekrut-content"
-         role="dialog"
-         aria-modal="true"
-         aria-labelledby="judulModalRekrut">
-
-        <div class="modal-rekrut-header">
-            <h2 id="judulModalRekrut">Tambah Rekrutmen</h2>
-
-            <button type="button"
-                    id="tutupModalRekrut"
-                    class="modal-rekrut-close"
-                    aria-label="Tutup formulir">
-                &times;
-            </button>
-        </div>
-
-        <form id="formRekrut">
-
-            <input type="hidden" id="editRekrutId">
-
-            <div class="form-group-rekrut">
-                <label for="judulRekrut">Nama Lomba *</label>
-                <input type="text"
-                       id="judulRekrut"
-                       placeholder="Contoh: Gemastik XVIII"
-                       required>
-            </div>
-
-            <div class="form-group-rekrut">
-                <label for="kategoriRekrut">Kategori *</label>
-                <input type="text"
-                       id="kategoriRekrut"
-                       placeholder="Contoh: UI/UX & Desain"
-                       required>
-            </div>
-
-            <div class="form-group-rekrut">
-                <label for="posisiRekrut">Posisi yang Dicari *</label>
-                <input type="text"
-                       id="posisiRekrut"
-                       placeholder="Contoh: UX Researcher"
-                       required>
-            </div>
-
-            <div class="form-group-rekrut">
-                <label for="slotRekrut">Jumlah Slot *</label>
-                <input type="number"
-                       id="slotRekrut"
-                       min="1"
-                       max="100"
-                       value="1"
-                       required>
-            </div>
-
-            <div class="form-group-rekrut">
-                <label for="skillRekrut">Keahlian yang Dibutuhkan *</label>
-                <input type="text"
-                       id="skillRekrut"
-                       placeholder="Figma, User Interview, Microcopy"
-                       required>
-                <small>Pisahkan setiap keahlian dengan koma.</small>
-            </div>
-
-            <div class="form-group-rekrut">
-                <label for="statusRekrut">Status Rekrutmen</label>
-
-                <select id="statusRekrut">
-                    <option value="Aktif">Aktif</option>
-                    <option value="Ditutup">Ditutup</option>
-                </select>
-            </div>
-
-            <div class="modal-rekrut-actions">
                 <button type="button"
-                        class="btn-batal-rekrut"
-                        id="batalRekrut">
-                    Batal
+                        class="btn-tambah-rekrut"
+                        id="btnTambahRekrut">
+
+                    + Tambah Rekrutmen
+
                 </button>
 
-                <button type="submit"
-                        class="btn-simpan-rekrut">
-                    Simpan Rekrutmen
-                </button>
             </div>
 
-        </form>
-    </div>
-</div>
+            {{-- Daftar postingan ditampilkan oleh JavaScript --}}
+            <div id="daftarPostingRekrut"></div>
 
-{{-- Data awal untuk CRUD rekrutmen; aman untuk HTML dan tidak memicu parser JS VS Code --}}
-<div id="postingRekrutData"
-     data-posting="{{ \Illuminate\Support\Js::encode($postingRekrut) }}"
-     hidden></div>
-<script>
-    const postingRekrutData = document.getElementById('postingRekrutData');
-    try {
-        window.postingRekrutAwal = postingRekrutData
-            ? JSON.parse(postingRekrutData.dataset.posting || '[]')
-            : [];
-    } catch (error) {
-        console.error('Data posting rekrutmen tidak valid:', error);
-        window.postingRekrutAwal = [];
-    }
-</script>
+        </section>
 
+        {{-- ========================================= --}}
+        {{-- MODAL TAMBAH DAN EDIT REKRUTMEN --}}
+        {{-- ========================================= --}}
 
+        <div class="modal-rekrut"
+             id="modalRekrut"
+             aria-hidden="true">
+
+            <div class="modal-rekrut-content"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="judulModalRekrut">
+
+                <div class="modal-rekrut-header">
+
+                    <h2 id="judulModalRekrut">
+                        Tambah Rekrutmen
+                    </h2>
+
+                    <button type="button"
+                            id="tutupModalRekrut"
+                            class="modal-rekrut-close"
+                            aria-label="Tutup formulir">
+
+                        &times;
+
+                    </button>
+
+                </div>
+
+                <form id="formRekrut">
+
+                    <input type="hidden" id="editRekrutId">
+
+                    <div class="form-group-rekrut">
+
+                        <label for="judulRekrut">
+                            Nama Lomba *
+                        </label>
+
+                        <input type="text"
+                               id="judulRekrut"
+                               placeholder="Contoh: Gemastik XVIII"
+                               required>
+
+                    </div>
+
+                    <div class="form-group-rekrut">
+
+                        <label for="kategoriRekrut">
+                            Kategori *
+                        </label>
+
+                        <input type="text"
+                               id="kategoriRekrut"
+                               placeholder="Contoh: UI/UX & Desain"
+                               required>
+
+                    </div>
+
+                    <div class="form-group-rekrut">
+
+                        <label for="posisiRekrut">
+                            Posisi yang Dicari *
+                        </label>
+
+                        <input type="text"
+                               id="posisiRekrut"
+                               placeholder="Contoh: UX Researcher"
+                               required>
+
+                    </div>
+
+                    <div class="form-group-rekrut">
+
+                        <label for="slotRekrut">
+                            Jumlah Slot *
+                        </label>
+
+                        <input type="number"
+                               id="slotRekrut"
+                               min="1"
+                               max="100"
+                               value="1"
+                               required>
+
+                    </div>
+
+                    <div class="form-group-rekrut">
+
+                        <label for="skillRekrut">
+                            Keahlian yang Dibutuhkan *
+                        </label>
+
+                        <input type="text"
+                               id="skillRekrut"
+                               placeholder="Figma, User Interview, Microcopy"
+                               required>
+
+                        <small>
+                            Pisahkan setiap keahlian dengan koma.
+                        </small>
+
+                    </div>
+
+                    <div class="form-group-rekrut">
+
+                        <label for="statusRekrut">
+                            Status Rekrutmen
+                        </label>
+
+                        <select id="statusRekrut">
+
+                            <option value="Aktif">
+                                Aktif
+                            </option>
+
+                            <option value="Ditutup">
+                                Ditutup
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="modal-rekrut-actions">
+
+                        <button type="button"
+                                class="btn-batal-rekrut"
+                                id="batalRekrut">
+
+                            Batal
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn-simpan-rekrut">
+
+                            Simpan Rekrutmen
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        {{-- DATA AWAL UNTUK CRUD REKRUTMEN --}}
+        <div id="postingRekrutData"
+             data-posting="{{ \Illuminate\Support\Js::encode($postingRekrut) }}"
+             hidden>
+        </div>
+
+        <script>
+            const postingRekrutData =
+                document.getElementById('postingRekrutData');
+
+            try {
+                window.postingRekrutAwal = postingRekrutData
+                    ? JSON.parse(postingRekrutData.dataset.posting || '[]')
+                    : [];
+            } catch (error) {
+                console.error(
+                    'Data posting rekrutmen tidak valid:',
+                    error
+                );
+
+                window.postingRekrutAwal = [];
+            }
+        </script>
 
         {{-- ========================================= --}}
         {{-- TAB 4 : PENGAJUAN SAYA --}}
@@ -484,6 +553,7 @@
                     <p class="card__team card__team--plain">
 
                         Tim Tujuan:
+
                         <b>{{ $p['tim'] }}</b>
 
                     </p>
@@ -525,7 +595,6 @@
         </section>
 
     </main>
-
 
     {{-- ========================================= --}}
     {{-- FOOTER --}}
@@ -662,6 +731,7 @@
                 <div class="tips">
 
                     <strong>Tips Juara</strong>:
+
                     Tim multidisiplin (Teknologi + Bisnis + Riset)
                     memiliki tingkat lolos 3.2× lebih tinggi
                     di ajang bergengsi.
@@ -699,9 +769,10 @@
 
     </footer>
 
-    {{-- ================= JAVASCRIPT ================= --}}
-
-    <script src="/js/lomba_saya.js?v=20"></script>
+    {{-- JAVASCRIPT DENGAN VERSI OTOMATIS --}}
+    <script
+        src="/js/lomba_saya.js?v={{ filemtime(public_path('js/lomba_saya.js')) }}">
+    </script>
 
 </body>
 </html>

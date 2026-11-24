@@ -48,7 +48,7 @@
         $posterUrl = \Illuminate\Support\Str::startsWith(
             $image,
             ['http://', 'https://']
-        ) ? $image : asset(ltrim($image, '/'));
+        ) ? $image : '/' . ltrim($image, '/');
     }
 @endphp
 
@@ -60,11 +60,17 @@
 
     <title>{{ $title }} | FINS</title>
 
+    {{-- CSS dengan versi otomatis --}}
     <link rel="stylesheet"
-          href="{{ asset('css/cari_lomba_detail.css') }}?v=1">
+          href="/css/cari_lomba_detail.css?v={{ filemtime(public_path('css/cari_lomba_detail.css')) }}">
 
-    <script src="{{ asset('js/cari_lomba_detail.js') }}?v=1" defer></script>
+    {{-- JavaScript dengan versi otomatis --}}
+    <script
+        src="/js/cari_lomba_detail.js?v={{ filemtime(public_path('js/cari_lomba_detail.js')) }}"
+        defer>
+    </script>
 </head>
+
 <body>
 
 <div class="detail-overlay" id="detailOverlay">
@@ -82,7 +88,7 @@
 
             <div class="header-shade"></div>
 
-            <a href="{{ url('/cari-lomba') }}"
+            <a href="/cari-lomba"
                class="close-detail"
                id="closeDetail"
                aria-label="Tutup detail">
@@ -90,6 +96,7 @@
             </a>
 
             <div class="header-content">
+
                 <div class="detail-category">
                     {{ $category }}
 
@@ -101,6 +108,7 @@
                 <h1 class="detail-title" id="detailTitle">
                     {{ $title }}
                 </h1>
+
             </div>
 
         </div>
@@ -110,6 +118,7 @@
             <div class="detail-info-grid">
 
                 <div class="info-box">
+
                     <div class="info-label">
                         <span class="info-icon">♙</span>
                         Penyelenggara
@@ -118,9 +127,11 @@
                     <div class="info-value">
                         {{ $organizer }}
                     </div>
+
                 </div>
 
                 <div class="info-box">
+
                     <div class="info-label">
                         <span class="info-icon">▦</span>
                         Batas Akhir
@@ -129,9 +140,11 @@
                     <div class="info-value">
                         {{ $deadline->format('Y-m-d') }}
                     </div>
+
                 </div>
 
                 <div class="info-box">
+
                     <div class="info-label">
                         <span class="info-icon">♧</span>
                         Formasi Tim
@@ -140,9 +153,11 @@
                     <div class="info-value">
                         {{ $team == 1 ? 'Individu' : $team . ' Mahasiswa' }}
                     </div>
+
                 </div>
 
                 <div class="info-box">
+
                     <div class="info-label">
                         <span class="info-icon">♕</span>
                         Hadiah / Dana
@@ -151,29 +166,41 @@
                     <div class="info-value prize">
                         {{ $prize ?: 'Belum tersedia' }}
                     </div>
+
                 </div>
 
             </div>
 
             <section class="detail-section">
+
                 <h3>Tentang Kompetisi</h3>
 
                 <p>{{ $description }}</p>
+
             </section>
 
             <section class="detail-section">
+
                 <h3>Kompetensi &amp; Keahlian yang Relevan</h3>
 
                 <div class="detail-skills">
+
                     @forelse($skills as $skill)
+
                         <span>{{ $skill }}</span>
+
                     @empty
+
                         <p>Belum ada informasi skill.</p>
+
                     @endforelse
+
                 </div>
+
             </section>
 
             <section class="detail-section">
+
                 <h3>Timeline Penting</h3>
 
                 <div class="timeline-list">
@@ -181,38 +208,47 @@
                     @forelse($timeline as $event)
 
                         <div class="timeline-item">
+
                             <div class="timeline-left">
+
                                 <span class="timeline-icon">⊙</span>
 
                                 <span class="timeline-name">
                                     {{ data_get($event, 'name', 'Kegiatan') }}
                                 </span>
+
                             </div>
 
                             <span class="timeline-date">
                                 {{ data_get($event, 'date', '-') }}
                             </span>
+
                         </div>
 
                     @empty
 
                         <div class="timeline-item">
+
                             <div class="timeline-left">
+
                                 <span class="timeline-icon">⊙</span>
 
                                 <span class="timeline-name">
                                     Batas akhir pendaftaran
                                 </span>
+
                             </div>
 
                             <span class="timeline-date">
                                 {{ $deadline->translatedFormat('d M Y') }}
                             </span>
+
                         </div>
 
                     @endforelse
 
                 </div>
+
             </section>
 
         </div>
@@ -220,25 +256,33 @@
         <div class="detail-footer">
 
             @if($guide)
+
                 <a href="{{ $guide }}"
                    class="guide-link"
                    target="_blank"
                    rel="noopener noreferrer">
+
                     <span>▤</span>
                     Unduh Panduan Resmi
+
                 </a>
+
             @endif
 
             <div class="footer-actions">
 
-                <a href="{{ url('/cari-partner') }}"
+                <a href="/cari-partner"
                    class="btn-partner">
+
                     Cari Partner
+
                 </a>
 
-                <a href="{{ url('/tim-saya') }}"
+                <a href="/tim-saya"
                    class="btn-team">
+
                     Buat Tim Baru &nbsp; →
+
                 </a>
 
             </div>

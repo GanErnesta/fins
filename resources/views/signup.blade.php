@@ -12,8 +12,8 @@
 
     <title>Sign Up | FINS</title>
 
-    <link rel="stylesheet" href="{{ asset('css/signup.css') }}?v=31">
-    <link rel="stylesheet" href="{{ asset('css/fins-academic-dropdown.css') }}?v=31">
+  <link rel="stylesheet" href="/css/signup.css?v=51">
+<link rel="stylesheet" href="/css/fins-academic-dropdown.css?v=51">
 </head>
 
 <body>
@@ -345,8 +345,8 @@
      data-faculties="{{ json_encode(config('fins_academics.faculties', []), JSON_UNESCAPED_UNICODE) }}"
      data-aliases="{{ json_encode(config('fins_academics.aliases', []), JSON_UNESCAPED_UNICODE) }}"></div>
 
-<script src="{{ asset('js/signup.js') }}?v=31"></script>
-<script src="{{ asset('js/fins-academic-dropdown.js') }}?v=31" defer></script>
+<script src="/js/signup.js?v=51"></script>
+<script src="/js/fins-academic-dropdown.js?v=51" defer></script>
 
 </body>
 </html>
