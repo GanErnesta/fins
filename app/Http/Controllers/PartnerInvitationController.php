@@ -8,7 +8,10 @@ use Illuminate\Validation\Rule;
 
 class PartnerInvitationController extends Controller
 {
-    // User A mengirim ajakan kolaborasi
+    // ==========================================
+    // 1. KIRIM AJAKAN KOLABORASI
+    // ==========================================
+
     public function store(Request $request)
     {
         $user = $request->user();
@@ -43,7 +46,6 @@ class PartnerInvitationController extends Controller
             ], 422);
         }
 
-        // Cegah ajakan pending yang sama dikirim berulang
         $existing = DB::table('partner_invitations')
             ->where('sender_id', $user->id)
             ->where('receiver_id', $validated['receiver_id'])
@@ -79,7 +81,10 @@ class PartnerInvitationController extends Controller
         ], 201);
     }
 
-    // User B melihat ajakan yang diterima
+    // ==========================================
+    // 2. DAFTAR AJAKAN MASUK
+    // ==========================================
+
     public function received(Request $request)
     {
         $invitations = DB::table('partner_invitations as pi')
@@ -93,6 +98,7 @@ class PartnerInvitationController extends Controller
                 'pi.role',
                 'pi.message',
                 'pi.status',
+                'pi.conversation_id',
                 'pi.created_at'
             )
             ->orderByDesc('pi.created_at')
@@ -104,7 +110,10 @@ class PartnerInvitationController extends Controller
         ]);
     }
 
-    // User A melihat status ajakan yang dikirim
+    // ==========================================
+    // 3. DAFTAR AJAKAN TERKIRIM
+    // ==========================================
+
     public function sent(Request $request)
     {
         $invitations = DB::table('partner_invitations as pi')
@@ -118,6 +127,7 @@ class PartnerInvitationController extends Controller
                 'pi.role',
                 'pi.message',
                 'pi.status',
+                'pi.conversation_id',
                 'pi.created_at'
             )
             ->orderByDesc('pi.created_at')
@@ -129,7 +139,10 @@ class PartnerInvitationController extends Controller
         ]);
     }
 
-    // User B menerima atau menolak ajakan
+    // ==========================================
+    // 4. TERIMA ATAU TOLAK AJAKAN
+    // ==========================================
+
     public function respond(Request $request, int $id)
     {
         $validated = $request->validate([
@@ -139,31 +152,143 @@ class PartnerInvitationController extends Controller
             ]
         ]);
 
-        $updated = DB::table('partner_invitations')
-            ->where('id', $id)
-            ->where('receiver_id', $request->user()->id)
-            ->where('status', 'pending')
-            ->update([
-                'status' => $validated['status'],
-                'updated_at' => now()
+        $userId = $request->user()->id;
+
+        return DB::transaction(function () use (
+            $id,
+            $userId,
+            $validated
+        ) {
+
+            // Kunci data agar tidak direspons dua kali
+            $invitation = DB::table('partner_invitations')
+                ->where('id', $id)
+                ->where('receiver_id', $userId)
+                ->where('status', 'pending')
+                ->lockForUpdate()
+                ->first();
+
+            if (!$invitation) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ajakan tidak ditemukan atau sudah direspons.'
+                ], 409);
+            }
+
+            $conversationId = null;
+
+            // Buat chat hanya jika ajakan diterima
+            if ($validated['status'] === 'accepted') {
+
+                $conversationId = $this->getOrCreatePrivateConversation(
+                    (int) $invitation->sender_id,
+                    (int) $invitation->receiver_id
+                );
+            }
+
+            // Update status dan hubungkan dengan chat
+            DB::table('partner_invitations')
+                ->where('id', $id)
+                ->update([
+                    'status' => $validated['status'],
+                    'conversation_id' => $conversationId,
+                    'updated_at' => now()
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $validated['status'] === 'accepted'
+                    ? 'Ajakan kolaborasi diterima.'
+                    : 'Ajakan kolaborasi ditolak.',
+                'data' => [
+                    'id' => $id,
+                    'status' => $validated['status'],
+                    'conversation_id' => $conversationId,
+                    'chat_url' => $conversationId
+                        ? '/chat?conversation=' . $conversationId
+                        : null
+                ]
             ]);
 
-        if (!$updated) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ajakan tidak ditemukan atau sudah direspons.'
-            ], 409);
+        }, 3);
+    }
+
+    // ==========================================
+    // 5. BUAT ATAU GUNAKAN CHAT PRIBADI
+    // ==========================================
+
+    private function getOrCreatePrivateConversation(
+        int $senderId,
+        int $receiverId
+    ): int {
+
+        $userOne = min($senderId, $receiverId);
+        $userTwo = max($senderId, $receiverId);
+
+        // Cegah pembuatan chat bersamaan untuk pasangan sama
+        DB::select(
+            'SELECT pg_advisory_xact_lock(
+                hashtextextended(CAST(? AS text), 0)
+            )',
+            ["fins-private-chat:{$userOne}:{$userTwo}"]
+        );
+
+        // Periksa apakah ruang chat sudah tersedia
+        $existing = DB::table('conversations')
+            ->where('type', 'private')
+            ->where('private_user_one', $userOne)
+            ->where('private_user_two', $userTwo)
+            ->first();
+
+        if ($existing) {
+            return (int) $existing->id;
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => $validated['status'] === 'accepted'
-                ? 'Ajakan kolaborasi diterima.'
-                : 'Ajakan kolaborasi ditolak.',
-            'data' => [
-                'id' => $id,
-                'status' => $validated['status']
+        $now = now();
+
+        // Buat ruang chat baru
+        $conversationId = DB::table('conversations')
+            ->insertGetId([
+                'type' => 'private',
+                'name' => null,
+                'created_by' => $senderId,
+                'private_user_one' => $userOne,
+                'private_user_two' => $userTwo,
+                'photo_path' => null,
+                'created_at' => $now,
+                'updated_at' => $now
+            ]);
+
+        // Masukkan kedua pengguna sebagai anggota
+        DB::table('conversation_members')->insert([
+            [
+                'conversation_id' => $conversationId,
+                'user_id' => $senderId,
+                'role' => 'member',
+                'joined_at' => $now,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'conversation_id' => $conversationId,
+                'user_id' => $receiverId,
+                'role' => 'member',
+                'joined_at' => $now,
+                'created_at' => $now,
+                'updated_at' => $now
             ]
         ]);
+
+        // Pesan sistem sebagai pembuka percakapan
+        DB::table('messages')->insert([
+            'conversation_id' => $conversationId,
+            'sender_id' => null,
+            'message' => 'Kalian telah terhubung melalui ajakan kolaborasi. Yuk, mulai berdiskusi!',
+            'type' => 'system',
+            'created_at' => $now,
+            'updated_at' => $now
+        ]);
+
+        return (int) $conversationId;
     }
 }

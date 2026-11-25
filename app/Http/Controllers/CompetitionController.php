@@ -3,11 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\CariLomba;
+use Carbon\Carbon;
 
 class CompetitionController extends Controller
 {
     public function index()
     {
+        // Menghapus otomatis lomba H+2 setelah deadline
+        CariLomba::whereDate(
+            'deadline',
+            '<=',
+            Carbon::today('Asia/Jakarta')->subDays(2)
+        )->delete();
+
         // Mengambil semua lomba
         $lomba = CariLomba::orderBy('deadline', 'asc')->get();
 
@@ -24,33 +32,32 @@ class CompetitionController extends Controller
         ));
     }
 
-    
-        public function show($id)
-        {
-            $lomba = CariLomba::findOrFail($id);
+    public function show($id)
+    {
+        $lomba = CariLomba::findOrFail($id);
 
-            return view('cari_lomba_detail', [
-                'lomba' => $lomba
-            ]);
-        }
+        return view('cari_lomba_detail', [
+            'lomba' => $lomba
+        ]);
+    }
 
     public function store(\Illuminate\Http\Request $request)
-{
-    $data = $request->validate([
-        'lomba_id' => 'required|integer',
-        'skills' => 'required|array|min:1',
-        'skills.*' => 'required|string|max:100',
-    ]);
+    {
+        $data = $request->validate([
+            'lomba_id' => 'required|integer',
+            'skills' => 'required|array|min:1',
+            'skills.*' => 'required|string|max:100',
+        ]);
 
-    $lomba = \App\Models\CariLomba::findOrFail($data['lomba_id']);
+        $lomba = CariLomba::findOrFail($data['lomba_id']);
 
-    $lomba->skills = $data['skills'];
-    $lomba->save();
+        $lomba->skills = $data['skills'];
+        $lomba->save();
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Skill lomba berhasil disimpan',
-        'data' => $lomba,
-    ], 200);
-}
+        return response()->json([
+            'success' => true,
+            'message' => 'Skill lomba berhasil disimpan',
+            'data' => $lomba,
+        ], 200);
+    }
 }

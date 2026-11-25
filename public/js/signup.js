@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
 
     // ==========================================
@@ -166,8 +165,9 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener("submit", (event) => {
 
             // Menentukan tahap berdasarkan form Laravel
+            // Menentukan tahap berdasarkan input yang tersedia
             const isStep1 = !!form.querySelector("#nama");
-            const isStep2 = !!form.querySelector("#email");
+            const isStep2 = !!form.querySelector("#password");
 
             // ==================================
             // VALIDASI STEP 1
@@ -269,5 +269,148 @@ document.addEventListener("DOMContentLoaded", () => {
                     : "Mendaftarkan...";
             }
         });
+    }
+     // ==========================================
+    // DROPDOWN FAKULTAS DAN PROGRAM STUDI
+    // ==========================================
+
+    const fakultasSelect = document.getElementById("fakultas");
+    const prodiSelect = document.getElementById("prodi");
+
+    const daftarProdi = {
+        FH: [
+            "Ilmu Hukum"
+        ],
+        FEB: [
+            "Akuntansi",
+            "Ekonomi Pembangunan",
+            "Manajemen",
+            "Ekonomi Islam",
+            "Kewirausahaan",
+            "Ekonomi, Keuangan dan Perbankan"
+        ],
+        FIA: [
+            "Ilmu Administrasi Negara/Publik",
+            "Ilmu Administrasi Niaga/Bisnis",
+            "Perpajakan",
+            "Ilmu Perpustakaan",
+            "Pariwisata",
+            "Administrasi Pendidikan"
+        ],
+        FBiPK: [
+            "Agribisnis",
+            "Agroekoteknologi",
+            "Agribisnis (PSDKU Kediri)",
+            "Agroekoteknologi (PSDKU Kediri)",
+            "Kehutanan"
+        ],
+        FAST: [
+            "Peternakan",
+            "Peternakan (PSDKU Kediri)"
+        ],
+        FT: [
+            "Teknik Sipil",
+            "Teknik Mesin",
+            "Teknik Pengairan",
+            "Teknik Elektro",
+            "Teknik Industri",
+            "Teknik Kimia",
+            "Perencanaan Wilayah dan Kota",
+            "Arsitektur"
+        ],
+        FK: [
+            "Kedokteran",
+            "Farmasi",
+            "Kebidanan"
+        ],
+        FPIK: [
+            "Agrobisnis Perikanan",
+            "Budidaya Perairan",
+            "Ilmu Kelautan",
+            "Manajemen Sumberdaya Perairan",
+            "Pemanfaatan Sumberdaya Perikanan",
+            "Teknologi Hasil Perikanan",
+            "Akuakultur (PSDKU Kediri)",
+            "Sosial Ekonomi Perikanan (PSDKU Kediri)"
+        ],
+        FSTeM: [
+            "Biologi",
+            "Fisika",
+            "Kimia",
+            "Matematika",
+            "Statistika",
+            "Teknik Geofisika",
+            "Instrumentasi",
+            "Ilmu Aktuaria"
+        ],
+        FTAB: [
+            "Ilmu dan Teknologi Pangan",
+            "Teknologi Industri Pertanian",
+            "Teknik Lingkungan",
+            "Bioteknologi",
+            "Teknologi Bioproses",
+            "Teknik Pertanian"
+        ],
+        FISIP: [
+            "Hubungan Internasional",
+            "Ilmu Komunikasi",
+            "Ilmu Politik",
+            "Psikologi",
+            "Sosiologi",
+            "Ilmu Pemerintahan"
+        ],
+        FIB: [
+            "Sastra Inggris",
+            "Sastra Jepang",
+            "Sastra Cina",
+            "Bahasa dan Sastra Perancis",
+            "Pendidikan Bahasa dan Sastra Indonesia",
+            "Pendidikan Bahasa Inggris",
+            "Pendidikan Bahasa Jepang",
+            "Antropologi (Sosial)",
+            "Seni Rupa Murni"
+        ],
+        FKH: [
+            "Pendidikan Dokter Hewan"
+        ],
+        FILKOM: [
+            "Teknik Informatika",
+            "Teknik Komputer",
+            "Sistem Informasi",
+            "Teknologi Informasi",
+            "Pendidikan Teknologi Informasi"
+        ],
+        FKG: [
+            "Kedokteran Gigi"
+        ],
+        FIKES: [
+            "Keperawatan",
+            "Ilmu Gizi"
+        ]
+    };
+
+    if (fakultasSelect && prodiSelect) {
+
+        function updateProdi() {
+            const kodeFakultas = fakultasSelect.value;
+
+            prodiSelect.innerHTML =
+                '<option value="">Pilih Program Studi...</option>';
+
+            const pilihanProdi = daftarProdi[kodeFakultas] || [];
+
+            prodiSelect.disabled = pilihanProdi.length === 0;
+
+            pilihanProdi.forEach((namaProdi) => {
+                const option = document.createElement("option");
+                option.value = namaProdi;
+                option.textContent = namaProdi;
+                prodiSelect.appendChild(option);
+            });
+        }
+
+        fakultasSelect.addEventListener("change", updateProdi);
+
+        updateProdi();
     }
 });
