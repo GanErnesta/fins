@@ -205,6 +205,7 @@
 
                     </div>
 
+
                     <p id="finsAcademicHint" class="fins-academic-hint" aria-live="polite">
                         Pilih fakultas untuk melihat program studi yang sesuai.
                     </p>
