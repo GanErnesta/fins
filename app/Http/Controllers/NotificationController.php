@@ -16,12 +16,19 @@ class NotificationController extends Controller
 
         $notifications = DB::table('notifications as n')
             ->leftJoin('users as u', 'u.id', '=', 'n.actor_id')
+            ->leftJoin(
+                'partner_invitations as pi',
+                'pi.id',
+                '=',
+                'n.invitation_id'
+            )
             ->where('n.user_id', $userId)
             ->select([
                 'n.id',
                 'n.user_id',
                 'n.actor_id',
                 'n.invitation_id',
+                'pi.conversation_id as conversation_id',
                 'n.type',
                 'n.title',
                 'n.message',
