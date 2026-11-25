@@ -1,0 +1,25 @@
+{
+    auto_https off
+    frankenphp
+}
+
+:80 {
+    root * /app/public
+
+    encode gzip
+
+    @dynamic {
+        not file
+    }
+
+    header @dynamic {
+        Cache-Control "private, no-store, no-cache, must-revalidate"
+        Vercel-CDN-Cache-Control "no-store"
+    }
+
+    php_server
+
+    log {
+        output stdout
+    }
+}
