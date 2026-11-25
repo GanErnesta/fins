@@ -24,6 +24,8 @@ RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoload
 
 COPY --from=frontend /app/public/build /app/public/build
 
+COPY Caddyfile /etc/caddy/Caddyfile
+
 RUN mkdir -p storage/framework/cache/data \
     storage/framework/sessions \
     storage/framework/views \
@@ -34,3 +36,5 @@ RUN mkdir -p storage/framework/cache/data \
 ENV SERVER_NAME=:80
 
 EXPOSE 80
+
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
