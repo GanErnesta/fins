@@ -101,25 +101,15 @@
                         Nama Lengkap
                     </label>
 
-                    
-<label for="email">Email</label>
-
-<input
-    id="email"
-    name="email"
-    type="email"
-    placeholder="Email UB kamu"
-    value="{{ old('email', $old['email'] ?? '') }}"
-    autocomplete="email"
-    aria-describedby="emailError"
-    required
->
-
-<p id="emailError" class="input-error" role="alert">
-    @error('email')
-        {{ $message }}
-    @enderror
-</p>
+                    <input
+                        id="nama"
+                        name="nama"
+                        type="text"
+                        placeholder="Masukkan nama lengkap kamu"
+                        value="{{ old('nama', $old['nama'] ?? '') }}"
+                        autocomplete="name"
+                        required
+                    >
 
 
                     <label for="nim">NIM</label>
@@ -136,77 +126,38 @@
                         required
                     >
 
-                    <div class="field-row">
+                <div class="form-row">
+                <div class="form-group">
+                <label for="fakultas">Fakultas</label>
+                    
+                <select id="fakultas" name="fakultas" required>
+                    <option value="">Pilih Fakultas...</option>
+                    <option value="FH">Fakultas Hukum</option>
+                    <option value="FEB">Fakultas Ekonomi dan Bisnis</option>
+                    <option value="FIA">Fakultas Ilmu Administrasi</option>
+                    <option value="FBiPK">Fakultas Bio-Industri Pertanian dan Kehutanan</option>
+                    <option value="FAST">Fakultas Sains dan Teknologi Peternakan</option>
+                    <option value="FT">Fakultas Teknik</option>
+                    <option value="FK">Fakultas Kedokteran</option>
+                    <option value="FPIK">Fakultas Perikanan dan Ilmu Kelautan</option>
+                    <option value="FSTeM">Fakultas Sains, Teknologi, dan Matematika</option>
+                    <option value="FTAB">Fakultas Teknologi Agroindustri dan Biosistem</option>
+                    <option value="FISIP">Fakultas Ilmu Sosial dan Ilmu Politik</option>
+                    <option value="FIB">Fakultas Ilmu Budaya</option>
+                    <option value="FKH">Fakultas Kedokteran Hewan</option>
+                    <option value="FILKOM">Fakultas Ilmu Komputer</option>
+                    <option value="FKG">Fakultas Kedokteran Gigi</option>
+                    <option value="FIKES">Fakultas Ilmu Kesehatan</option>
+                </select>
+                </div>
 
-                        <div class="field-group">
-
-                            <label for="fakultas">
-                                Fakultas
-                            </label>
-
-                            <select
-                                id="fakultas"
-                                name="fakultas"
-                                required
-                            >
-                                <option value="">
-                                    Fakultas...
-                                </option>
-
-                                @foreach ($faculties as $faculty)
-
-                                    <option
-                                        value="{{ $faculty }}"
-                                        @selected(
-                                            old(
-                                                'fakultas',
-                                                $old['fakultas'] ?? ''
-                                            ) === $faculty
-                                        )
-                                    >
-                                        {{ $faculty }}
-                                    </option>
-
-                                @endforeach
-                            </select>
-
-                        </div>
-
-                        <div class="field-group">
-
-                            <label for="prodi">
-                                Program Studi
-                            </label>
-
-                            <select
-                                id="prodi"
-                                name="prodi"
-                                required
-                            >
-                                <option value="">
-                                    Program studi...
-                                </option>
-
-                                @foreach ($programs as $program)
-
-                                    <option
-                                        value="{{ $program }}"
-                                        @selected(
-                                            old(
-                                                'prodi',
-                                                $old['prodi'] ?? ''
-                                            ) === $program
-                                        )
-                                    >
-                                        {{ $program }}
-                                    </option>
-
-                                @endforeach
-                            </select>
-
-                        </div>
-
-                    </div>
+                <div class="form-group">
+                    <label for="prodi">Program Studi</label>
+                    <select id="prodi" name="prodi" required disabled>
+                        <option value="">Pilih Fakultas terlebih dahulu</option>
+                    </select>
+                </div>
+            </div>
 
                     <button
                         class="primary-button"

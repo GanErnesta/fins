@@ -15,19 +15,25 @@ class SignupController extends Controller
     // DATA FAKULTAS
     // ==========================================
 
-    private function faculties(): array
+   private function faculties(): array
     {
         return [
-            'Ilmu Komputer',
-            'Teknik',
-            'Ekonomi dan Bisnis',
-            'Ilmu Administrasi',
-            'Ilmu Sosial dan Ilmu Politik',
-            'Pertanian',
-            'Kedokteran',
-            'Ilmu Budaya',
-            'Hukum',
-            'MIPA',
+            'FH',
+            'FEB',
+            'FIA',
+            'FBiPK',
+            'FAST',
+            'FT',
+            'FK',
+            'FPIK',
+            'FSTeM',
+            'FTAB',
+            'FISIP',
+            'FIB',
+            'FKH',
+            'FILKOM',
+            'FKG',
+            'FIKES',
         ];
     }
 
@@ -38,16 +44,114 @@ class SignupController extends Controller
     private function programs(): array
     {
         return [
-            'Pendidikan Teknologi Informasi',
-            'Teknik Informatika',
-            'Sistem Informasi',
-            'Teknik Komputer',
-            'Desain Komunikasi Visual',
-            'Manajemen',
-            'Ilmu Komunikasi',
-            'Akuntansi',
-            'Psikologi',
+            // Fakultas Hukum
             'Ilmu Hukum',
+
+            // Fakultas Ekonomi dan Bisnis
+            'Akuntansi',
+            'Ekonomi Pembangunan',
+            'Manajemen',
+            'Ekonomi Islam',
+            'Kewirausahaan',
+            'Ekonomi, Keuangan dan Perbankan',
+
+            // Fakultas Ilmu Administrasi
+            'Ilmu Administrasi Negara/Publik',
+            'Ilmu Administrasi Niaga/Bisnis',
+            'Perpajakan',
+            'Ilmu Perpustakaan',
+            'Pariwisata',
+            'Administrasi Pendidikan',
+
+            // Fakultas Bio-Industri Pertanian dan Kehutanan
+            'Agribisnis',
+            'Agroekoteknologi',
+            'Agribisnis (PSDKU Kediri)',
+            'Agroekoteknologi (PSDKU Kediri)',
+            'Kehutanan',
+
+            // Fakultas Sains dan Teknologi Peternakan
+            'Peternakan',
+            'Peternakan (PSDKU Kediri)',
+
+            // Fakultas Teknik
+            'Teknik Sipil',
+            'Teknik Mesin',
+            'Teknik Pengairan',
+            'Teknik Elektro',
+            'Teknik Industri',
+            'Teknik Kimia',
+            'Perencanaan Wilayah dan Kota',
+            'Arsitektur',
+
+            // Fakultas Kedokteran
+            'Kedokteran',
+            'Farmasi',
+            'Kebidanan',
+
+            // Fakultas Perikanan dan Ilmu Kelautan
+            'Agrobisnis Perikanan',
+            'Budidaya Perairan',
+            'Ilmu Kelautan',
+            'Manajemen Sumberdaya Perairan',
+            'Pemanfaatan Sumberdaya Perikanan',
+            'Teknologi Hasil Perikanan',
+            'Akuakultur (PSDKU Kediri)',
+            'Sosial Ekonomi Perikanan (PSDKU Kediri)',
+
+            // Fakultas Sains, Teknologi, dan Matematika
+            'Biologi',
+            'Fisika',
+            'Kimia',
+            'Matematika',
+            'Statistika',
+            'Teknik Geofisika',
+            'Instrumentasi',
+            'Ilmu Aktuaria',
+
+            // Fakultas Teknologi Agroindustri dan Biosistem
+            'Ilmu dan Teknologi Pangan',
+            'Teknologi Industri Pertanian',
+            'Teknik Lingkungan',
+            'Bioteknologi',
+            'Teknologi Bioproses',
+            'Teknik Pertanian',
+
+            // Fakultas Ilmu Sosial dan Ilmu Politik
+            'Hubungan Internasional',
+            'Ilmu Komunikasi',
+            'Ilmu Politik',
+            'Psikologi',
+            'Sosiologi',
+            'Ilmu Pemerintahan',
+
+            // Fakultas Ilmu Budaya
+            'Sastra Inggris',
+            'Sastra Jepang',
+            'Sastra Cina',
+            'Bahasa dan Sastra Perancis',
+            'Pendidikan Bahasa dan Sastra Indonesia',
+            'Pendidikan Bahasa Inggris',
+            'Pendidikan Bahasa Jepang',
+            'Antropologi (Sosial)',
+            'Seni Rupa Murni',
+
+            // Fakultas Kedokteran Hewan
+            'Pendidikan Dokter Hewan',
+
+            // Fakultas Ilmu Komputer
+            'Teknik Informatika',
+            'Teknik Komputer',
+            'Sistem Informasi',
+            'Teknologi Informasi',
+            'Pendidikan Teknologi Informasi',
+
+            // Fakultas Kedokteran Gigi
+            'Kedokteran Gigi',
+
+            // Fakultas Ilmu Kesehatan
+            'Keperawatan',
+            'Ilmu Gizi',
         ];
     }
 

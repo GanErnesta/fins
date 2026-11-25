@@ -774,4 +774,8 @@ a {
     .brand-illustration {
         max-height: 250px;
     }
+    /* Mengurangi jarak antara Email dan NIM */
+    #emailError:empty {
+    display: none;
+}
 }
