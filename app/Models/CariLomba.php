@@ -9,6 +9,7 @@ class CariLomba extends Model
     protected $table = 'cari_lomba';
 
     protected $fillable = [
+        'user_id',
         'title',
         'slug',
         'subtitle',
@@ -24,12 +25,11 @@ class CariLomba extends Model
     protected $casts = [
         'deadline' => 'date',
         'skills' => 'array',
-        'team' => 'integer',
     ];
 
-    public function getRouteKeyName()
+    // Relasi dengan pengguna yang memposting lomba
+    public function user()
     {
-        return 'slug';
+        return $this->belongsTo(User::class, 'user_id');
     }
-    
 }
