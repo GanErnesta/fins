@@ -1,11 +1,6 @@
-
 document.addEventListener('DOMContentLoaded', () => {
-
-    // =====================================
-    // 1. ELEMENT CARI PARTNER
-    // =====================================
-
     const grid = document.getElementById('partnerCardGrid');
+
     if (!grid) return;
 
     const cards = Array.from(
@@ -25,16 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const info = document.getElementById('paginationInfo');
     const pages = document.getElementById('pageButtons');
     const empty = document.getElementById('emptyPartnerState');
-
     const modal = document.getElementById('inviteModal');
-
-    const activeFiltersBar = document.getElementById(
-        'activeFiltersBar'
-    );
-
-    const skillFilterSearch = document.getElementById(
-        'skillFilterSearch'
-    );
+    const activeFiltersBar = document.getElementById('activeFiltersBar');
+    const skillFilterSearch = document.getElementById('skillFilterSearch');
 
     let query = '';
     let page = 1;
@@ -43,13 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let sendingInvite = false;
 
     const pageSize = 6;
-
-    // =====================================
-    // 2. URL ENDPOINT
-    // =====================================
-
-    // Gunakan domain halaman yang sedang dibuka.
-    // Kompatibel dengan localhost dan Cloudflare HTTPS.
 
     function endpoint(path, fallback) {
         try {
@@ -63,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 parsed.pathname +
                 parsed.search
             );
-
         } catch (error) {
             return window.location.origin + fallback;
         }
@@ -78,12 +58,13 @@ document.addEventListener('DOMContentLoaded', () => {
         sent: endpoint(
             modal?.dataset.sentUrl,
             '/partner-invitations/sent'
+        ),
+
+        profile: id => endpoint(
+            `/cari-partner/${encodeURIComponent(id)}/profile`,
+            `/cari-partner/${encodeURIComponent(id)}/profile`
         )
     };
-
-    // =====================================
-    // 3. FILTER
-    // =====================================
 
     const chosen = type => checks
         .filter(input =>
@@ -93,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .map(input => input.value);
 
     function matches(card) {
-
         if (
             query &&
             !(card.dataset.search || '')
@@ -126,18 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (
             chosen('study').length &&
-            !chosen('study').includes(
-                card.dataset.study
-            )
+            !chosen('study').includes(card.dataset.study)
         ) {
             return false;
         }
 
         if (
             chosen('semester').length &&
-            !chosen('semester').includes(
-                card.dataset.semester
-            )
+            !chosen('semester').includes(card.dataset.semester)
         ) {
             return false;
         }
@@ -158,17 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    // =====================================
-    // 4. FILTER CHIPS
-    // =====================================
-
     function renderChips() {
-
-        if (
-            !chips ||
-            !count ||
-            !activeFiltersBar
-        ) {
+        if (!chips || !count || !activeFiltersBar) {
             return;
         }
 
@@ -179,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         active.forEach(input => {
-
             const label = input.closest('label');
 
             const text =
@@ -187,9 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ?.textContent.trim() ||
                 `Semester ${input.value}`;
 
-            const button = document.createElement(
-                'button'
-            );
+            const button = document.createElement('button');
 
             button.type = 'button';
             button.className = 'filter-chip';
@@ -198,16 +162,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.createTextNode(text + ' ')
             );
 
-            const cross = document.createElement(
-                'span'
-            );
+            const cross = document.createElement('span');
 
             cross.textContent = '×';
 
             button.appendChild(cross);
 
             button.addEventListener('click', () => {
-
                 input.checked = false;
                 page = 1;
 
@@ -223,34 +184,24 @@ document.addEventListener('DOMContentLoaded', () => {
             active.length ? 'flex' : 'none';
     }
 
-    // =====================================
-    // 5. RENDER PARTNER
-    // =====================================
-
     function render() {
-
         const found = cards.filter(matches);
 
         const sortBy = sort?.value || 'relevance';
 
         if (sortBy === 'name') {
-
             found.sort((a, b) =>
                 (a.dataset.name || '').localeCompare(
                     b.dataset.name || '',
                     'id'
                 )
             );
-
         } else if (sortBy === 'semester') {
-
             found.sort((a, b) =>
                 Number(a.dataset.semester) -
                 Number(b.dataset.semester)
             );
-
         } else {
-
             found.sort((a, b) =>
                 Number(b.dataset.match) -
                 Number(a.dataset.match)
@@ -267,16 +218,12 @@ document.addEventListener('DOMContentLoaded', () => {
         page = Math.min(page, last);
 
         cards.forEach(card => {
-
             card.hidden = true;
 
-            card.classList.remove(
-                'cp-is-visible'
-            );
+            card.classList.remove('cp-is-visible');
         });
 
         found.forEach((card, index) => {
-
             card.hidden =
                 index < (page - 1) * pageSize ||
                 index >= page * pageSize;
@@ -291,12 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (resultCount) {
-            resultCount.textContent =
-                `${total} Mahasiswa`;
+            resultCount.textContent = `${total} Mahasiswa`;
         }
 
         if (info) {
-
             const start = total
                 ? (page - 1) * pageSize + 1
                 : 0;
@@ -307,12 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `dari ${total} mahasiswa potensial`;
         }
 
-        // =====================================
-        // PAGINATION
-        // =====================================
-
         if (pages) {
-
             pages.innerHTML = '';
 
             const makeButton = (
@@ -321,16 +261,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 disabled,
                 active
             ) => {
-
-                const button =
-                    document.createElement('button');
+                const button = document.createElement('button');
 
                 button.type = 'button';
                 button.textContent = text;
                 button.disabled = disabled;
 
                 if (active) {
-
                     button.className = 'active';
 
                     button.setAttribute(
@@ -339,14 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     );
                 }
 
-                button.addEventListener(
-                    'click',
-                    () => {
-
-                        page = targetPage;
-                        render();
-                    }
-                );
+                button.addEventListener('click', () => {
+                    page = targetPage;
+                    render();
+                });
 
                 pages.appendChild(button);
             };
@@ -359,7 +292,6 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
             for (let i = 1; i <= last; i++) {
-
                 makeButton(
                     String(i),
                     i,
@@ -379,82 +311,59 @@ document.addEventListener('DOMContentLoaded', () => {
         renderChips();
 
         requestAnimationFrame(() => {
-
             updateVisibleReveals();
             requestParallax();
         });
     }
 
-    // =====================================
-    // 6. EVENT FILTER
-    // =====================================
-
     checks.forEach(input => {
-
-        input.addEventListener(
-            'change',
-            () => {
-
-                page = 1;
-                render();
-            }
-        );
+        input.addEventListener('change', () => {
+            page = 1;
+            render();
+        });
     });
 
-    document.getElementById(
-        'partnerSearchForm'
-    )?.addEventListener('submit', event => {
+    document.getElementById('partnerSearchForm')
+        ?.addEventListener('submit', event => {
+            event.preventDefault();
 
-        event.preventDefault();
+            query = search?.value.trim() || '';
+            page = 1;
 
-        query = search?.value.trim() || '';
-        page = 1;
-
-        render();
-    });
+            render();
+        });
 
     search?.addEventListener('input', () => {
-
         query = search.value.trim();
         page = 1;
 
         render();
     });
 
-    document.getElementById(
-        'clearPartnerSearch'
-    )?.addEventListener('click', () => {
+    document.getElementById('clearPartnerSearch')
+        ?.addEventListener('click', () => {
+            if (search) {
+                search.value = '';
+            }
 
-        if (search) {
-            search.value = '';
-        }
+            query = '';
+            page = 1;
 
-        query = '';
-        page = 1;
-
-        render();
-    });
+            render();
+        });
 
     sort?.addEventListener('change', () => {
-
         page = 1;
         render();
     });
 
-    document.getElementById(
-        'applyFilters'
-    )?.addEventListener('click', () => {
-
-        page = 1;
-        render();
-    });
-
-    // =====================================
-    // 7. RESET FILTER
-    // =====================================
+    document.getElementById('applyFilters')
+        ?.addEventListener('click', () => {
+            page = 1;
+            render();
+        });
 
     function reset() {
-
         checks.forEach(input => {
             input.checked = false;
         });
@@ -472,7 +381,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll(
             '#skillFilterList .check-option'
         ).forEach(option => {
-
             option.hidden = false;
         });
 
@@ -486,36 +394,25 @@ document.addEventListener('DOMContentLoaded', () => {
         'clearAllFilters',
         'emptyResetFilters'
     ].forEach(id => {
-
         document.getElementById(id)
             ?.addEventListener('click', reset);
     });
 
-    skillFilterSearch?.addEventListener(
-        'input',
-        event => {
+    skillFilterSearch?.addEventListener('input', event => {
+        const searchText =
+            event.target.value.toLowerCase();
 
-            const searchText =
-                event.target.value.toLowerCase();
-
-            document.querySelectorAll(
-                '#skillFilterList .check-option'
-            ).forEach(option => {
-
-                option.hidden =
-                    !option.textContent
-                        .toLowerCase()
-                        .includes(searchText);
-            });
-        }
-    );
-
-    // =====================================
-    // 8. MODAL AJAK KOLABORASI
-    // =====================================
+        document.querySelectorAll(
+            '#skillFilterList .check-option'
+        ).forEach(option => {
+            option.hidden =
+                !option.textContent
+                    .toLowerCase()
+                    .includes(searchText);
+        });
+    });
 
     function close() {
-
         if (!modal || sendingInvite) {
             return;
         }
@@ -539,12 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function open(card) {
-
-        if (
-            !modal ||
-            !card ||
-            sendingInvite
-        ) {
+        if (!modal || !card || sendingInvite) {
             return;
         }
 
@@ -556,34 +448,23 @@ document.addEventListener('DOMContentLoaded', () => {
         target = card;
 
         const name =
-            card.querySelector(
-                '.person-info h3'
-            )?.textContent || 'Partner';
+            card.querySelector('.person-info h3')
+                ?.textContent.trim() || 'Partner';
 
         const nameInput =
-            document.getElementById(
-                'invitePartnerName'
-            );
+            document.getElementById('invitePartnerName');
 
         const competitionInput =
-            document.getElementById(
-                'inviteCompetition'
-            );
+            document.getElementById('inviteCompetition');
 
         const roleInput =
-            document.getElementById(
-                'inviteRole'
-            );
+            document.getElementById('inviteRole');
 
         const messageInput =
-            document.getElementById(
-                'inviteMessage'
-            );
+            document.getElementById('inviteMessage');
 
         const feedback =
-            document.getElementById(
-                'inviteFeedback'
-            );
+            document.getElementById('inviteFeedback');
 
         if (nameInput) {
             nameInput.value = name;
@@ -598,7 +479,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (messageInput) {
-
             messageInput.value =
                 `Hai ${name.split(' ')[0]}! ` +
                 `Aku ingin mengajakmu berkolaborasi ` +
@@ -621,21 +501,47 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = 'hidden';
     }
 
-    // =====================================
-    // 9. TOMBOL CARD PARTNER
-    // =====================================
+    function getPartnerId(card) {
+        const id = String(
+            card?.dataset.id || ''
+        ).trim();
+
+        if (!/^[1-9]\d*$/.test(id)) {
+            return null;
+        }
+
+        return id;
+    }
+
+    function openPartnerProfile(card) {
+        const partnerId = getPartnerId(card);
+
+        if (!partnerId) {
+            console.error(
+                '[Cari Partner] ID mahasiswa tidak ditemukan.'
+            );
+
+            return;
+        }
+
+        window.location.assign(
+            API.profile(partnerId)
+        );
+    }
 
     grid.addEventListener('click', event => {
+        const invite = event.target.closest('[data-invite]');
+        const profile = event.target.closest('[data-profile]');
 
-        const invite = event.target.closest(
-            '[data-invite]'
-        );
+        if (invite) {
+            event.preventDefault();
 
-        const profile = event.target.closest(
-            '[data-profile]'
-        );
-
-        if (invite && !invite.disabled) {
+            if (
+                invite.disabled ||
+                invite.getAttribute('aria-disabled') === 'true'
+            ) {
+                return;
+            }
 
             open(
                 invite.closest('.partner-card')
@@ -645,73 +551,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (profile) {
+            event.preventDefault();
 
-            const card = profile.closest(
-                '.partner-card'
-            );
+            if (
+                profile.disabled ||
+                profile.getAttribute('aria-disabled') === 'true'
+            ) {
+                return;
+            }
 
-            const name =
-                card?.querySelector(
-                    '.person-info h3'
-                )?.textContent || 'Partner';
+            const card = profile.closest('.partner-card');
 
-            alert(
-                `Profil ${name}\n` +
-                `Halaman detail profil dapat ` +
-                `dihubungkan pada tahap berikutnya.`
-            );
+            openPartnerProfile(card);
         }
     });
 
-    document.getElementById(
-        'closeInviteModal'
-    )?.addEventListener('click', close);
+    document.getElementById('closeInviteModal')
+        ?.addEventListener('click', close);
 
-    document.getElementById(
-        'cancelInvite'
-    )?.addEventListener('click', close);
+    document.getElementById('cancelInvite')
+        ?.addEventListener('click', close);
 
     modal?.addEventListener('click', event => {
-
         if (event.target === modal) {
             close();
         }
     });
 
-    document.addEventListener(
-        'keydown',
-        event => {
-
-            if (
-                event.key === 'Escape' &&
-                modal?.classList.contains(
-                    'is-open'
-                )
-            ) {
-                close();
-            }
+    document.addEventListener('keydown', event => {
+        if (
+            event.key === 'Escape' &&
+            modal?.classList.contains('is-open')
+        ) {
+            close();
         }
-    );
+    });
 
-    // =====================================
-    // 10. KIRIM UNDANGAN KE LARAVEL
-    // =====================================
-
-    document.getElementById(
-        'inviteForm'
-    )?.addEventListener(
-        'submit',
-        async event => {
-
+    document.getElementById('inviteForm')
+        ?.addEventListener('submit', async event => {
             event.preventDefault();
 
             if (!target || sendingInvite) {
                 return;
             }
 
-            const receiverId = Number(
-                target.dataset.id
-            );
+            const receiverId = Number(target.dataset.id);
 
             const form = event.currentTarget;
 
@@ -720,9 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
             const feedback =
-                document.getElementById(
-                    'inviteFeedback'
-                );
+                document.getElementById('inviteFeedback');
 
             const csrf = document.querySelector(
                 'meta[name="csrf-token"]'
@@ -734,9 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 !csrf ||
                 !submit
             ) {
-
                 if (feedback) {
-
                     feedback.style.color = '#a21d1d';
 
                     feedback.textContent =
@@ -747,24 +627,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const competitionName =
-                document.getElementById(
-                    'inviteCompetition'
-                )?.value.trim() || '';
+                document.getElementById('inviteCompetition')
+                    ?.value.trim() || '';
 
             const role =
-                document.getElementById(
-                    'inviteRole'
-                )?.value || '';
+                document.getElementById('inviteRole')
+                    ?.value || '';
 
             const message =
-                document.getElementById(
-                    'inviteMessage'
-                )?.value.trim() || '';
+                document.getElementById('inviteMessage')
+                    ?.value.trim() || '';
 
             if (!competitionName) {
-
                 if (feedback) {
-
                     feedback.style.color = '#a21d1d';
 
                     feedback.textContent =
@@ -778,69 +653,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
             submit.disabled = true;
 
-            const originalSubmitText =
-                submit.textContent;
+            const originalSubmitText = submit.textContent;
 
             submit.textContent = 'Mengirim...';
 
             if (feedback) {
-
-                feedback.textContent =
-                    'Mengirim undangan...';
-
+                feedback.textContent = 'Mengirim undangan...';
                 feedback.style.color = '#786b60';
             }
 
             try {
-
                 console.debug(
                     '[Cari Partner] POST:',
                     API.store
                 );
 
-                const response = await fetch(
-                    API.store,
-                    {
-                        method: 'POST',
+                const response = await fetch(API.store, {
+                    method: 'POST',
 
-                        credentials: 'same-origin',
+                    credentials: 'same-origin',
 
-                        headers: {
-                            'Content-Type':
-                                'application/json',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrf,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
 
-                            'Accept':
-                                'application/json',
-
-                            'X-CSRF-TOKEN': csrf,
-
-                            'X-Requested-With':
-                                'XMLHttpRequest'
-                        },
-
-                        body: JSON.stringify({
-                            receiver_id: receiverId,
-                            competition_name:
-                                competitionName,
-                            role: role,
-                            message: message
-                        })
-                    }
-                );
+                    body: JSON.stringify({
+                        receiver_id: receiverId,
+                        competition_name: competitionName,
+                        role: role,
+                        message: message
+                    })
+                });
 
                 const contentType =
-                    response.headers.get(
-                        'content-type'
-                    ) || '';
+                    response.headers.get('content-type') || '';
 
-                if (
-                    !contentType.includes(
-                        'application/json'
-                    )
-                ) {
-
+                if (!contentType.includes('application/json')) {
                     if (response.status === 419) {
-
                         throw new Error(
                             'Sesi login kedaluwarsa. ' +
                             'Refresh halaman dan login kembali.'
@@ -848,7 +700,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (response.status === 401) {
-
                         throw new Error(
                             'Kamu belum login. ' +
                             'Silakan login kembali.'
@@ -862,18 +713,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     );
                 }
 
-                const result =
-                    await response.json();
+                const result = await response.json();
 
-                if (
-                    !response.ok ||
-                    !result.success
-                ) {
-
+                if (!response.ok || !result.success) {
                     const errors = result.errors
-                        ? Object.values(
-                            result.errors
-                        ).flat().join(' ')
+                        ? Object.values(result.errors)
+                            .flat()
+                            .join(' ')
                         : '';
 
                     throw new Error(
@@ -884,25 +730,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     );
                 }
 
-                // Berhasil disimpan di backend
-
                 const button =
-                    target.querySelector(
-                        '[data-invite]'
-                    );
+                    target.querySelector('[data-invite]');
 
                 if (button) {
-
-                    button.textContent =
-                        'Undangan Terkirim';
-
+                    button.textContent = 'Undangan Terkirim';
                     button.disabled = true;
                 }
 
                 if (feedback) {
-
-                    feedback.style.color =
-                        '#167a4a';
+                    feedback.style.color = '#167a4a';
 
                     feedback.textContent =
                         'Undangan berhasil dikirim! ' +
@@ -916,26 +753,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
 
             } catch (error) {
-
                 console.error(
                     '[Cari Partner] Error:',
                     error
                 );
 
                 if (feedback) {
-
-                    feedback.style.color =
-                        '#a21d1d';
+                    feedback.style.color = '#a21d1d';
 
                     if (error instanceof TypeError) {
-
                         feedback.textContent =
                             'Tidak dapat terhubung ke server. ' +
                             'Periksa Laravel, Cloudflare Tunnel, ' +
                             'dan Network browser.';
-
                     } else {
-
                         feedback.textContent =
                             error.message ||
                             'Gagal mengirim undangan.';
@@ -943,45 +774,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
             } finally {
-
                 sendingInvite = false;
 
                 submit.disabled = false;
 
-                submit.textContent =
-                    originalSubmitText;
+                submit.textContent = originalSubmitText;
             }
-        }
-    );
-
-    // =====================================
-    // 11. CEK UNDANGAN TERKIRIM
-    // =====================================
+        });
 
     async function loadSentInvitations() {
-
         try {
+            const response = await fetch(API.sent, {
+                method: 'GET',
 
-            const response = await fetch(
-                API.sent,
-                {
-                    method: 'GET',
+                credentials: 'same-origin',
 
-                    credentials: 'same-origin',
-
-                    headers: {
-                        'Accept':
-                            'application/json'
-                    }
+                headers: {
+                    'Accept': 'application/json'
                 }
-            );
+            });
 
             if (!response.ok) {
                 return;
             }
 
-            const result =
-                await response.json();
+            const result = await response.json();
 
             if (
                 !result.success ||
@@ -996,38 +813,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         invitation.status === 'pending'
                     )
                     .map(invitation =>
-                        String(
-                            invitation.receiver_id
-                        )
+                        String(invitation.receiver_id)
                     )
             );
 
             cards.forEach(card => {
-
                 const button =
-                    card.querySelector(
-                        '[data-invite]'
-                    );
+                    card.querySelector('[data-invite]');
 
                 if (!button) {
                     return;
                 }
 
-                if (
-                    pendingIds.has(
-                        card.dataset.id
-                    )
-                ) {
-
-                    button.textContent =
-                        'Undangan Terkirim';
-
+                if (pendingIds.has(card.dataset.id)) {
+                    button.textContent = 'Undangan Terkirim';
                     button.disabled = true;
                 }
             });
 
         } catch (error) {
-
             console.warn(
                 'Status undangan belum dapat dimuat:',
                 error
@@ -1035,13 +839,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =====================================
-    // 12. PARALLAX
-    // =====================================
-
-    const hero = document.querySelector(
-        '.cp-hero'
-    );
+    const hero = document.querySelector('.cp-hero');
 
     const heroText = hero?.querySelector(
         'div:first-child'
@@ -1080,9 +878,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let parallaxPending = false;
 
     function progressInViewport(element) {
-
-        const rect =
-            element.getBoundingClientRect();
+        const rect = element.getBoundingClientRect();
 
         return clamp(
             (window.innerHeight - rect.top) /
@@ -1093,89 +889,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateParallax() {
-
         parallaxPending = false;
 
         if (reduceMotion.matches) {
             return;
         }
 
-        const mobile =
-            window.innerWidth <= 760;
+        const mobile = window.innerWidth <= 760;
 
         if (hero && heroText) {
-
             const progress =
                 progressInViewport(hero) - 0.5;
 
             heroText.style.setProperty(
                 '--cp-hero-text-y',
-                `${progress * (
-                    mobile ? 20 : 52
-                )}px`
+                `${progress * (mobile ? 20 : 52)}px`
             );
 
             heroPill?.style.setProperty(
                 '--cp-hero-pill-y',
-                `${-progress * (
-                    mobile ? 14 : 35
-                )}px`
+                `${-progress * (mobile ? 14 : 35)}px`
             );
         }
 
         if (searchBar) {
-
             const progress =
-                progressInViewport(
-                    searchBar
-                ) - 0.5;
+                progressInViewport(searchBar) - 0.5;
 
             searchBar.style.setProperty(
                 '--cp-search-y',
-                `${progress * (
-                    mobile ? 12 : 26
-                )}px`
+                `${progress * (mobile ? 12 : 26)}px`
             );
         }
 
         if (filterPanel) {
-
             const progress =
-                progressInViewport(
-                    filterPanel
-                ) - 0.5;
+                progressInViewport(filterPanel) - 0.5;
 
             filterPanel.style.setProperty(
                 '--cp-filter-y',
-                `${-progress * (
-                    mobile ? 8 : 20
-                )}px`
+                `${-progress * (mobile ? 8 : 20)}px`
             );
         }
 
         if (resultsHeader) {
-
             const progress =
-                progressInViewport(
-                    resultsHeader
-                ) - 0.5;
+                progressInViewport(resultsHeader) - 0.5;
 
             resultsHeader.style.setProperty(
                 '--cp-results-y',
-                `${progress * (
-                    mobile ? 8 : 20
-                )}px`
+                `${progress * (mobile ? 8 : 20)}px`
             );
         }
 
         cards.forEach(card => {
-
             if (card.hidden) {
                 return;
             }
 
-            const rect =
-                card.getBoundingClientRect();
+            const rect = card.getBoundingClientRect();
 
             if (
                 rect.bottom <= 0 ||
@@ -1189,36 +961,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             card.style.setProperty(
                 '--cp-person-y',
-                `${progress * (
-                    mobile ? 10 : 22
-                )}px`
+                `${progress * (mobile ? 10 : 22)}px`
             );
 
             card.style.setProperty(
                 '--cp-bio-y',
-                `${-progress * (
-                    mobile ? 5 : 10
-                )}px`
+                `${-progress * (mobile ? 5 : 10)}px`
             );
         });
     }
 
     function requestParallax() {
-
         if (parallaxPending) {
             return;
         }
 
         parallaxPending = true;
 
-        requestAnimationFrame(
-            updateParallax
-        );
+        requestAnimationFrame(updateParallax);
     }
-
-    // =====================================
-    // 13. REVEAL SAAT SCROLL
-    // =====================================
 
     const revealElements = [
         hero,
@@ -1234,9 +995,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             ? new IntersectionObserver(
                 entries => {
-
                     entries.forEach(entry => {
-
                         if (entry.target.hidden) {
                             return;
                         }
@@ -1246,69 +1005,48 @@ document.addEventListener('DOMContentLoaded', () => {
                             entry.isIntersecting
                         );
                     });
-
                 },
                 {
                     threshold: 0.06,
-                    rootMargin:
-                        '0px 0px -4% 0px'
+                    rootMargin: '0px 0px -4% 0px'
                 }
             )
 
             : null;
 
     if (revealObserver) {
-
         revealElements.forEach(element => {
+            element.classList.add('cp-scroll-reveal');
 
-            element.classList.add(
-                'cp-scroll-reveal'
-            );
-
-            if (
-                element.classList.contains(
-                    'partner-card'
-                )
-            ) {
-
-                const order =
-                    cards.indexOf(element);
+            if (element.classList.contains('partner-card')) {
+                const order = cards.indexOf(element);
 
                 element.style.transitionDelay =
                     `${(order % 3) * 75}ms`;
             }
 
-            revealObserver.observe(
-                element
-            );
+            revealObserver.observe(element);
         });
     }
 
     function updateVisibleReveals() {
-
         if (!revealObserver) {
             return;
         }
 
         cards.forEach(card => {
-
             if (card.hidden) {
                 return;
             }
 
-            const rect =
-                card.getBoundingClientRect();
+            const rect = card.getBoundingClientRect();
 
             const inView =
-                rect.top <
-                    window.innerHeight * 0.96 &&
+                rect.top < window.innerHeight * 0.96 &&
                 rect.bottom > 0;
 
             if (inView) {
-
-                card.classList.add(
-                    'cp-is-visible'
-                );
+                card.classList.add('cp-is-visible');
             }
         });
     }
@@ -1324,37 +1062,22 @@ document.addEventListener('DOMContentLoaded', () => {
         requestParallax
     );
 
-    reduceMotion.addEventListener?.(
-        'change',
-        () => {
-
-            if (reduceMotion.matches) {
-
-                revealElements.forEach(
-                    element => {
-
-                        element.classList.remove(
-                            'cp-scroll-reveal',
-                            'cp-is-visible'
-                        );
-                    }
+    reduceMotion.addEventListener?.('change', () => {
+        if (reduceMotion.matches) {
+            revealElements.forEach(element => {
+                element.classList.remove(
+                    'cp-scroll-reveal',
+                    'cp-is-visible'
                 );
-
-            } else {
-
-                requestParallax();
-            }
+            });
+        } else {
+            requestParallax();
         }
-    );
-
-    // =====================================
-    // 14. INITIAL LOAD
-    // =====================================
+    });
 
     render();
 
     requestParallax();
 
     loadSentInvitations();
-
 });
