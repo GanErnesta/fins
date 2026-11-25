@@ -1,4 +1,9 @@
-
+@php
+    $finsFacultyMap = config('fins_academics.faculties', []);
+    $finsAllPrograms = $finsFacultyMap
+        ? array_values(array_unique(array_merge(...array_values($finsFacultyMap))))
+        : [];
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,7 +12,8 @@
 
     <title>Sign Up | FINS</title>
 
-    <link rel="stylesheet" href="{{ asset('css/signup.css') }}">
+  <link rel="stylesheet" href="/css/signup.css?v=51">
+<link rel="stylesheet" href="/css/fins-academic-dropdown.css?v=51">
 </head>
 
 <body>
@@ -97,67 +103,112 @@
                 >
                     @csrf
 
-                    <label for="nama">
-                        Nama Lengkap
-                    </label>
+                    <!-- Nama Lengkap: Email hanya di Step 2 -->
+                    <div class="field-group">
+                        <label for="nama">Nama Lengkap</label>
+                        <input
+                            id="nama"
+                            name="nama"
+                            type="text"
+                            placeholder="Nama lengkap sesuai KTM"
+                            value="{{ old('nama', $old['nama'] ?? '') }}"
+                            autocomplete="name"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
 
-                    <input
-                        id="nama"
-                        name="nama"
-                        type="text"
-                        placeholder="Masukkan nama lengkap kamu"
-                        value="{{ old('nama', $old['nama'] ?? '') }}"
-                        autocomplete="name"
-                        required
-                    >
+                    <div class="field-group">
+                        <label for="nim">NIM</label>
+                        <input
+                            id="nim"
+                            name="nim"
+                            type="text"
+                            placeholder="NIM sesuai KTM"
+                            value="{{ old('nim', $old['nim'] ?? '') }}"
+                            inputmode="numeric"
+                            maxlength="15"
+                            autocomplete="off"
+                            required
+                        >
+                    </div>
+
+                    <div class="field-row">
+
+                        <div class="field-group">
+
+                            <label for="fakultas">
+                                Fakultas
+                            </label>
+
+                            <select
+                                id="fakultas"
+                                name="fakultas"
+                                required
+                            >
+                                <option value="">
+                                    Fakultas...
+                                </option>
+
+                                @foreach (array_keys($finsFacultyMap) as $faculty)
+
+                                    <option
+                                        value="{{ $faculty }}"
+                                        @selected(
+                                            old(
+                                                'fakultas',
+                                                $old['fakultas'] ?? ''
+                                            ) === $faculty
+                                        )
+                                    >
+                                        {{ $faculty }}
+                                    </option>
+
+                                @endforeach
+                            </select>
+
+                        </div>
+
+                        <div class="field-group">
+
+                            <label for="prodi">
+                                Program Studi
+                            </label>
+
+                            <select
+                                id="prodi"
+                                name="prodi"
+                                required
+                            >
+                                <option value="">
+                                    Program studi...
+                                </option>
+
+                                @foreach ($finsAllPrograms as $program)
+
+                                    <option
+                                        value="{{ $program }}"
+                                        @selected(
+                                            old(
+                                                'prodi',
+                                                $old['prodi'] ?? ''
+                                            ) === $program
+                                        )
+                                    >
+                                        {{ $program }}
+                                    </option>
+
+                                @endforeach
+                            </select>
+
+                        </div>
+
+                    </div>
 
 
-                    <label for="nim">NIM</label>
-
-                    <input
-                        id="nim"
-                        name="nim"
-                        type="text"
-                        placeholder="NIM sesuai KTM"
-                        value="{{ old('nim', $old['nim'] ?? '') }}"
-                        inputmode="numeric"
-                        maxlength="15"
-                        autocomplete="off"
-                        required
-                    >
-
-                <div class="form-row">
-                <div class="form-group">
-                <label for="fakultas">Fakultas</label>
-                    
-                <select id="fakultas" name="fakultas" required>
-                    <option value="">Pilih Fakultas...</option>
-                    <option value="FH">Fakultas Hukum</option>
-                    <option value="FEB">Fakultas Ekonomi dan Bisnis</option>
-                    <option value="FIA">Fakultas Ilmu Administrasi</option>
-                    <option value="FBiPK">Fakultas Bio-Industri Pertanian dan Kehutanan</option>
-                    <option value="FAST">Fakultas Sains dan Teknologi Peternakan</option>
-                    <option value="FT">Fakultas Teknik</option>
-                    <option value="FK">Fakultas Kedokteran</option>
-                    <option value="FPIK">Fakultas Perikanan dan Ilmu Kelautan</option>
-                    <option value="FSTeM">Fakultas Sains, Teknologi, dan Matematika</option>
-                    <option value="FTAB">Fakultas Teknologi Agroindustri dan Biosistem</option>
-                    <option value="FISIP">Fakultas Ilmu Sosial dan Ilmu Politik</option>
-                    <option value="FIB">Fakultas Ilmu Budaya</option>
-                    <option value="FKH">Fakultas Kedokteran Hewan</option>
-                    <option value="FILKOM">Fakultas Ilmu Komputer</option>
-                    <option value="FKG">Fakultas Kedokteran Gigi</option>
-                    <option value="FIKES">Fakultas Ilmu Kesehatan</option>
-                </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="prodi">Program Studi</label>
-                    <select id="prodi" name="prodi" required disabled>
-                        <option value="">Pilih Fakultas terlebih dahulu</option>
-                    </select>
-                </div>
-            </div>
+                    <p id="finsAcademicHint" class="fins-academic-hint" aria-live="polite">
+                        Pilih fakultas untuk melihat program studi yang sesuai.
+                    </p>
 
                     <button
                         class="primary-button"
@@ -166,6 +217,12 @@
                         Next
                         <span aria-hidden="true">➜</span>
                     </button>
+
+                    {{-- Pengguna yang sudah memiliki akun bisa langsung masuk --}}
+                    <p class="signin-link">
+                        Sudah punya akun?
+                        <a href="{{ route('login') }}">Masuk di sini</a>
+                    </p>
 
                 </form>
 
@@ -180,84 +237,78 @@
                 >
                     @csrf
 
-                    <label for="email">Email</label>
-
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="Email UB kamu"
-                        value="{{ old('email', $old['email'] ?? '') }}"
-                        autocomplete="email"
-                        required
-                    >
-
-                    <label for="password">
-                        Create Password
-                    </label>
-
-                    <div class="password-field">
-
+                    <div class="field-group">
+                        <label for="email">Email</label>
                         <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            placeholder="Buat password kamu minimal 8 karakter"
-                            minlength="8"
-                            autocomplete="new-password"
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="Email UB kamu"
+                            value="{{ old('email', $old['email'] ?? '') }}"
+                            autocomplete="email"
                             required
                         >
-
-                        <button
-                            type="button"
-                            class="toggle-password"
-                            data-target="password"
-                            aria-label="Tampilkan password"
-                        >
-                            ◉
-                        </button>
-
                     </div>
 
-                    <label for="confirmPassword">
-                        Confirm Password
-                    </label>
-
-                    <div class="password-field">
-
-                        <input
-                            id="confirmPassword"
-                            name="password_confirmation"
-                            type="password"
-                            placeholder="Ulangi password kamu"
-                            minlength="8"
-                            autocomplete="new-password"
-                            required
-                        >
-
-                        <button
-                            type="button"
-                            class="toggle-password"
-                            data-target="confirmPassword"
-                            aria-label="Tampilkan konfirmasi password"
-                        >
-                            ◉
-                        </button>
-
+                    <div class="field-group">
+                        <label for="password">Create Password</label>
+                        <div class="password-field">
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                placeholder="Buat password kamu minimal 8 karakter"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required
+                            >
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="password"
+                                aria-label="Tampilkan password"
+                            >
+                                ◉
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="password-meter" aria-hidden="true">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                    <div class="field-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="password-field">
+                            <input
+                                id="confirmPassword"
+                                name="password_confirmation"
+                                type="password"
+                                placeholder="Ulangi password kamu"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required
+                            >
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="confirmPassword"
+                                aria-label="Tampilkan konfirmasi password"
+                            >
+                                ◉
+                            </button>
+                        </div>
                     </div>
 
-                    <p class="helper-text">
-                        Gunakan simbol, angka, dan karakter unik.
-                    </p>
+                    <div class="password-hints">
+                        <div class="password-meter" aria-hidden="true">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <p class="helper-text">
+                            Gunakan simbol, angka, dan karakter unik.
+                        </p>
+                    </div>
 
                     <button
                         class="primary-button"
@@ -267,9 +318,9 @@
                     </button>
 
                     <p class="signin-link">
-                        Have an account?
+                        Sudah punya akun?
                         <a href="{{ route('login') }}">
-                            Sign in
+                            Masuk di sini
                         </a>
                     </p>
 
@@ -290,7 +341,13 @@
 
 </main>
 
-<script src="{{ asset('js/signup.js') }}"></script>
+{{-- Data fakultas/prodi dipakai kedua halaman, bukan hardcode dalam JS. --}}
+<div id="finsAcademicData" hidden
+     data-faculties="{{ json_encode(config('fins_academics.faculties', []), JSON_UNESCAPED_UNICODE) }}"
+     data-aliases="{{ json_encode(config('fins_academics.aliases', []), JSON_UNESCAPED_UNICODE) }}"></div>
+
+<script src="/js/signup.js?v=51"></script>
+<script src="/js/fins-academic-dropdown.js?v=51" defer></script>
 
 </body>
 </html>

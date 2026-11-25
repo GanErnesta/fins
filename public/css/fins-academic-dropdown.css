@@ -1,0 +1,256 @@
+/* Dropdown Fakultas & Prodi: gaya FINS merah, tanpa mengubah CSS form lama. */
+.fins-academic-select {
+    position: relative;
+    min-width: 0;
+    width: 100%;
+}
+
+.fins-academic-select.is-ready>select {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+}
+
+.fins-academic-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 14px;
+    border: 1px solid #c88a8a;
+    border-radius: 12px;
+    color: #3d3030;
+    background: #fff6f0;
+    text-align: left;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(95, 20, 20, .02);
+    transition: border-color .2s, box-shadow .2s, background .2s, transform .2s;
+}
+
+.fins-academic-trigger:hover {
+    border-color: #9d3838;
+    background: #fffaf6;
+}
+
+.fins-academic-trigger:focus-visible,
+.fins-academic-select.is-open .fins-academic-trigger {
+    outline: none;
+    border-color: #860000;
+    box-shadow: 0 0 0 3px rgba(134, 0, 0, .12);
+}
+
+.fins-academic-trigger:disabled {
+    opacity: .58;
+    cursor: not-allowed;
+    background: #f2ede9;
+    border-color: #ddd0cb;
+}
+
+.fins-academic-trigger__value {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #8b7f7d;
+    min-width: 0;
+}
+
+.fins-academic-select.has-selection .fins-academic-trigger__value {
+    color: #312626;
+}
+
+.fins-academic-trigger__chevron {
+    flex: 0 0 auto;
+    color: #860000;
+    display: flex;
+    transition: transform .28s cubic-bezier(.2, .8, .2, 1);
+}
+
+.fins-academic-select.is-open .fins-academic-trigger__chevron {
+    transform: rotate(180deg);
+}
+
+.fins-academic-panel {
+    position: absolute;
+    top: calc(100% + 7px);
+    left: 0;
+    right: 0;
+    z-index: 1400;
+    padding: 0 10px;
+    max-height: 0;
+    overflow: hidden;
+    background: #fffcf9;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    box-shadow: 0 16px 38px rgba(55, 10, 10, .12);
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px) scale(.985);
+    pointer-events: none;
+    transform-origin: top center;
+    transition: opacity .22s ease, transform .22s ease, max-height .27s ease,
+        padding .22s ease, visibility .22s ease, border-color .22s ease;
+}
+
+.fins-academic-select.is-open .fins-academic-panel {
+    max-height: var(--fins-dropdown-height, 240px);
+    padding: 10px;
+    border-color: #e7c9c9;
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* Jika pilihan dekat tepi bawah viewport, panel otomatis tampil ke atas. */
+.fins-academic-select.is-up .fins-academic-panel {
+    top: auto;
+    bottom: calc(100% + 7px);
+    transform-origin: bottom center;
+}
+
+.fins-academic-select.is-up:not(.is-open) .fins-academic-panel {
+    transform: translateY(8px) scale(.985);
+}
+
+.fins-academic-search {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.fins-academic-search input,
+#signupForm .fins-academic-search input {
+    width: 100%;
+    height: 39px;
+    min-height: 39px;
+    border: 1px solid #efdada;
+    border-radius: 9px;
+    padding: 8px 11px;
+    outline: none;
+    color: #3a2929;
+    background: #fff7f5;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+}
+
+.fins-academic-search input:focus,
+#signupForm .fins-academic-search input:focus {
+    border-color: #ae6c6c;
+    box-shadow: 0 0 0 3px rgba(134, 0, 0, .08);
+}
+
+.fins-academic-options {
+    max-height: max(65px, calc(var(--fins-dropdown-height, 240px) - 70px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #d8b6b6 transparent;
+}
+
+.fins-academic-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 2px 0;
+    padding: 9px 11px;
+    border: none;
+    border-radius: 9px;
+    color: #473737;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.fins-academic-option:hover,
+.fins-academic-option:focus-visible {
+    background: #f9eaea;
+    color: #860000;
+    outline: none;
+    transform: translateX(2px);
+}
+
+.fins-academic-option.is-selected {
+    color: #860000;
+    background: #f9eded;
+    font-weight: 600;
+}
+
+.fins-academic-check {
+    opacity: 0;
+    flex-shrink: 0;
+    color: #860000;
+    font-size: 15px;
+}
+
+.fins-academic-option.is-selected .fins-academic-check {
+    opacity: 1;
+}
+
+.fins-academic-empty {
+    margin: 9px 8px;
+    font-size: 12px;
+    color: #8e7f7a;
+}
+
+.fins-academic-empty[hidden] {
+    display: none;
+}
+
+.fins-academic-hint {
+    margin: -4px 0 0;
+    color: #7e716e;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.fins-academic-hint.is-error {
+    color: #ae2727;
+    font-weight: 500;
+}
+
+/* Supaya panel bisa keluar dari area grid tanpa tertutup elemen form lain */
+.fins-academic-select.is-open {
+    z-index: 1500;
+}
+
+@media (max-width: 620px) {
+    .fins-academic-trigger {
+        font-size: 12px;
+        min-height: 46px;
+    }
+
+    .fins-academic-select.is-open .fins-academic-panel {
+        max-height: var(--fins-dropdown-height, 240px);
+    }
+
+    .fins-academic-options {
+        max-height: max(65px, calc(var(--fins-dropdown-height, 240px) - 70px));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .fins-academic-trigger,
+    .fins-academic-panel,
+    .fins-academic-option,
+    .fins-academic-trigger__chevron {
+        transition-duration: .01ms !important;
+    }
+}

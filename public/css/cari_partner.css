@@ -1177,3 +1177,117 @@ a {
         white-space: normal
     }
 }
+
+/* ===================================================
+   FINS CARI PARTNER - PARALLAX DUA ARAH
+   Tidak mengubah filter, pagination, atau modal
+=================================================== */
+
+/* Lapisan hero yang bergerak dengan kecepatan berbeda */
+.cp-hero {
+    position: relative;
+    isolation: isolate;
+}
+
+.cp-hero > div:first-child {
+    position: relative;
+    transform: translate3d(0, var(--cp-hero-text-y, 0px), 0);
+    will-change: transform;
+}
+
+.cp-hero .cp-active-pill {
+    position: relative;
+    transform: translate3d(0, var(--cp-hero-pill-y, 0px), 0);
+    will-change: transform;
+}
+
+/* Search bar, panel filter dan header hasil bergerak halus */
+.cp-main > .cp-search {
+    position: relative;
+    z-index: 1;
+    transform: translate3d(0, var(--cp-search-y, 0px), 0);
+    will-change: transform;
+}
+
+.cp-filter-panel {
+    transform: translate3d(0, var(--cp-filter-y, 0px), 0);
+    will-change: transform;
+}
+
+.results-header {
+    transform: translate3d(0, var(--cp-results-y, 0px), 0);
+    will-change: transform;
+}
+
+/* Dua layer kecil dalam kartu memberi rasa kedalaman */
+.partner-card .person-row {
+    transform: translate3d(0, var(--cp-person-y, 0px), 0);
+}
+
+.partner-card .bio {
+    transform: translate3d(0, var(--cp-bio-y, 0px), 0);
+}
+
+/* Reveal bisa diulang setiap kali masuk/keluar viewport.
+   Gunakan translate (bukan transform) agar tidak bentrok
+   dengan gerakan parallax lain. */
+.cp-scroll-reveal {
+    opacity: 0;
+    translate: 0 24px;
+    transition:
+        opacity 680ms ease,
+        translate 680ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.cp-scroll-reveal.cp-is-visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+/* Jangan tampilkan kartu yang disembunyikan filter/pagination */
+.partner-card[hidden],
+.empty-state[hidden],
+.card-grid[hidden] {
+    display: none !important;
+}
+
+/* Modal tetap statis, tidak mengikuti parallax */
+.modal-backdrop,
+.modal-backdrop .invite-modal {
+    translate: none;
+}
+
+@media (max-width: 760px) {
+    .cp-scroll-reveal {
+        translate: 0 14px;
+        transition-duration: 480ms;
+    }
+
+    .cp-hero > div:first-child,
+    .cp-hero .cp-active-pill,
+    .cp-main > .cp-search,
+    .cp-filter-panel,
+    .results-header {
+        will-change: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cp-hero > div:first-child,
+    .cp-hero .cp-active-pill,
+    .cp-main > .cp-search,
+    .cp-filter-panel,
+    .results-header,
+    .partner-card .person-row,
+    .partner-card .bio {
+        transform: none !important;
+        will-change: auto;
+    }
+
+    .cp-scroll-reveal,
+    .cp-scroll-reveal.cp-is-visible {
+        opacity: 1 !important;
+        translate: none !important;
+        transition: none !important;
+    }
+}

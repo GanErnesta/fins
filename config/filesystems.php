@@ -1,3 +1,4 @@
+
 <?php
 
 return [
@@ -6,11 +7,6 @@ return [
     |--------------------------------------------------------------------------
     | Default Filesystem Disk
     |--------------------------------------------------------------------------
-    |
-    | Here you may specify the default filesystem disk that should be used
-    | by the framework. The "local" disk, as well as a variety of cloud
-    | based disks are available to your application for file storage.
-    |
     */
 
     'default' => env('FILESYSTEM_DISK', 'local'),
@@ -19,16 +15,61 @@ return [
     |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
-    |
-    | Below you may configure as many filesystem disks as necessary, and you
-    | may even configure multiple disks for the same driver. Examples for
-    | most supported storage drivers are configured here for reference.
-    |
-    | Supported drivers: "local", "ftp", "sftp", "s3"
-    |
     */
 
     'disks' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Supabase Storage - FINS
+        |--------------------------------------------------------------------------
+        |
+        | Digunakan untuk menyimpan foto profil mahasiswa
+        | langsung ke bucket Supabase Storage.
+        |
+        */
+
+        'supabase' => [
+            'driver' => 's3',
+
+            // Kredensial S3 dari Supabase
+            'key' => env('SUPABASE_S3_ACCESS_KEY'),
+            'secret' => env('SUPABASE_S3_SECRET_KEY'),
+
+            // Region Supabase
+            'region' => env(
+                'SUPABASE_S3_REGION',
+                'ap-southeast-2'
+            ),
+
+            // Nama bucket foto profil
+            'bucket' => env(
+                'SUPABASE_S3_BUCKET',
+                'profile-photos'
+            ),
+
+            // Endpoint S3 Supabase
+            'endpoint' => env('SUPABASE_S3_ENDPOINT'),
+
+            'use_path_style_endpoint' => true,
+
+            // URL publik project Supabase
+            'public_base_url' => env(
+                'SUPABASE_URL',
+                'https://cckkvqsiqpocsbhesgjk.supabase.co'
+            ),
+
+            // Berikan error jika upload gagal
+            'throw' => true,
+
+            'report' => false,
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Local Storage
+        |--------------------------------------------------------------------------
+        */
 
         'local' => [
             'driver' => 'local',
@@ -38,14 +79,26 @@ return [
             'report' => false,
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Public Storage
+        |--------------------------------------------------------------------------
+        */
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | AWS S3 Storage
+        |--------------------------------------------------------------------------
+        */
 
         's3' => [
             'driver' => 's3',
@@ -55,7 +108,10 @@ return [
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'use_path_style_endpoint' => env(
+                'AWS_USE_PATH_STYLE_ENDPOINT',
+                false
+            ),
             'throw' => false,
             'report' => false,
         ],
@@ -66,11 +122,6 @@ return [
     |--------------------------------------------------------------------------
     | Symbolic Links
     |--------------------------------------------------------------------------
-    |
-    | Here you may configure the symbolic links that will be created when the
-    | `storage:link` Artisan command is executed. The array keys should be
-    | the locations of the links and the values should be their targets.
-    |
     */
 
     'links' => [

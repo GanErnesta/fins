@@ -9,7 +9,7 @@ class CompetitionController extends Controller
 {
     public function index()
     {
-        // TAMBAHAN: Menghapus otomatis lomba H+2 setelah deadline
+        // Menghapus otomatis lomba H+2 setelah deadline
         CariLomba::whereDate(
             'deadline',
             '<=',
