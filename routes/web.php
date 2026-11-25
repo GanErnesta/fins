@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\VerificationController;
@@ -93,8 +92,8 @@ Route::middleware('guest')->group(function () {
         PasswordResetController::class,
         'sendLink'
     ])
-    ->middleware('throttle:3,1')
-    ->name('password.email');
+        ->middleware('throttle:3,1')
+        ->name('password.email');
 
     Route::get('/reset-password', [
         PasswordResetController::class,
@@ -105,17 +104,16 @@ Route::middleware('guest')->group(function () {
         PasswordResetController::class,
         'resetPassword'
     ])
-    ->middleware('throttle:5,1')
-    ->name('password.update');
-
+        ->middleware('throttle:5,1')
+        ->name('password.update');
 });
 
 Route::post('/logout', [
     LoginController::class,
     'logout'
 ])
-->middleware('auth')
-->name('logout');
+    ->middleware('auth')
+    ->name('logout');
 
 Route::middleware('auth')->group(function () {
 
@@ -152,6 +150,13 @@ Route::middleware('auth')->group(function () {
         'index'
     ])->name('cari-partner');
 
+    Route::get('/cari-partner/{id}/profile', [
+        ProfileController::class,
+        'showPartner'
+    ])
+        ->whereNumber('id')
+        ->name('partner.profile');
+
     Route::get('/cari-lomba', [
         CompetitionController::class,
         'index'
@@ -161,8 +166,8 @@ Route::middleware('auth')->group(function () {
         CompetitionController::class,
         'show'
     ])
-    ->whereNumber('id')
-    ->name('cari_lomba.show');
+        ->whereNumber('id')
+        ->name('cari_lomba.show');
 
     Route::get('/posting-lomba', [
         PostingLombaController::class,
@@ -202,8 +207,8 @@ Route::middleware('auth')->group(function () {
         ChatFileController::class,
         'download'
     ])
-    ->where('filename', '[A-Za-z0-9._-]+')
-    ->name('chat.file.download');
+        ->where('filename', '[A-Za-z0-9._-]+')
+        ->name('chat.file.download');
 
     Route::post('/chat/attachments/upload', [
         ChatAttachmentController::class,
@@ -214,8 +219,8 @@ Route::middleware('auth')->group(function () {
         ChatAttachmentController::class,
         'download'
     ])
-    ->whereNumber('attachmentId')
-    ->name('chat.attachments.download');
+        ->whereNumber('attachmentId')
+        ->name('chat.attachments.download');
 
     Route::get('/chat/conversations', [
         ChatController::class,
@@ -226,39 +231,39 @@ Route::middleware('auth')->group(function () {
         ChatController::class,
         'messages'
     ])
-    ->whereNumber('conversationId')
-    ->name('chat.conversations.messages');
+        ->whereNumber('conversationId')
+        ->name('chat.conversations.messages');
 
     Route::post('/chat/conversations/{conversationId}/messages', [
         ChatController::class,
         'sendMessage'
     ])
-    ->whereNumber('conversationId')
-    ->name('chat.conversations.messages.send');
+        ->whereNumber('conversationId')
+        ->name('chat.conversations.messages.send');
 
     Route::patch('/chat/conversations/{conversationId}/messages/{messageId}', [
         ChatController::class,
         'updateMessage'
     ])
-    ->whereNumber('conversationId')
-    ->whereNumber('messageId')
-    ->name('chat.conversations.messages.update');
+        ->whereNumber('conversationId')
+        ->whereNumber('messageId')
+        ->name('chat.conversations.messages.update');
 
     Route::delete('/chat/conversations/{conversationId}/messages/{messageId}/me', [
         ChatController::class,
         'deleteMessageForMe'
     ])
-    ->whereNumber('conversationId')
-    ->whereNumber('messageId')
-    ->name('chat.messages.delete.me');
+        ->whereNumber('conversationId')
+        ->whereNumber('messageId')
+        ->name('chat.messages.delete.me');
 
     Route::delete('/chat/conversations/{conversationId}/messages/{messageId}/everyone', [
         ChatController::class,
         'deleteMessageForEveryone'
     ])
-    ->whereNumber('conversationId')
-    ->whereNumber('messageId')
-    ->name('chat.messages.delete.everyone');
+        ->whereNumber('conversationId')
+        ->whereNumber('messageId')
+        ->name('chat.messages.delete.everyone');
 
     Route::post('/partner-invitations', [
         PartnerInvitationController::class,
@@ -279,18 +284,17 @@ Route::middleware('auth')->group(function () {
         PartnerInvitationController::class,
         'respond'
     ])
-    ->whereNumber('id')
-    ->name('partner-invitations.respond');
-
+        ->whereNumber('id')
+        ->name('partner-invitations.respond');
 });
 
 Route::get('/realtime/token', [
     RealtimeController::class,
     'token'
 ])
-->middleware(['auth', 'throttle:60,1'])
-->block(30, 30)
-->name('realtime.token');
+    ->middleware(['auth', 'throttle:60,1'])
+    ->block(30, 30)
+    ->name('realtime.token');
 
 Route::middleware('auth')->prefix('notifications')->group(function () {
 
@@ -313,7 +317,6 @@ Route::middleware('auth')->prefix('notifications')->group(function () {
         NotificationController::class,
         'markAsRead'
     ])
-    ->whereNumber('id')
-    ->name('notifications.read');
-
+        ->whereNumber('id')
+        ->name('notifications.read');
 });
