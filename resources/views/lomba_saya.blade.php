@@ -338,7 +338,7 @@
 
                 <button type="button"
                         class="btn-tambah-rekrut"
-                        id="btnTambahRekrut">
+                        id="btnTambahRekrut" disabled>
 
                     + Tambah Rekrutmen
 
@@ -381,7 +381,8 @@
 
                 </div>
 
-                <form id="formRekrut">
+                <form id="formRekrut" data-url="{{ route('rekrut-saya.index', [], false) }}">
+                    @csrf
 
                     <input type="hidden" id="editRekrutId">
 
@@ -391,10 +392,7 @@
                             Nama Lomba *
                         </label>
 
-                        <input type="text"
-                               id="judulRekrut"
-                               placeholder="Contoh: Gemastik XVIII"
-                               required>
+                        <select id="judulRekrut" required></select>
 
                     </div>
 
@@ -405,13 +403,18 @@
                         </label>
 
                         <input type="text"
-                               id="kategoriRekrut"
+                               id="kategoriRekrut" readonly
                                placeholder="Contoh: UI/UX & Desain"
                                required>
 
                     </div>
 
-                    <div class="form-group-rekrut">
+                    <div id="rincianBaru">
+<div class="form-group-rekrut"><label for="deskripsi">Deskripsi rekrutmen *</label><input type="text" id="deskripsi" maxlength="3000" required></div>
+<div class="form-group-rekrut"><label for="target">Target anggota *</label><input type="text" id="target" maxlength="300" required></div>
+<div class="form-group-rekrut"><label for="kanal_diskusi">Kanal diskusi *</label><input type="text" id="kanal_diskusi" maxlength="255" required></div>
+</div>
+<div class="form-group-rekrut">
 
                         <label for="posisiRekrut">
                             Posisi yang Dicari *
@@ -500,30 +503,6 @@
             </div>
 
         </div>
-
-        {{-- DATA AWAL UNTUK CRUD REKRUTMEN --}}
-        <div id="postingRekrutData"
-             data-posting="{{ \Illuminate\Support\Js::encode($postingRekrut) }}"
-             hidden>
-        </div>
-
-        <script>
-            const postingRekrutData =
-                document.getElementById('postingRekrutData');
-
-            try {
-                window.postingRekrutAwal = postingRekrutData
-                    ? JSON.parse(postingRekrutData.dataset.posting || '[]')
-                    : [];
-            } catch (error) {
-                console.error(
-                    'Data posting rekrutmen tidak valid:',
-                    error
-                );
-
-                window.postingRekrutAwal = [];
-            }
-        </script>
 
         {{-- ========================================= --}}
         {{-- TAB 4 : PENGAJUAN SAYA --}}
