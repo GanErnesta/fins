@@ -16,6 +16,8 @@ use App\Http\Controllers\PartnerInvitationController;
 use App\Http\Controllers\CariPartnerController;
 use App\Http\Controllers\RealtimeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RekrutSayaController;
+
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -319,4 +321,11 @@ Route::middleware('auth')->prefix('notifications')->group(function () {
     ])
         ->whereNumber('id')
         ->name('notifications.read');
+});
+
+Route::middleware('auth')->prefix('lomba-saya/rekrutmen')->controller(RekrutSayaController::class)->group(function () {
+    Route::get('/', 'index')->name('rekrut-saya.index');
+    Route::post('/', 'store');
+    Route::put('/{posting}/{posisi}', 'update')->whereNumber('posting')->whereNumber('posisi');
+    Route::delete('/{posting}/{posisi}', 'destroy')->whereNumber('posting')->whereNumber('posisi');
 });
