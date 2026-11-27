@@ -1,592 +1,467 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const tabs   = document.querySelectorAll('.tab');
-    const panels = document.querySelectorAll('.panel');
+document.addEventListener("DOMContentLoaded", () => {
+    const tabs = document.querySelectorAll(".tab[data-tab]");
+    const panels = document.querySelectorAll(".panel");
 
-    function activate(id) {
-        tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === id));
-        panels.forEach(p => p.classList.toggle('active', p.id === id));
+    function aktifkanTab(id) {
+        const tabAda = Array.from(tabs).some(tab => tab.dataset.tab === id);
+        if (!tabAda) return;
+
+        tabs.forEach(tab => {
+            tab.classList.toggle("active", tab.dataset.tab === id);
+        });
+
+        panels.forEach(panel => {
+            panel.classList.toggle("active", panel.id === id);
+        });
     }
 
     tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            activate(tab.dataset.tab);
-            history.replaceState(null, '', '#' + tab.dataset.tab); // simpan tab aktif di URL
+        tab.addEventListener("click", () => {
+            const id = tab.dataset.tab;
+            aktifkanTab(id);
+            history.replaceState(null, "", "#" + id);
         });
     });
 
-    // Buka tab sesuai hash URL, mis. /lomba-saya#pengajuan
-    const hash = location.hash.replace('#', '');
-    if (hash && document.getElementById(hash)) activate(hash);
+    aktifkanTab(location.hash.slice(1));
 
-    // Tombol terima / tolak pelamar
-    document.querySelectorAll('.applicant__actions .btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const accept = btn.textContent.trim() === 'Terima';
-            const box = btn.closest('.applicant__actions');
-            box.outerHTML = `<p class="applicant__done">${accept ? 'Telah ditambahkan<br>ke tim' : 'Pelamar<br>ditolak'}</p>`;
-            // TODO: kirim ke backend dengan fetch() ke route Laravel
+    // Pertahankan interaksi pada kartu contoh di bagian lain halaman.
+    document.querySelectorAll(".applicant__actions .btn").forEach(button => {
+        button.addEventListener("click", () => {
+            const actions = button.closest(".applicant__actions");
+            if (!actions) return;
+
+            const pesan = document.createElement("p");
+            pesan.className = "applicant__done";
+            pesan.textContent = button.textContent.trim() === "Terima"
+                ? "Telah ditambahkan ke tim"
+                : "Pelamar ditolak";
+
+            actions.replaceWith(pesan);
         });
     });
-});
 
+    const el = id => document.getElementById(id);
 
-/* ==========================================
-   CRUD POSTING REKRUT SAYA
-   TANPA DATABASE - LOCAL STORAGE
-========================================== */
+    const daftar = el("daftarPostingRekrut");
+    const modal = el("modalRekrut");
+    const form = el("formRekrut");
+    const tombolTambah = el("btnTambahRekrut");
 
-document.addEventListener("DOMContentLoaded", function () {
+    if (!daftar || !modal || !form || !tombolTambah) return;
 
-    const daftar = document.getElementById("daftarPostingRekrut");
-    const modal = document.getElementById("modalRekrut");
-    const form = document.getElementById("formRekrut");
+    const tombolSimpan = form.querySelector('[type="submit"]');
+    const tabRekrut = document.querySelector('.tab[data-tab="posting-rekrut"]');
+    const endpoint = form.dataset.url;
+    const labelSimpanAwal = tombolSimpan.textContent.trim();
 
-    if (!daftar || !modal || !form) return;
+    let posting = [];
+    let daftarLomba = [];
+    let sedangMemuat = false;
+    let sedangMenyimpan = false;
 
-    const STORAGE_KEY = "fins_posting_rekrut_v1";
+    // Status diumumkan juga kepada pengguna pembaca layar.
+    daftar.setAttribute("aria-live", "polite");
 
-    const el = (id) => document.getElementById(id);
-
-    // Mencegah input pengguna menjadi HTML berbahaya
     function aman(value) {
+        const karakter = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+
         return String(value ?? "").replace(
             /[&<>"']/g,
-            (char) => ({
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;"
-            })[char]
+            huruf => karakter[huruf]
         );
     }
 
-    function buatId() {
-        return "rekrut_" + Date.now() + "_" +
-            Math.random().toString(36).slice(2);
-    }
+    async function kirimRequest(url, method = "GET", data) {
+        const headers = {
+            Accept: "application/json"
+        };
 
-    // Data awal dari Laravel Controller
-    function dataAwal() {
-        return (window.postingRekrutAwal || []).map(item => ({
-            ...item,
-            id: buatId(),
-            skill: Array.isArray(item.skill)
-                ? item.skill
-                : [],
-            pelamar: Array.isArray(item.pelamar)
-                ? item.pelamar
-                : []
-        }));
-    }
-
-    let posting = [];
-
-    try {
-        const data = localStorage.getItem(STORAGE_KEY);
-
-        posting = data === null
-            ? dataAwal()
-            : JSON.parse(data);
-
-        if (!Array.isArray(posting)) {
-            posting = dataAwal();
+        if (method !== "GET") {
+            headers["Content-Type"] = "application/json";
+            headers["X-CSRF-TOKEN"] = form.elements.namedItem("_token").value;
         }
 
-    } catch (error) {
-        posting = dataAwal();
-    }
+        const response = await fetch(url, {
+            method,
+            headers,
+            credentials: "same-origin",
+            body: data === undefined ? undefined : JSON.stringify(data)
+        });
 
-    function simpanData() {
-        try {
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(posting)
+        if (!response.ok) {
+            const hasil = await response.json().catch(() => ({}));
+            const validasi = Object.values(hasil.errors ?? {}).flat().join("\n");
+
+            if (response.status === 419) {
+                throw new Error("Sesi sudah berakhir. Refresh halaman lalu coba lagi.");
+            }
+
+            throw new Error(
+                validasi ||
+                hasil.message ||
+                `Permintaan gagal (HTTP ${response.status}).`
             );
-        } catch (error) {
-            alert("Data gagal disimpan di browser.");
-            return false;
         }
 
-        return true;
+        if (response.status === 204) return null;
+
+        return response.json();
     }
-
-    function inisial(nama) {
-        return String(nama || "U")
-            .trim()
-            .split(/\s+/)
-            .slice(0, 2)
-            .map(kata => kata.charAt(0).toUpperCase())
-            .join("");
-    }
-
-    function avatar(nama) {
-        const warna = [
-            "#6C5CE7",
-            "#4FC3F7",
-            "#FF6B9D",
-            "#10B981"
-        ];
-
-        let hash = 0;
-
-        for (const huruf of String(nama)) {
-            hash = (hash * 31 + huruf.charCodeAt(0)) >>> 0;
-        }
-
-        const bg = warna[hash % warna.length];
-
-        return `
-            <span class="avatar"
-                  style="
-                    width:60px;
-                    height:60px;
-                    background:${bg};
-                    font-size:21px;
-                    display:inline-flex;
-                    align-items:center;
-                    justify-content:center;
-                    line-height:1;
-                  ">
-                ${aman(inisial(nama))}
-            </span>
-        `;
-    }
-
-    // =====================================
-    // READ: TAMPILKAN POSTING REKRUT
-    // =====================================
 
     function tampilkanPosting() {
+        if (tabRekrut) {
+            tabRekrut.textContent = `Posting Rekrut Saya (${posting.length})`;
+        }
 
         if (posting.length === 0) {
             daftar.innerHTML = `
                 <div class="rekrut-empty">
                     <h3>Belum Ada Postingan Rekrutmen</h3>
-                    <p>
-                        Klik Tambah Rekrutmen untuk membuat
-                        postingan pencarian anggota tim.
-                    </p>
+                    <p>Klik Tambah Rekrutmen untuk membuat postingan pencarian anggota tim.</p>
                 </div>
             `;
-        } else {
-
-            daftar.innerHTML = posting.map(item => {
-
-                const skill = Array.isArray(item.skill)
-                    ? item.skill
-                    : [];
-
-                const pelamar = Array.isArray(item.pelamar)
-                    ? item.pelamar
-                    : [];
-
-                const daftarSkill = skill.map(s => `
-                    <span class="chip">${aman(s)}</span>
-                `).join("");
-
-                const daftarPelamar = pelamar.map((pl, i) => {
-
-                    const status = pl.status || "Menunggu";
-
-                    let statusClass = "badge--menunggu";
-
-                    if (status === "Diterima") {
-                        statusClass = "badge--green";
-                    }
-
-                    const tombol = status === "Diterima"
-                        ? `<p class="applicant__done">
-                               Telah ditambahkan ke tim
-                           </p>`
-                        : status === "Ditolak"
-                            ? `<p class="applicant__done">
-                                   Pelamar ditolak
-                               </p>`
-                            : `
-                                <div class="applicant__actions">
-                                    <button type="button"
-                                        class="btn btn--primary btn--sm"
-                                        data-aksi-pelamar="Diterima"
-                                        data-posting-id="${aman(item.id)}"
-                                        data-pelamar-index="${i}">
-                                        Terima
-                                    </button>
-
-                                    <button type="button"
-                                        class="btn btn--ghost btn--sm"
-                                        data-aksi-pelamar="Ditolak"
-                                        data-posting-id="${aman(item.id)}"
-                                        data-pelamar-index="${i}">
-                                        Tolak
-                                    </button>
-                                </div>
-                            `;
-
-                    return `
-                        <div class="applicant">
-
-                            ${avatar(pl.nama)}
-
-                            <div class="applicant__body">
-
-                                <div class="applicant__name">
-                                    <b>${aman(pl.nama)}</b>
-
-                                    <small>
-                                        (${aman(pl.asal)})
-                                    </small>
-
-                                    <span class="badge ${statusClass} badge--xs">
-                                        ${aman(status)}
-                                    </span>
-                                </div>
-
-                                <p class="applicant__role">
-                                    Melamar posisi:
-                                    ${aman(pl.posisi)}
-                                </p>
-
-                                <div class="applicant__row">
-
-                                    <blockquote>
-                                        "${aman(pl.pesan)}"
-                                    </blockquote>
-
-                                    ${tombol}
-
-                                </div>
-
-                            </div>
-                        </div>
-                    `;
-
-                }).join("");
-
-                const warnaStatus = item.status === "Aktif"
-                    ? "badge--outline-green"
-                    : "badge--diterima";
-
-                return `
-                    <article class="card card--wide rekrut-item">
-
-                        <div class="card__head">
-
-                            <div class="post-meta">
-                                <span class="tag">
-                                    ${aman(item.kategori)}
-                                </span>
-
-                                <span class="muted">
-                                    · Diposting ${aman(item.waktu)}
-                                </span>
-                            </div>
-
-                            <span class="badge ${warnaStatus}">
-                                Status: ${aman(item.status)}
-                            </span>
-
-                        </div>
-
-                        <h3 class="card__title card__title--lg">
-                            ${aman(item.judul)}
-                        </h3>
-
-                        <div class="slot-box">
-
-                            <div class="slot-box__top">
-                                <strong>${aman(item.posisi)}</strong>
-
-                                <span class="slot-box__slot">
-                                    ${aman(item.slot)} slot kosong
-                                </span>
-                            </div>
-
-                            <div class="chips">
-                                ${daftarSkill}
-                            </div>
-
-                        </div>
-
-                        <p class="label label--icon">
-                            PELAMAR / MAHASISWA YANG INGIN
-                            BERGABUNG (${pelamar.length})
-                        </p>
-
-                        ${pelamar.length > 0
-                            ? daftarPelamar
-                            : `<p class="muted">
-                                   Belum ada mahasiswa yang melamar.
-                               </p>`
-                        }
-
-                        <div class="rekrut-crud-actions">
-
-                            <button type="button"
-                                class="btn-edit-rekrut"
-                                data-edit-id="${aman(item.id)}">
-                                Edit Postingan
-                            </button>
-
-                            <button type="button"
-                                class="btn-hapus-rekrut"
-                                data-hapus-id="${aman(item.id)}">
-                                Hapus Postingan
-                            </button>
-
-                        </div>
-
-                    </article>
-                `;
-
-            }).join("");
+            return;
         }
 
-        // Perbarui angka pada tab
-        const tab = document.querySelector(
-            '.tab[data-tab="posting-rekrut"]'
-        );
+        daftar.innerHTML = posting.map(item => {
+            const skill = Array.isArray(item.skill) ? item.skill : [];
+            const pelamar = Array.isArray(item.pelamar) ? item.pelamar : [];
 
-        if (tab) {
-            tab.textContent =
-                `Posting Rekrut Saya (${posting.length})`;
+            const chips = skill.map(nama => `
+                <span class="chip">${aman(nama)}</span>
+            `).join("");
+
+            const daftarPelamar = pelamar.map(orang => `
+                <div class="applicant">
+                    <div class="applicant__body">
+                        <div class="applicant__name">
+                            <b>${aman(orang.nama)}</b>
+                            <small>${aman(orang.asal)}</small>
+                            <span class="badge badge--xs">
+                                ${aman(orang.status || "Menunggu")}
+                            </span>
+                        </div>
+                        <p class="applicant__role">
+                            Melamar posisi: ${aman(orang.posisi)}
+                        </p>
+                        <blockquote>${aman(orang.pesan)}</blockquote>
+                    </div>
+                </div>
+            `).join("");
+
+            const warnaStatus = item.status === "Aktif"
+                ? "badge--outline-green"
+                : "badge--diterima";
+
+            return `
+                <article class="card card--wide rekrut-item">
+                    <div class="card__head">
+                        <div class="post-meta">
+                            <span class="tag">${aman(item.kategori)}</span>
+                            <span class="muted">· Diposting ${aman(item.waktu)}</span>
+                        </div>
+                        <span class="badge ${warnaStatus}">
+                            Status: ${aman(item.status)}
+                        </span>
+                    </div>
+
+                    <h3 class="card__title card__title--lg">${aman(item.judul)}</h3>
+
+                    <div class="slot-box">
+                        <div class="slot-box__top">
+                            <strong>${aman(item.posisi)}</strong>
+                            <span class="slot-box__slot">
+                                ${aman(item.slot)} slot kosong
+                            </span>
+                        </div>
+                        <div class="chips">${chips}</div>
+                    </div>
+
+                    <p class="label label--icon">
+                        PELAMAR / MAHASISWA YANG INGIN BERGABUNG (${pelamar.length})
+                    </p>
+
+                    ${daftarPelamar || '<p class="muted">Belum ada mahasiswa yang melamar.</p>'}
+
+                    <div class="rekrut-crud-actions">
+                        <button type="button"
+                                class="btn-edit-rekrut"
+                                data-edit-id="${aman(item.id)}">
+                            Edit Posisi
+                        </button>
+                        <button type="button"
+                                class="btn-hapus-rekrut"
+                                data-hapus-id="${aman(item.id)}">
+                            Hapus Posisi
+                        </button>
+                    </div>
+                </article>
+            `;
+        }).join("");
+    }
+
+    async function muatPosting() {
+        if (sedangMemuat) return;
+
+        sedangMemuat = true;
+        tombolTambah.disabled = true;
+        daftar.setAttribute("aria-busy", "true");
+
+        daftar.innerHTML = `
+            <div class="rekrut-empty" role="status">
+                <p>Memuat rekrutmen…</p>
+            </div>
+        `;
+
+        try {
+            const hasil = await kirimRequest(endpoint);
+
+            if (!Array.isArray(hasil.posting) || !Array.isArray(hasil.lomba)) {
+                throw new Error("Format data rekrutmen dari server tidak sesuai.");
+            }
+
+            posting = hasil.posting;
+            daftarLomba = hasil.lomba;
+
+            tampilkanPosting();
+            tombolTambah.disabled = false;
+        } catch (error) {
+            daftar.innerHTML = `
+                <div class="rekrut-empty">
+                    <p role="alert">${aman(error.message)}</p>
+                    <button type="button" class="btn" data-muat-ulang>
+                        Coba lagi
+                    </button>
+                </div>
+            `;
+        } finally {
+            sedangMemuat = false;
+            daftar.setAttribute("aria-busy", "false");
         }
     }
 
-    // =====================================
-    // MODAL TAMBAH DAN EDIT
-    // =====================================
+    function bukaModal(id = "") {
+        if (sedangMemuat || sedangMenyimpan) return;
 
-    function bukaModal(id = null) {
+        const item = id
+            ? posting.find(baris => String(baris.id) === String(id))
+            : null;
+
+        if (id && !item) return;
 
         form.reset();
 
-        el("editRekrutId").value = "";
+        const edit = Boolean(item);
+        const pilihanLomba = el("judulRekrut");
 
-        el("judulModalRekrut").textContent =
-            id ? "Edit Rekrutmen" : "Tambah Rekrutmen";
+        el("editRekrutId").value = item?.id ?? "";
+        el("judulModalRekrut").textContent = edit
+            ? "Edit Rekrutmen"
+            : "Tambah Rekrutmen";
 
-        if (id) {
+        pilihanLomba.replaceChildren(new Option("Pilih lomba", ""));
 
-            const item = posting.find(p => p.id === id);
+        daftarLomba.forEach(lomba => {
+            pilihanLomba.add(new Option(lomba.title, String(lomba.id)));
+        });
 
-            if (!item) return;
+        pilihanLomba.disabled = edit;
 
-            el("editRekrutId").value = item.id;
-            el("judulRekrut").value = item.judul;
-            el("kategoriRekrut").value = item.kategori;
-            el("posisiRekrut").value = item.posisi;
-            el("slotRekrut").value = item.slot;
+        const rincianBaru = el("rincianBaru");
+        rincianBaru.hidden = edit;
 
-            el("skillRekrut").value =
-                Array.isArray(item.skill)
-                    ? item.skill.join(", ")
-                    : "";
+        rincianBaru.querySelectorAll("input, textarea, select").forEach(input => {
+            input.disabled = edit;
+        });
 
-            el("statusRekrut").value =
-                item.status === "Ditutup"
-                    ? "Ditutup"
-                    : "Aktif";
+        if (edit) {
+            const lombaAda = daftarLomba.some(
+                lomba => String(lomba.id) === String(item.competition)
+            );
+
+            if (lombaAda) {
+                pilihanLomba.value = String(item.competition);
+            } else {
+                pilihanLomba.add(new Option(item.judul, "lomba-lama"));
+                pilihanLomba.value = "lomba-lama";
+            }
+
+            el("kategoriRekrut").value = item.kategori ?? "";
+            el("posisiRekrut").value = item.posisi ?? "";
+            el("slotRekrut").value = item.slot ?? 1;
+            el("skillRekrut").value = (item.skill ?? []).join(", ");
+            el("statusRekrut").value = item.status === "Ditutup" ? "Ditutup" : "Aktif";
         }
+
+        tombolSimpan.textContent = edit ? "Simpan perubahan" : labelSimpanAwal;
+        tombolSimpan.disabled = false;
 
         modal.classList.add("show");
         modal.setAttribute("aria-hidden", "false");
-
         document.body.style.overflow = "hidden";
 
-        el("judulRekrut").focus();
+        (edit ? el("posisiRekrut") : pilihanLomba).focus();
     }
 
     function tutupModal() {
         modal.classList.remove("show");
         modal.setAttribute("aria-hidden", "true");
-
         document.body.style.overflow = "";
-
         form.reset();
+        tombolTambah.focus();
     }
 
-    el("btnTambahRekrut").addEventListener(
-        "click",
-        () => bukaModal()
-    );
+    function batalJikaBisa() {
+        if (!sedangMenyimpan) tutupModal();
+    }
 
-    el("tutupModalRekrut").addEventListener(
-        "click",
-        tutupModal
-    );
+    tombolTambah.addEventListener("click", () => bukaModal());
+    el("tutupModalRekrut").addEventListener("click", batalJikaBisa);
+    el("batalRekrut").addEventListener("click", batalJikaBisa);
 
-    el("batalRekrut").addEventListener(
-        "click",
-        tutupModal
-    );
+    modal.addEventListener("click", event => {
+        if (event.target === modal) batalJikaBisa();
+    });
 
-    modal.addEventListener("click", function (e) {
-        if (e.target === modal) {
-            tutupModal();
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && modal.classList.contains("show")) {
+            batalJikaBisa();
         }
     });
 
-    document.addEventListener("keydown", function (e) {
-        if (
-            e.key === "Escape" &&
-            modal.classList.contains("show")
-        ) {
-            tutupModal();
-        }
+    el("judulRekrut").addEventListener("change", event => {
+        const lomba = daftarLomba.find(
+            item => String(item.id) === event.target.value
+        );
+
+        el("kategoriRekrut").value = lomba?.category ?? "";
     });
 
-    // =====================================
-    // CREATE DAN UPDATE
-    // =====================================
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
 
-    form.addEventListener("submit", function (e) {
+        if (sedangMenyimpan || sedangMemuat) return;
 
-        e.preventDefault();
-
-        const idEdit = el("editRekrutId").value;
-
-        const keahlian = el("skillRekrut").value
-            .split(",")
-            .map(s => s.trim())
-            .filter(Boolean);
-
-        if (keahlian.length === 0) {
-            alert("Masukkan minimal satu keahlian.");
-            return;
-        }
-
-        const jumlahSlot = Number(el("slotRekrut").value);
-
-        if (
-            !Number.isInteger(jumlahSlot) ||
-            jumlahSlot < 1 ||
-            jumlahSlot > 100
-        ) {
-            alert("Jumlah slot harus antara 1 sampai 100.");
-            return;
-        }
-
+        const id = el("editRekrutId").value;
         const data = {
-            judul: el("judulRekrut").value.trim(),
-            kategori: el("kategoriRekrut").value.trim(),
             posisi: el("posisiRekrut").value.trim(),
-            slot: jumlahSlot,
-            skill: keahlian,
+            slot: Number(el("slotRekrut").value),
+            skill: el("skillRekrut").value
+                .split(",")
+                .map(nilai => nilai.trim())
+                .filter(Boolean),
             status: el("statusRekrut").value
         };
 
-        if (idEdit) {
+        if (!data.skill.length) {
+            alert("Masukkan minimal satu keahlian.");
+            el("skillRekrut").focus();
+            return;
+        }
 
-            // UPDATE
-            const index = posting.findIndex(
-                p => p.id === idEdit
-            );
+        if (id) {
+            const item = posting.find(baris => String(baris.id) === id);
+            if (!item) return;
 
-            if (index === -1) return;
-
-            posting[index] = {
-                ...posting[index],
-                ...data
-            };
-
+            data.version = item.version;
         } else {
-
-            // CREATE
-            posting.unshift({
-                id: buatId(),
-                ...data,
-                waktu: new Date().toLocaleString("id-ID"),
-                pelamar: []
-            });
+            data.competition = el("judulRekrut").value;
+            data.deskripsi = el("deskripsi").value.trim();
+            data.target = el("target").value.trim();
+            data.kanal_diskusi = el("kanal_diskusi").value.trim();
         }
 
-        if (simpanData()) {
-            tampilkanPosting();
+        const labelSebelumnya = tombolSimpan.textContent;
+
+        sedangMenyimpan = true;
+        tombolSimpan.disabled = true;
+        tombolSimpan.textContent = id
+            ? "Menyimpan perubahan…"
+            : "Menyimpan rekrutmen…";
+
+        form.setAttribute("aria-busy", "true");
+
+        try {
+            const hasil = await kirimRequest(
+                id ? `${endpoint}/${id}` : endpoint,
+                id ? "PUT" : "POST",
+                data
+            );
+
             tutupModal();
+
+            if (!id && Array.isArray(hasil?.posting)) {
+                // Controller terbaru mengembalikan kartu yang sudah tersimpan.
+                posting.unshift(...hasil.posting);
+                tampilkanPosting();
+            } else {
+                // Edit, atau controller lama yang hanya mengembalikan ID.
+                await muatPosting();
+            }
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            sedangMenyimpan = false;
+            tombolSimpan.disabled = false;
+            tombolSimpan.textContent = labelSebelumnya;
+            form.setAttribute("aria-busy", "false");
         }
     });
 
-    // =====================================
-    // DELETE, EDIT, DAN STATUS PELAMAR
-    // =====================================
+    daftar.addEventListener("click", async event => {
+        if (sedangMemuat || sedangMenyimpan) return;
 
-    daftar.addEventListener("click", function (e) {
-
-        const tombolEdit = e.target.closest(
-            "[data-edit-id]"
-        );
-
-        const tombolHapus = e.target.closest(
-            "[data-hapus-id]"
-        );
-
-        const tombolPelamar = e.target.closest(
-            "[data-aksi-pelamar]"
-        );
-
-        if (tombolEdit) {
-            bukaModal(tombolEdit.dataset.editId);
+        if (event.target.closest("[data-muat-ulang]")) {
+            await muatPosting();
             return;
         }
 
-        if (tombolHapus) {
-
-            const id = tombolHapus.dataset.hapusId;
-
-            const item = posting.find(p => p.id === id);
-
-            if (!item) return;
-
-            const yakin = confirm(
-                `Yakin ingin menghapus postingan "${item.judul}"?`
-            );
-
-            if (!yakin) return;
-
-            posting = posting.filter(p => p.id !== id);
-
-            if (simpanData()) {
-                tampilkanPosting();
-            }
-
+        const edit = event.target.closest("[data-edit-id]");
+        if (edit) {
+            bukaModal(edit.dataset.editId);
             return;
         }
 
-        if (tombolPelamar) {
+        const hapus = event.target.closest("[data-hapus-id]");
+        if (!hapus) return;
 
-            const item = posting.find(
-                p => p.id === tombolPelamar.dataset.postingId
-            );
+        const item = posting.find(
+            baris => String(baris.id) === hapus.dataset.hapusId
+        );
+        if (!item) return;
 
-            if (!item) return;
+        const yakin = confirm(
+            `Hapus posisi "${item.posisi}" dari "${item.judul}"? ` +
+            "Jika ini posisi terakhir, posting ikut dihapus."
+        );
 
-            const index = Number(
-                tombolPelamar.dataset.pelamarIndex
-            );
+        if (!yakin) return;
 
-            const pelamar = item.pelamar?.[index];
+        sedangMenyimpan = true;
+        hapus.disabled = true;
+        hapus.textContent = "Menghapus…";
 
-            if (!pelamar || pelamar.status !== "Menunggu") {
-                return;
-            }
+        try {
+            await kirimRequest(`${endpoint}/${item.id}`, "DELETE", {
+                version: item.version
+            });
 
-            const status = tombolPelamar.dataset.aksiPelamar;
-
-            if (!["Diterima", "Ditolak"].includes(status)) {
-                return;
-            }
-
-            pelamar.status = status;
-
-            if (simpanData()) {
-                tampilkanPosting();
-            }
+            await muatPosting();
+        } catch (error) {
+            hapus.disabled = false;
+            hapus.textContent = "Hapus Posisi";
+            alert(error.message);
+        } finally {
+            sedangMenyimpan = false;
         }
     });
 
-    // Tampilkan data saat halaman dibuka
-    tampilkanPosting();
-
+    muatPosting();
 });
-

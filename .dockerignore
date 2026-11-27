@@ -1,0 +1,15 @@
+.git
+.github
+.env
+.env.*
+.env example
+vendor
+node_modules
+.vercel
+public/hot
+public/build
+storage/logs/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/cache/data/*
+bootstrap/cache/*.php

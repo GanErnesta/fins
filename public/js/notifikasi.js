@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
     "use strict";
 
@@ -120,6 +119,12 @@ document.addEventListener("DOMContentLoaded", () => {
         ) || 0;
     }
 
+    function validConversationId(value) {
+        return /^[1-9]\d*$/.test(
+            String(value ?? "")
+        );
+    }
+
     async function request(url, options = {}) {
         const method = options.method || "GET";
 
@@ -187,6 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 invitationId: item.id,
 
+                conversationId: item.conversation_id ?? null,
+
                 sumber: "partner_invitation",
 
                 kategori: "undangan",
@@ -241,6 +248,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 serverId: item.id,
 
                 invitationId: item.invitation_id,
+
+                conversationId: item.conversation_id ?? null,
 
                 sumber: "server",
 
@@ -1024,7 +1033,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 <button
                     type="button"
                     class="invite-accept-btn"
-                    data-invite-chat>
+                    data-invite-chat
+                    data-conversation-id="${aman(
+                        item.conversationId ?? ""
+                    )}">
 
                     Chat
 
@@ -1162,7 +1174,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 <button
                     type="button"
                     class="invite-accept-btn"
-                    data-invite-chat>
+                    data-invite-chat
+                    data-notification-id="${aman(item.serverId)}"
+                    data-conversation-id="${aman(
+                        item.conversationId ?? ""
+                    )}">
 
                     Buka Chat
 
@@ -1239,14 +1255,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
 
-            await request(API.respond(id), {
+            const result = await request(
+                API.respond(id),
+                {
+                    method: "PATCH",
 
-                method: "PATCH",
+                    body: JSON.stringify({
+                        status
+                    })
+                }
+            );
 
-                body: JSON.stringify({
-                    status
-                })
-            });
+            // Ambil ID percakapan dari Laravel
+
+            const conversationId =
+                result.data?.conversation_id ?? null;
+
+            // Update data undangan lokal
 
             invitations = invitations.map(inv =>
 
@@ -1254,15 +1279,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     ? {
                         ...inv,
-                        status
+                        status,
+                        conversation_id: conversationId
                     }
 
                     : inv
             );
 
+            // Tampilkan modal dengan ID chat terbaru
+
             bukaDetailUndangan({
                 ...item,
-                status
+                status,
+                conversationId
             });
 
             if (feedback) {
@@ -1282,13 +1311,23 @@ document.addEventListener("DOMContentLoaded", () => {
                         : "#b91c1c";
             }
 
+            if (status === "accepted") {
+
+                console.info(
+                    "[FINS Chat] Percakapan:",
+                    conversationId
+                );
+            }
+
             render();
 
             emit("fins:invitation-updated", {
 
                 invitationId: id,
 
-                status
+                status,
+
+                conversationId
             });
 
             emit("fins:notifications-updated");
@@ -1323,7 +1362,90 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 16. EVENT TOMBOL
+    // 16. BUKA RUANG CHAT
+    // ==========================================
+
+    async function bukaChat(button) {
+
+        if (button.disabled) return;
+
+        let conversationId =
+            button.dataset.conversationId;
+
+        const notificationId =
+            button.dataset.notificationId;
+
+        button.disabled = true;
+
+        try {
+
+            // Payload realtime belum tentu membawa
+            // conversation_id hasil JOIN dari Laravel.
+
+            if (
+                !validConversationId(conversationId) &&
+                notificationId
+            ) {
+
+                await loadNotifications();
+
+                const terbaru = notifications.find(
+                    item =>
+                        String(item.id) ===
+                        String(notificationId)
+                );
+
+                conversationId =
+                    terbaru?.conversation_id ?? null;
+
+                render();
+            }
+
+            if (!validConversationId(conversationId)) {
+
+                throw new Error(
+                    "Ruang chat belum tersedia untuk ajakan ini."
+                );
+            }
+
+            console.info(
+                "[FINS Chat] Membuka percakapan:",
+                conversationId
+            );
+
+            window.location.href =
+                `/chat?conversation=${encodeURIComponent(
+                    conversationId
+                )}`;
+
+        } catch (error) {
+
+            console.error(
+                "[FINS Chat]",
+                error
+            );
+
+            const feedback = $("inviteDetailFeedback");
+
+            if (feedback) {
+
+                feedback.textContent = error.message;
+
+                feedback.style.color = "#b91c1c";
+
+            } else {
+
+                alert(error.message);
+            }
+
+        } finally {
+
+            button.disabled = false;
+        }
+    }
+
+    // ==========================================
+    // 17. EVENT TOMBOL
     // ==========================================
 
     document.addEventListener("click", event => {
@@ -1364,7 +1486,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (chatButton) {
 
-            window.location.href = "/chat";
+            bukaChat(chatButton);
 
             return;
         }
@@ -1415,7 +1537,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 17. EVENT HALAMAN
+    // 18. EVENT HALAMAN
     // ==========================================
 
     $("notificationSearch")?.addEventListener(
@@ -1476,7 +1598,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     // ==========================================
-    // 18. EVENT SUPABASE REALTIME
+    // 19. EVENT SUPABASE REALTIME
     // Koneksi dikelola oleh fins-realtime.js
     // ==========================================
 
@@ -1570,7 +1692,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     // ==========================================
-    // 19. SINKRONISASI ANTAR TAB
+    // 20. SINKRONISASI ANTAR TAB
     // ==========================================
 
     window.addEventListener(
@@ -1605,7 +1727,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     // ==========================================
-    // 20. BUKA DETAIL DARI URL NAVBAR
+    // 21. BUKA DETAIL DARI URL NAVBAR
     // ==========================================
 
     let urlHandled = false;
@@ -1656,7 +1778,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 21. INITIAL LOAD
+    // 22. INITIAL LOAD
     // ==========================================
 
     async function init() {
@@ -1675,7 +1797,7 @@ document.addEventListener("DOMContentLoaded", () => {
     init();
 
     // ==========================================
-    // 22. POLLING CADANGAN
+    // 23. POLLING CADANGAN
     // ==========================================
 
     setInterval(async () => {

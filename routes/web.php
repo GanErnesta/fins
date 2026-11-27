@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\VerificationController;
@@ -17,22 +16,12 @@ use App\Http\Controllers\PartnerInvitationController;
 use App\Http\Controllers\CariPartnerController;
 use App\Http\Controllers\RealtimeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RekrutSayaController;
 
-/*
-|--------------------------------------------------------------------------
-| HALAMAN UTAMA
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
-
-/*
-|--------------------------------------------------------------------------
-| LOGIN
-|--------------------------------------------------------------------------
-*/
 
 Route::middleware('guest')->group(function () {
 
@@ -45,16 +34,6 @@ Route::middleware('guest')->group(function () {
         LoginController::class,
         'login'
     ])->name('login.submit');
-
-});
-
-/*
-|--------------------------------------------------------------------------
-| SIGN UP
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('guest')->group(function () {
 
     Route::get('/signup', [
         SignupController::class,
@@ -70,16 +49,6 @@ Route::middleware('guest')->group(function () {
         SignupController::class,
         'step2'
     ])->name('signup.step2');
-
-});
-
-/*
-|--------------------------------------------------------------------------
-| VERIFIKASI EMAIL
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('guest')->group(function () {
 
     Route::get('/verification', [
         VerificationController::class,
@@ -97,13 +66,11 @@ Route::middleware('guest')->group(function () {
     ])->name('verification.resend');
 
     Route::get('/verification-success', function () {
-
         if (!session('account_verified')) {
             return redirect()->route('signup');
         }
 
         return view('verification-success');
-
     })->name('verification-success');
 
     Route::get('/verification-failed', function () {
@@ -118,16 +85,6 @@ Route::middleware('guest')->group(function () {
         return redirect()->route('verification-failed');
     })->name('verification.failed');
 
-});
-
-/*
-|--------------------------------------------------------------------------
-| LUPA PASSWORD DAN RESET PASSWORD
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('guest')->group(function () {
-
     Route::get('/forgot-password', [
         PasswordResetController::class,
         'requestForm'
@@ -137,8 +94,8 @@ Route::middleware('guest')->group(function () {
         PasswordResetController::class,
         'sendLink'
     ])
-    ->middleware('throttle:3,1')
-    ->name('password.email');
+        ->middleware('throttle:3,1')
+        ->name('password.email');
 
     Route::get('/reset-password', [
         PasswordResetController::class,
@@ -149,57 +106,26 @@ Route::middleware('guest')->group(function () {
         PasswordResetController::class,
         'resetPassword'
     ])
-    ->middleware('throttle:5,1')
-    ->name('password.update');
-
+        ->middleware('throttle:5,1')
+        ->name('password.update');
 });
-
-/*
-|--------------------------------------------------------------------------
-| LOGOUT
-|--------------------------------------------------------------------------
-*/
 
 Route::post('/logout', [
     LoginController::class,
     'logout'
 ])
-->middleware('auth')
-->name('logout');
-
-/*
-|--------------------------------------------------------------------------
-| HALAMAN FINS - WAJIB LOGIN
-|--------------------------------------------------------------------------
-*/
+    ->middleware('auth')
+    ->name('logout');
 
 Route::middleware('auth')->group(function () {
-
-    /*
-    |--------------------------------------------------------------------------
-    | HOME
-    |--------------------------------------------------------------------------
-    */
 
     Route::get('/home', function () {
         return view('home');
     })->name('home');
 
-    /*
-    |--------------------------------------------------------------------------
-    | NOTIFIKASI
-    |--------------------------------------------------------------------------
-    */
-
     Route::get('/notifikasi', function () {
         return view('notifikasi');
     })->name('notifikasi');
-
-    /*
-    |--------------------------------------------------------------------------
-    | PROFILE
-    |--------------------------------------------------------------------------
-    */
 
     Route::get('/profile', [
         ProfileController::class,
@@ -221,16 +147,17 @@ Route::middleware('auth')->group(function () {
         'removePhoto'
     ])->name('profile.photo.remove');
 
-    /*
-    |--------------------------------------------------------------------------
-    | CARI PARTNER
-    |--------------------------------------------------------------------------
-    */
-
     Route::get('/cari-partner', [
         CariPartnerController::class,
         'index'
     ])->name('cari-partner');
+
+    Route::get('/cari-partner/{id}/profile', [
+        ProfileController::class,
+        'showPartner'
+    ])
+        ->whereNumber('id')
+        ->name('partner.profile');
 
    /*
 |--------------------------------------------------------------------------
@@ -293,32 +220,14 @@ Route::middleware('auth')->group(function () {
         'store'
     ])->name('lomba.store');
 
-    /*
-    |--------------------------------------------------------------------------
-    | LOMBA SAYA
-    |--------------------------------------------------------------------------
-    */
-
     Route::get('/lomba-saya', [
         LombaSayaController::class,
         'index'
     ])->name('lomba-saya');
 
-    /*
-    |--------------------------------------------------------------------------
-    | CHAT
-    |--------------------------------------------------------------------------
-    */
-
     Route::get('/chat', function () {
         return view('chat');
     })->name('chat');
-
-    /*
-    |--------------------------------------------------------------------------
-    | CHAT FILE
-    |--------------------------------------------------------------------------
-    */
 
     Route::post('/chat/upload', [
         ChatFileController::class,
@@ -329,14 +238,8 @@ Route::middleware('auth')->group(function () {
         ChatFileController::class,
         'download'
     ])
-    ->where('filename', '[A-Za-z0-9._-]+')
-    ->name('chat.file.download');
-
-    /*
-    |--------------------------------------------------------------------------
-    | CHAT ATTACHMENTS - SUPABASE STORAGE
-    |--------------------------------------------------------------------------
-    */
+        ->where('filename', '[A-Za-z0-9._-]+')
+        ->name('chat.file.download');
 
     Route::post('/chat/attachments/upload', [
         ChatAttachmentController::class,
@@ -347,14 +250,8 @@ Route::middleware('auth')->group(function () {
         ChatAttachmentController::class,
         'download'
     ])
-    ->whereNumber('attachmentId')
-    ->name('chat.attachments.download');
-
-    /*
-    |--------------------------------------------------------------------------
-    | CHAT CONVERSATIONS
-    |--------------------------------------------------------------------------
-    */
+        ->whereNumber('attachmentId')
+        ->name('chat.attachments.download');
 
     Route::get('/chat/conversations', [
         ChatController::class,
@@ -365,72 +262,99 @@ Route::middleware('auth')->group(function () {
         ChatController::class,
         'messages'
     ])
-    ->whereNumber('conversationId')
-    ->name('chat.conversations.messages');
+        ->whereNumber('conversationId')
+        ->name('chat.conversations.messages');
 
     Route::post('/chat/conversations/{conversationId}/messages', [
         ChatController::class,
         'sendMessage'
     ])
-    ->whereNumber('conversationId')
-    ->name('chat.conversations.messages.send');
+        ->whereNumber('conversationId')
+        ->name('chat.conversations.messages.send');
 
-    /*
-    |--------------------------------------------------------------------------
-    | PARTNER INVITATIONS - CARI PARTNER
-    |--------------------------------------------------------------------------
-    */
+    Route::patch('/chat/conversations/{conversationId}/messages/{messageId}', [
+        ChatController::class,
+        'updateMessage'
+    ])
+        ->whereNumber('conversationId')
+        ->whereNumber('messageId')
+        ->name('chat.conversations.messages.update');
 
-    // User A mengirim undangan
+    Route::delete('/chat/conversations/{conversationId}/messages/{messageId}/me', [
+        ChatController::class,
+        'deleteMessageForMe'
+    ])
+        ->whereNumber('conversationId')
+        ->whereNumber('messageId')
+        ->name('chat.messages.delete.me');
+
+    Route::delete('/chat/conversations/{conversationId}/messages/{messageId}/everyone', [
+        ChatController::class,
+        'deleteMessageForEveryone'
+    ])
+        ->whereNumber('conversationId')
+        ->whereNumber('messageId')
+        ->name('chat.messages.delete.everyone');
+
     Route::post('/partner-invitations', [
         PartnerInvitationController::class,
         'store'
     ])->name('partner-invitations.store');
 
-    // User B melihat undangan masuk
     Route::get('/partner-invitations/received', [
         PartnerInvitationController::class,
         'received'
     ])->name('partner-invitations.received');
 
-    // User A melihat undangan terkirim
     Route::get('/partner-invitations/sent', [
         PartnerInvitationController::class,
         'sent'
     ])->name('partner-invitations.sent');
 
-    // User B menerima atau menolak undangan
     Route::patch('/partner-invitations/{id}/respond', [
         PartnerInvitationController::class,
         'respond'
     ])
-    ->whereNumber('id')
-    ->name('partner-invitations.respond');
-
+        ->whereNumber('id')
+        ->name('partner-invitations.respond');
 });
 
-// ================= SUPABASE REALTIME =================
-
-Route::get('/realtime/token', [RealtimeController::class, 'token'])
+Route::get('/realtime/token', [
+    RealtimeController::class,
+    'token'
+])
     ->middleware(['auth', 'throttle:60,1'])
     ->block(30, 30)
     ->name('realtime.token');
 
-// ================= NOTIFICATIONS =================
-
 Route::middleware('auth')->prefix('notifications')->group(function () {
 
-    Route::get('/', [NotificationController::class, 'index'])
-        ->name('notifications.index');
+    Route::get('/', [
+        NotificationController::class,
+        'index'
+    ])->name('notifications.index');
 
-    Route::get('/unread-count', [NotificationController::class, 'unreadCount'])
-        ->name('notifications.unread-count');
+    Route::get('/unread-count', [
+        NotificationController::class,
+        'unreadCount'
+    ])->name('notifications.unread-count');
 
-    Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
-        ->name('notifications.read-all');
+    Route::patch('/read-all', [
+        NotificationController::class,
+        'markAllAsRead'
+    ])->name('notifications.read-all');
 
-    Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])
+    Route::patch('/{id}/read', [
+        NotificationController::class,
+        'markAsRead'
+    ])
         ->whereNumber('id')
         ->name('notifications.read');
+});
 
+Route::middleware('auth')->prefix('lomba-saya/rekrutmen')->controller(RekrutSayaController::class)->group(function () {
+    Route::get('/', 'index')->name('rekrut-saya.index');
+    Route::post('/', 'store');
+    Route::put('/{posting}/{posisi}', 'update')->whereNumber('posting')->whereNumber('posisi');
+    Route::delete('/{posting}/{posisi}', 'destroy')->whereNumber('posting')->whereNumber('posisi');
 });
