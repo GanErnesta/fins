@@ -260,6 +260,8 @@ class PostingLombaController extends Controller
                     // Simpan lomba baru ke tabel cari_lomba
                     $cariLombaId = DB::table('cari_lomba')
                         ->insertGetId([
+                            'user_id' => Auth::id(),
+                            
                             'title' => $namaLomba,
 
                             'slug' => $slug,

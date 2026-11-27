@@ -159,17 +159,46 @@ Route::middleware('auth')->group(function () {
         ->whereNumber('id')
         ->name('partner.profile');
 
+   /*
+|--------------------------------------------------------------------------
+| CARI LOMBA
+|--------------------------------------------------------------------------
+*/
+
+// Menampilkan daftar lomba
     Route::get('/cari-lomba', [
         CompetitionController::class,
         'index'
     ])->name('cari-lomba');
 
+    // Menampilkan detail lomba
     Route::get('/cari-lomba/{id}', [
         CompetitionController::class,
         'show'
-    ])
-        ->whereNumber('id')
-        ->name('cari_lomba.show');
+    ])->whereNumber('id')->name('cari_lomba.show');
+
+    // Menampilkan halaman edit lomba
+    Route::get('/cari-lomba/{id}/edit', [
+        CompetitionController::class,
+        'edit'
+    ])->whereNumber('id')->name('cari_lomba.edit');
+
+    // Menyimpan perubahan lomba
+    Route::put('/cari-lomba/{id}', [
+        CompetitionController::class,
+        'update'
+    ])->whereNumber('id')->name('cari_lomba.update');
+
+    // Menghapus lomba
+    Route::delete('/cari-lomba/{id}', [
+        CompetitionController::class,
+        'destroy'
+    ])->whereNumber('id')->name('cari_lomba.destroy');
+    /*
+    |--------------------------------------------------------------------------
+    | POSTING LOMBA
+    |--------------------------------------------------------------------------
+    */
 
     Route::get('/posting-lomba', [
         PostingLombaController::class,
